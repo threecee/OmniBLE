@@ -1,0 +1,95 @@
+name: Build matrix (iOS + watchOS)
+
+on:
+  push:
+    branches: [watchos-support]
+  pull_request:
+    branches: [watchos-support, dev, main]
+  workflow_dispatch:
+
+# OmniBLE can't build on its own — it links against LoopKit and
+# LoopKitUI, which live in sibling submodules. We clone the consumer
+# LoopWorkspace (personal branch, threecee fork) and point its
+# OmniBLE submodule at the commit that triggered this workflow, then
+# drive the build through the workspace.  This mirrors how Loop devs
+# actually consume OmniBLE.
+
+env:
+  WORKSPACE_REPO: threecee/LoopWorkspace
+  WORKSPACE_BRANCH: personal
+
+jobs:
+  build:
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "iOS build"
+            destination: "generic/platform=iOS"
+          - name: "watchOS build"
+            destination: "generic/platform=watchOS"
+    name: ${{ matrix.name }}
+    steps:
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Checkout LoopWorkspace (consumer)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKSPACE_REPO }}
+          ref: ${{ env.WORKSPACE_BRANCH }}
+          submodules: recursive
+          path: LoopWorkspace
+
+      - name: Point OmniBLE submodule at this commit
+        working-directory: LoopWorkspace/OmniBLE
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "${{ github.sha }}" || git fetch --no-tags origin "${{ github.ref }}"
+          git checkout --force "${{ github.sha }}"
+          git log --oneline -1
+
+      - name: Build OmniBLE for ${{ matrix.destination }}
+        working-directory: LoopWorkspace
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -workspace LoopWorkspace.xcworkspace \
+            -scheme OmniBLE \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || (cat && exit 1)
+
+  test-ios:
+    runs-on: macos-15
+    name: iOS tests
+    steps:
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Checkout LoopWorkspace (consumer)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKSPACE_REPO }}
+          ref: ${{ env.WORKSPACE_BRANCH }}
+          submodules: recursive
+          path: LoopWorkspace
+
+      - name: Point OmniBLE submodule at this commit
+        working-directory: LoopWorkspace/OmniBLE
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "${{ github.sha }}" || git fetch --no-tags origin "${{ github.ref }}"
+          git checkout --force "${{ github.sha }}"
+
+      - name: Run iOS tests
+        working-directory: LoopWorkspace
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -workspace LoopWorkspace.xcworkspace \
+            -scheme OmniBLETests \
+            -destination "platform=iOS Simulator,name=iPhone 16" \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || (cat && exit 1)
