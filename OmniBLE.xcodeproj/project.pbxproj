@@ -1495,7 +1495,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = "$(CLANG_MODULES_ENABLE_VERIFIER_TOOL)";
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=watchos*]" = (
+				"EXCLUDED_SOURCE_FILE_NAMES[sdk=watch*]" = (
 					"$(SRCROOT)/OmniBLE/PumpManagerUI/*",
 					"$(SRCROOT)/OmniBLE/PumpManagerUI/*/*",
 					"$(SRCROOT)/OmniBLE/PumpManagerUI/*/*/*",
@@ -1544,7 +1544,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = "$(CLANG_MODULES_ENABLE_VERIFIER_TOOL)";
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=watchos*]" = (
+				"EXCLUDED_SOURCE_FILE_NAMES[sdk=watch*]" = (
 					"$(SRCROOT)/OmniBLE/PumpManagerUI/*",
 					"$(SRCROOT)/OmniBLE/PumpManagerUI/*/*",
 					"$(SRCROOT)/OmniBLE/PumpManagerUI/*/*/*",
