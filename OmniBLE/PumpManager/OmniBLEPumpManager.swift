@@ -12,7 +12,9 @@ import LoopKit
 import UserNotifications
 import os.log
 import CoreBluetooth
+#if canImport(UIKit)
 import UIKit
+#endif
 
 
 // Returns a String of the form "iPhoneZ,Y" or "iPodX,Y"
@@ -111,6 +113,7 @@ public class OmniBLEPumpManager: DeviceManager {
         self.podComms.delegate = self
         self.podComms.messageLogger = self
 
+        #if os(iOS)
         let nc = NotificationCenter.default
         nc.addObserver(
             self,
@@ -124,9 +127,18 @@ public class OmniBLEPumpManager: DeviceManager {
             name: UIApplication.willEnterForegroundNotification,
             object: nil
         )
+        #else
+        // TODO(B.3): wire up equivalent lifecycle observers for watchOS
+        // (WKExtension.applicationDidEnterBackgroundNotification on watchOS).
+        #endif
 
         // Needed setup if pod keep alives might be used
+        #if os(iOS)
         podKeepAliveSetup(refresh: refresh)
+        #else
+        // TODO(B.3): provide a watchOS pod keep-alive path (the iOS implementation
+        // relies on AVAudioSession silent-tune which isn't available on watchOS).
+        #endif
     }
 
     func refresh() {
@@ -309,6 +321,7 @@ public class OmniBLEPumpManager: DeviceManager {
         }
     }
 
+    #if os(iOS)
     private let backgroundTask = BackgroundTask()
     @objc func appMovedToBackground() {
         backgroundTask.startBackgroundTask(hasPod: state.podState != nil)
@@ -317,6 +330,10 @@ public class OmniBLEPumpManager: DeviceManager {
     @objc func appMovedToForeground() {
         backgroundTask.stopBackgroundTask()
     }
+    #else
+    // TODO(B.3): supply a watchOS-appropriate background task using
+    // WKExtendedRuntimeSession for pod keep-alive / silent-tune behavior.
+    #endif
 
     private let pumpDelegate = WeakSynchronizedDelegate<PumpManagerDelegate>()
 
@@ -705,6 +722,7 @@ extension OmniBLEPumpManager {
         return false
     }
 
+    #if os(iOS)
     public var reservoirLevelHighlightState: ReservoirLevelHighlightState? {
         guard let reservoirLevel = reservoirLevel else {
             return nil
@@ -723,6 +741,11 @@ extension OmniBLEPumpManager {
             }
         }
     }
+    #else
+    // TODO(B.3): `ReservoirLevelHighlightState` is currently declared inside the
+    // iOS-only PumpManagerUI layer (OmniBLESettingsViewModel.swift).  On watchOS
+    // this property is omitted until the type is promoted to a UI-free module.
+    #endif
 
     public func buildPumpLifecycleProgress(for state: OmniBLEPumpManagerState) -> PumpLifecycleProgress? {
         switch podCommState {
@@ -940,6 +963,7 @@ extension OmniBLEPumpManager {
                         // Have new podState, reset all the per pod pump manager state
                         self.resetPerPodPumpManagerState()
 
+                        #if os(iOS)
                         if self.usingInPlayPod == true && self.iPhoneWithPossibleInPlayIssues {
                             if Storage.shared.podKeepAlive.value == .disabled {
                                 // Enable the most conservative pod keep alive mode
@@ -948,6 +972,9 @@ extension OmniBLEPumpManager {
                                 Storage.shared.podKeepAlive.value = .whenOpen
                             }
                         }
+                        #else
+                        // TODO(B.3): pod keep-alive is iOS-only (AVAudioSession-based).
+                        #endif
                         // Calls completion
                         primeSession(result)
                     }

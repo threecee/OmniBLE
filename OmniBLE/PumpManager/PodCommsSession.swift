@@ -330,8 +330,10 @@ public class PodCommsSession {
 
             let response = try transport.sendMessage(message)
 
+            #if os(iOS)
             // Inform the pod keep alive code that we just received a pod response.
             gotPodResponse()
+            #endif
 
             // Simulate fault
             //let podInfoResponse = try PodInfoResponse(encodedData: Data(hexadecimalString: "0216020d0000000000ab6a038403ff03860000285708030d0000")!)

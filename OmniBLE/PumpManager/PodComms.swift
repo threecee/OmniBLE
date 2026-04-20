@@ -10,7 +10,9 @@
 import Foundation
 import LoopKit
 import os.log
+#if canImport(UIKit)
 import UIKit
+#endif
 import CoreBluetooth
 
 protocol PodCommsDelegate: OmniBLEConnectionDelegate {
