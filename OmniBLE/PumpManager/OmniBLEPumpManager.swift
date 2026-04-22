@@ -346,9 +346,20 @@ public class OmniBLEPumpManager: DeviceManager {
     @objc func appMovedToForeground() {
         backgroundTask.stopBackgroundTask()
     }
-    #else
-    // TODO(B.3): supply a watchOS-appropriate background task using
-    // WKExtendedRuntimeSession for pod keep-alive / silent-tune behavior.
+    #elseif os(watchOS)
+    // No-op on watchOS.
+    //
+    // The iOS `BackgroundTask` wrapper around `UIApplication.beginBackgroundTask`
+    // buys extra runtime so pod operations can finish after the app is backgrounded.
+    // watchOS provides an equivalent guarantee via the `bluetooth-central`
+    // UIBackgroundModes entry that OmniBLE's watchOS consumers declare in their
+    // Info.plist — watchOS continues delivering BLE notifications while the app
+    // is suspended, so we don't need to explicitly extend the process lifetime.
+    //
+    // These `@objc` methods still exist so the lifecycle observers registered
+    // in `init(...)` have resolvable selectors; they are intentionally empty.
+    @objc func appMovedToBackground() {}
+    @objc func appMovedToForeground() {}
     #endif
 
     private let pumpDelegate = WeakSynchronizedDelegate<PumpManagerDelegate>()
