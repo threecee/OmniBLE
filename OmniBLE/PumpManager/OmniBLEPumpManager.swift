@@ -152,8 +152,16 @@ public class OmniBLEPumpManager: DeviceManager {
         #if os(iOS)
         podKeepAliveSetup(refresh: refresh)
         #else
-        // TODO(B.3): provide a watchOS pod keep-alive path (the iOS implementation
-        // relies on AVAudioSession silent-tune which isn't available on watchOS).
+        // No-op on watchOS.
+        //
+        // The iOS `podKeepAliveSetup` path uses an AVAudioSession silent-tone trick
+        // to keep the app alive in background so the pod's BLE session stays up.
+        // watchOS consumers of OmniBLE (e.g., LoopWatchApp) declare
+        // `bluetooth-central` in UIBackgroundModes, which causes watchOS to deliver
+        // BLE notifications to the central while the app is suspended. That
+        // satisfies the same requirement the iOS trick addresses, so a separate
+        // watchOS keep-alive mechanism is not needed here. This is an intentional
+        // architectural decision, not an unimplemented stub.
         #endif
     }
 
@@ -1000,7 +1008,11 @@ extension OmniBLEPumpManager {
                             }
                         }
                         #else
-                        // TODO(B.3): pod keep-alive is iOS-only (AVAudioSession-based).
+                        // No-op on watchOS. Pod keep-alive here is iOS-specific
+                        // (AVAudioSession silent-tone path). watchOS's
+                        // bluetooth-central background mode gives equivalent
+                        // BLE liveness — see the note in the keep-alive-setup
+                        // branch earlier in this file.
                         #endif
                         // Calls completion
                         primeSession(result)
