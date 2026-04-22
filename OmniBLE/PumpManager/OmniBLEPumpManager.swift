@@ -127,9 +127,25 @@ public class OmniBLEPumpManager: DeviceManager {
             name: UIApplication.willEnterForegroundNotification,
             object: nil
         )
-        #else
-        // TODO(B.3): wire up equivalent lifecycle observers for watchOS
-        // (WKExtension.applicationDidEnterBackgroundNotification on watchOS).
+        #elseif os(watchOS)
+        // WKExtension.applicationDidEnterBackgroundNotification /
+        // applicationWillEnterForegroundNotification require linking WatchKit,
+        // which OmniBLE (a pure-Swift framework) intentionally avoids.
+        // Using the raw NSNotificationName string constants is equivalent and
+        // avoids the framework dependency — these strings are stable public API.
+        let nc = NotificationCenter.default
+        nc.addObserver(
+            self,
+            selector: #selector(appMovedToBackground),
+            name: Notification.Name("WKApplicationDidEnterBackgroundNotification"),
+            object: nil
+        )
+        nc.addObserver(
+            self,
+            selector: #selector(appMovedToForeground),
+            name: Notification.Name("WKApplicationWillEnterForegroundNotification"),
+            object: nil
+        )
         #endif
 
         // Needed setup if pod keep alives might be used
