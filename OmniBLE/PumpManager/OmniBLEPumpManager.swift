@@ -757,7 +757,6 @@ extension OmniBLEPumpManager {
         return false
     }
 
-    #if os(iOS)
     public var reservoirLevelHighlightState: ReservoirLevelHighlightState? {
         guard let reservoirLevel = reservoirLevel else {
             return nil
@@ -776,11 +775,6 @@ extension OmniBLEPumpManager {
             }
         }
     }
-    #else
-    // TODO(B.3): `ReservoirLevelHighlightState` is currently declared inside the
-    // iOS-only PumpManagerUI layer (OmniBLESettingsViewModel.swift).  On watchOS
-    // this property is omitted until the type is promoted to a UI-free module.
-    #endif
 
     public func buildPumpLifecycleProgress(for state: OmniBLEPumpManagerState) -> PumpLifecycleProgress? {
         switch podCommState {

@@ -223,6 +223,7 @@
 		D8C72C042A50D95200268D82 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10389A1D26FF7841002115E9 /* Message.swift */; };
 		D8C72C052A50D96800268D82 /* Pod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325327185EE4007A3BC2 /* Pod.swift */; };
 		D8C72C062A50D97500268D82 /* PodProgressStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325627185EE4007A3BC2 /* PodProgressStatus.swift */; };
+		WA7C4006000000000000001 /* ReservoirLevelHighlightState.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -294,6 +295,7 @@
 		10289E802739F8E4000339E6 /* SessionKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionKeys.swift; sourceTree = "<group>"; };
 		10289E822739F917000339E6 /* SessionEstablisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionEstablisher.swift; sourceTree = "<group>"; };
 		1029AE4627094D0E00B7F5B6 /* OmniBLEPumpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLEPumpManager.swift; sourceTree = "<group>"; };
+		WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservoirLevelHighlightState.swift; sourceTree = "<group>"; };
 		1029AE4727094D0E00B7F5B6 /* OmniBLEPumpManagerState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLEPumpManagerState.swift; sourceTree = "<group>"; };
 		1029AE4A27094DDC00B7F5B6 /* OmniBLEPumpManager+UI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "OmniBLEPumpManager+UI.swift"; sourceTree = "<group>"; };
 		1029AE4E27094E1900B7F5B6 /* OmniBLEUI.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = OmniBLEUI.xcassets; sourceTree = "<group>"; };
@@ -651,6 +653,7 @@
 				1021114C2709467400784F13 /* PodComms.swift */,
 				102111402709462300784F13 /* PodState.swift */,
 				C1D27A1A27911E9900C41EBA /* PodAdvertisement.swift */,
+				WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */,
 			);
 			path = PumpManager;
 			sourceTree = "<group>";
@@ -1218,6 +1221,7 @@
 				10389A3926FF7841002115E9 /* PodInfoResponse.swift in Sources */,
 				84752EE226ED13F5009FD801 /* PayloadJoiner.swift in Sources */,
 				1029AE4827094D0E00B7F5B6 /* OmniBLEPumpManager.swift in Sources */,
+				WA7C4006000000000000001 /* ReservoirLevelHighlightState.swift in Sources */,
 				10389A3526FF7841002115E9 /* BeepConfigCommand.swift in Sources */,
 				1016325D27185EE5007A3BC2 /* AlertSlot.swift in Sources */,
 				C1F67EC827975F360017487F /* DeactivatePodViewModel.swift in Sources */,

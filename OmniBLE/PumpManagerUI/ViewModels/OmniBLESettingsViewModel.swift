@@ -19,12 +19,6 @@ enum DashSettingsViewAlert {
     case syncTimeError(OmniBLEPumpManagerError)
 }
 
-public enum ReservoirLevelHighlightState: String, Equatable {
-    case normal
-    case warning
-    case critical
-}
-
 struct DashSettingsNotice {
     let title: String
     let description: String
