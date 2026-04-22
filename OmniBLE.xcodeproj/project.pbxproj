@@ -106,6 +106,12 @@
 		A9A5BCF6276C1E6D00B02C86 /* MessagePacketTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054CC2764FDB700FAFEFB /* MessagePacketTests.swift */; };
 		A9A5BCF7276C1E7000B02C86 /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054DB27655F9C00FAFEFB /* KeyExchangeTests.swift */; };
 		B60BB2E62BC6E74100D2BB39 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60BB2E52BC6E74000D2BB39 /* Bundle.swift */; };
+		B2C0E00000000000020 /* PhoneWatchProtocolVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */; };
+		B2C0E00000000000021 /* PhoneWatchHeartbeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */; };
+		B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */; };
+		B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */; };
+		B2C0E00000000000024 /* PhoneWatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000005 /* PhoneWatchMessage.swift */; };
+		B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000010 /* PhoneWatchMessageTests.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
 		C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */; };
@@ -368,6 +374,12 @@
 		A9D3492F2764F5780037F77C /* EnDecryptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnDecryptTests.swift; sourceTree = "<group>"; };
 		A9D349312764F5D30037F77C /* PayloadJoinerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadJoinerTest.swift; sourceTree = "<group>"; };
 		B60BB2E52BC6E74000D2BB39 /* Bundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
+		B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchProtocolVersion.swift; sourceTree = "<group>"; };
+		B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchHeartbeat.swift; sourceTree = "<group>"; };
+		B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchModeSwitch.swift; sourceTree = "<group>"; };
+		B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchPairingHandoff.swift; sourceTree = "<group>"; };
+		B2C0E00000000000005 /* PhoneWatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessage.swift; sourceTree = "<group>"; };
+		B2C0E00000000000010 /* PhoneWatchMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessageTests.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLETests.swift; sourceTree = "<group>"; };
@@ -621,6 +633,7 @@
 				84752E9226ED0FFE009FD801 /* Info.plist */,
 				D802CCFF27DD98B80072E3A1 /* MessageTests.swift */,
 				C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */,
+				B2C0E00000000000010 /* PhoneWatchMessageTests.swift */,
 				D802CD0427DD98C10072E3A1 /* PodCommsSessionTests.swift */,
 				D802CD0127DD98C10072E3A1 /* PodInfoTests.swift */,
 				D802CD0227DD98C10072E3A1 /* PodStateTests.swift */,
@@ -727,6 +740,11 @@
 				C1F67EB927975EB70017487F /* FrameworkLocalText.swift */,
 				B60BB2E52BC6E74000D2BB39 /* Bundle.swift */,
 				C1F67EDD2797AFF10017487F /* Image.swift */,
+				B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */,
+				B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */,
+				B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */,
+				B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */,
+				B2C0E00000000000005 /* PhoneWatchMessage.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1206,6 +1224,11 @@
 				C1F67ECA27975F360017487F /* OmniBLESettingsViewModel.swift in Sources */,
 				C1F67EBA27975EB70017487F /* FrameworkLocalText.swift in Sources */,
 				B60BB2E62BC6E74100D2BB39 /* Bundle.swift in Sources */,
+				B2C0E00000000000020 /* PhoneWatchProtocolVersion.swift in Sources */,
+				B2C0E00000000000021 /* PhoneWatchHeartbeat.swift in Sources */,
+				B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */,
+				B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */,
+				B2C0E00000000000024 /* PhoneWatchMessage.swift in Sources */,
 				C1F67E9227975B830017487F /* BasalStateView.swift in Sources */,
 				1024E32B27446DB000DE01F2 /* MessagePacket.swift in Sources */,
 				10289E7B2739F886000339E6 /* EapMessage.swift in Sources */,
@@ -1259,6 +1282,7 @@
 				D802CD0927DD98C10072E3A1 /* PodCommsSessionTests.swift in Sources */,
 				D802CD0827DD98C10072E3A1 /* StatusTests.swift in Sources */,
 				C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */,
+				B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */,
 				A9A5BCF2276C1E6D00B02C86 /* PayloadSplitterTest.swift in Sources */,
 				D802CD0A27DD98C10072E3A1 /* TempBasalTests.swift in Sources */,
 				A9A5BCEF276C1E2D00B02C86 /* TestUtilities.swift in Sources */,
