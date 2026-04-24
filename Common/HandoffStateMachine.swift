@@ -47,9 +47,12 @@ public final class HandoffStateMachine {
             effects = beginHandoff(direction: .phoneToWatch, now: now)
 
         case (.phoneDriver, .incomingModeSwitch(let ms))
-            where ms.targetMode == .watchDriver && ms.requestedBy == .watch:
-            // Watch initiated takeover; we transition to handoffPending using the
+            where ms.targetMode == .watchDriver:
+            // Incoming handoff request: someone (phone or watch user) triggered a
+            // handover to the watch. We transition to handoffPending using the
             // incoming transitionId (so subsequent confirm references same id).
+            // `ms.requestedBy` is informational only — the transition is the same
+            // regardless of which side initiated.
             effects = enterPending(direction: .phoneToWatch,
                                    transitionId: ms.transitionId,
                                    now: now)
@@ -75,7 +78,9 @@ public final class HandoffStateMachine {
             effects = beginHandoff(direction: .watchToPhone, now: now)
 
         case (.watchDriver, .incomingModeSwitch(let ms))
-            where ms.targetMode == .phoneDriver && ms.requestedBy == .phone:
+            where ms.targetMode == .phoneDriver:
+            // Symmetric to the phoneDriver → watchDriver case above. Accept handover
+            // requests from either side; `ms.requestedBy` is informational only.
             effects = enterPending(direction: .watchToPhone,
                                    transitionId: ms.transitionId,
                                    now: now)
