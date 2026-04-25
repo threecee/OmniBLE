@@ -259,6 +259,10 @@
 		T1P600000000000001 /* PodStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P600000000000002 /* PodStatusTests.swift */; };
 		T1P600000000000003 /* PodBolusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P600000000000004 /* PodBolusTests.swift */; };
 		T1P600000000000005 /* MockPumpManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P600000000000006 /* MockPumpManagerDelegate.swift */; };
+		T1P700000000000001 /* PodBasalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000002 /* PodBasalTests.swift */; };
+		T1P700000000000003 /* PodSuspendResumeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000004 /* PodSuspendResumeTests.swift */; };
+		T1P700000000000005 /* PodAlertsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000006 /* PodAlertsTests.swift */; };
+		T1P700000000000007 /* PodDeactivationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000008 /* PodDeactivationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -516,6 +520,10 @@
 		T1P600000000000002 /* PodStatusTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodStatusTests.swift; sourceTree = "<group>"; };
 		T1P600000000000004 /* PodBolusTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodBolusTests.swift; sourceTree = "<group>"; };
 		T1P600000000000006 /* MockPumpManagerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockPumpManagerDelegate.swift; sourceTree = "<group>"; };
+		T1P700000000000002 /* PodBasalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodBasalTests.swift; sourceTree = "<group>"; };
+		T1P700000000000004 /* PodSuspendResumeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSuspendResumeTests.swift; sourceTree = "<group>"; };
+		T1P700000000000006 /* PodAlertsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodAlertsTests.swift; sourceTree = "<group>"; };
+		T1P700000000000008 /* PodDeactivationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodDeactivationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -734,6 +742,10 @@
 				T1P500000000000000C /* PodActivationTests.swift */,
 				T1P600000000000002 /* PodStatusTests.swift */,
 				T1P600000000000004 /* PodBolusTests.swift */,
+				T1P700000000000002 /* PodBasalTests.swift */,
+				T1P700000000000004 /* PodSuspendResumeTests.swift */,
+				T1P700000000000006 /* PodAlertsTests.swift */,
+				T1P700000000000008 /* PodDeactivationTests.swift */,
 			);
 			path = Integration;
 			sourceTree = "<group>";
@@ -1457,6 +1469,10 @@
 				T1P600000000000003 /* PodBolusTests.swift in Sources */,
 				T1P600000000000005 /* MockPumpManagerDelegate.swift in Sources */,
 				T1P5B0000000000001 /* QueueBouncingCentralDelegate.swift in Sources */,
+				T1P700000000000001 /* PodBasalTests.swift in Sources */,
+				T1P700000000000003 /* PodSuspendResumeTests.swift in Sources */,
+				T1P700000000000005 /* PodAlertsTests.swift in Sources */,
+				T1P700000000000007 /* PodDeactivationTests.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
