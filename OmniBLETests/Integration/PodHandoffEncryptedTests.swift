@@ -135,23 +135,6 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
         }
     }
 
-    /// After `connectToActivePod()` is called, the pump's BluetoothManager has
-    /// the bleIdentifier in `autoConnectIDs` but `devices` is still empty (no
-    /// scan has run since this manager was constructed). The scan only starts
-    /// from `centralManagerDidUpdateState` when state transitions to .poweredOn
-    /// AND `!hasDiscoveredAllAutoConnectDevices`. Since the original state-change
-    /// fired while autoConnectIDs was empty, we need to nudge the BluetoothManager
-    /// to re-evaluate: re-fire `centralManagerDidUpdateState` on the manager
-    /// queue so it sees the populated autoConnectIDs and starts scanning.
-    private func nudgeScan(on manager: OmniBLEPumpManager) {
-        let bm = manager.podCommsForTesting.bluetoothManagerForTesting
-        let central = bm.centralManagerForTesting!
-        let queue = bm.managerQueueForTesting
-        queue.async {
-            bm.centralManagerDidUpdateState(central)
-        }
-    }
-
     /// Give the CBM scan → connect → didConnect → completeConfiguration
     /// (sendHello + enableNotifications + establishNewSession) cycle time to
     /// land. `connectToActivePod` returns immediately; the actual BLE
@@ -250,7 +233,6 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
         XCTAssertTrue(watchPM.hasActivePod, "watch should report active pod after restorePodState")
 
         watchPM.connectToActivePod()
-        nudgeScan(on: watchPM)
         // Give CBM time to scan, find the peripheral, connect, and complete
         // configuration (sendHello + enableNotifications + establishNewSession).
         waitForReconnect(timeout: 8.0)
@@ -303,7 +285,6 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
         // ── 9. Phone re-acquires ────────────────────────────────────────────
         phonePM.restorePodState(podStateForPhoneReturn)
         phonePM.connectToActivePod()
-        nudgeScan(on: phonePM)
         waitForReconnect(timeout: 8.0)
 
         // ── 10. R2: phone's post-handoff reservoir ──────────────────────────
@@ -367,7 +348,6 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
         waitForBluetoothSettle(timeout: 1.0)
         watchPM.restorePodState(watchPodState)
         watchPM.connectToActivePod()
-        nudgeScan(on: watchPM)
         waitForReconnect(timeout: 8.0)
 
         // Watch enacts a 0.5U bolus mid-handoff (smaller for shorter wait).
@@ -408,7 +388,6 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
 
         phonePM.restorePodState(phoneRestoreState)
         phonePM.connectToActivePod()
-        nudgeScan(on: phonePM)
         waitForReconnect(timeout: 8.0)
 
         let (R2, delivered2) = try captureReservoir(from: phonePM, label: "phone-post-handoff")
