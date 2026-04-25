@@ -263,6 +263,7 @@
 		T1P700000000000003 /* PodSuspendResumeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000004 /* PodSuspendResumeTests.swift */; };
 		T1P700000000000005 /* PodAlertsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000006 /* PodAlertsTests.swift */; };
 		T1P700000000000007 /* PodDeactivationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000008 /* PodDeactivationTests.swift */; };
+		T1P800000000000001 /* PodHandoffEncryptedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P800000000000002 /* PodHandoffEncryptedTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -524,6 +525,7 @@
 		T1P700000000000004 /* PodSuspendResumeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSuspendResumeTests.swift; sourceTree = "<group>"; };
 		T1P700000000000006 /* PodAlertsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodAlertsTests.swift; sourceTree = "<group>"; };
 		T1P700000000000008 /* PodDeactivationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodDeactivationTests.swift; sourceTree = "<group>"; };
+		T1P800000000000002 /* PodHandoffEncryptedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodHandoffEncryptedTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -746,6 +748,7 @@
 				T1P700000000000004 /* PodSuspendResumeTests.swift */,
 				T1P700000000000006 /* PodAlertsTests.swift */,
 				T1P700000000000008 /* PodDeactivationTests.swift */,
+				T1P800000000000002 /* PodHandoffEncryptedTests.swift */,
 			);
 			path = Integration;
 			sourceTree = "<group>";
@@ -1473,6 +1476,7 @@
 				T1P700000000000003 /* PodSuspendResumeTests.swift in Sources */,
 				T1P700000000000005 /* PodAlertsTests.swift in Sources */,
 				T1P700000000000007 /* PodDeactivationTests.swift in Sources */,
+				T1P800000000000001 /* PodHandoffEncryptedTests.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
