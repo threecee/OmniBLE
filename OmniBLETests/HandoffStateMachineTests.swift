@@ -435,4 +435,24 @@ final class HandoffStateMachineTests: XCTestCase {
         }
         XCTAssertTrue(effects.isEmpty, "No effects for no-op handle")
     }
+
+    // MARK: - B.2.e Phase 2 smoke tests
+
+    func testOmniBLEPumpManagerWatchSideDefaultStateHasNilPod() {
+        let state = OmniBLEPumpManagerState.watchSideDefault
+        XCTAssertNil(state.podState, "Default watch state should have no pod")
+        XCTAssertEqual(state.maximumTempBasalRate, 0)
+    }
+
+    func testOmniBLEPumpManagerCanInstantiateFromWatchSideDefault() {
+        // OmniBLEPumpManager init touches CBCentralManager (requires bluetooth-central
+        // entitlement not available in test bundles). Instead verify the state round-trips
+        // through rawValue — confirming it is fully serializable for use as a constructor arg.
+        let state = OmniBLEPumpManagerState.watchSideDefault
+        let raw = state.rawValue
+        let restored = OmniBLEPumpManagerState(rawValue: raw)
+        XCTAssertNotNil(restored, "watchSideDefault must round-trip through rawValue")
+        XCTAssertNil(restored?.podState, "Restored state should still have nil pod")
+        XCTAssertEqual(restored?.maximumTempBasalRate, 0)
+    }
 }

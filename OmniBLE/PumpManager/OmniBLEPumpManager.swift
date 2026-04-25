@@ -206,6 +206,35 @@ public class OmniBLEPumpManager: DeviceManager {
         return setStateWithResult(changes)
     }
 
+    // MARK: - B.2.e: Handoff-driven BLE ownership
+
+    /// B.2.e: Atomically replaces both the OmniBLEPumpManagerState's podState
+    /// AND the PodComms-internal podState with one received via WCSession.
+    /// Used by OmniBLEOwnership.acquireBLE() when this side becomes the driver
+    /// and needs to resume from the counterpart's last-known state.
+    public func restorePodState(_ newPodState: PodState) {
+        // 1. Update OmniBLEPumpManagerState (uses existing internal mutator since
+        //    podState is private(set) on the struct)
+        setState { state in
+            state.updatePodStateFromPodComms(newPodState)
+        }
+        // 2. Push into PodComms (which holds its OWN copy used by message transport)
+        podComms.setPodState(newPodState)
+    }
+
+    /// B.2.e: Connects to the currently-active pod (resumes BLE communication).
+    /// Called by OmniBLEOwnership.acquireBLE().
+    public func connectToActivePod() {
+        podComms.connectToActivePod()
+    }
+
+    /// B.2.e: Disconnects from the currently-active pod (releases BLE peripheral).
+    /// Called by OmniBLEOwnership.releaseBLE(). Does NOT clear podState — the
+    /// counterpart side may need it again on the reverse handoff.
+    public func disconnectFromActivePod() {
+        podComms.disconnectFromActivePod()
+    }
+
     // Status can change even when state does not, because some status changes
     // purely based on time. This provides a mechanism to evaluate status changes
     // as time progresses and trigger status updates to clients.

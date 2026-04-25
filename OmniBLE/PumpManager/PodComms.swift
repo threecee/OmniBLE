@@ -75,6 +75,42 @@ public class PodComms: CustomDebugStringConvertible {
         podStateLock.unlock()
     }
 
+    /// B.2.e: Replaces the in-memory podState. Used by OmniBLEPumpManager.restorePodState
+    /// when this side becomes the pod driver after a handoff and needs to hydrate from
+    /// a payload received via WCSession. The new podState contains its own controllerId
+    /// (myId) and podId — those values are read from podState by subsequent message-transport
+    /// calls, so this PodComms instance keeps working with the new identity.
+    public func setPodState(_ newPodState: PodState) {
+        podStateLock.lock()
+        defer { podStateLock.unlock() }
+        podState = newPodState
+    }
+
+    /// B.2.e: Connects to the currently-known pod's BLE peripheral.
+    /// Used by OmniBLEOwnership.acquireBLE() when this side becomes the driver.
+    /// No-op if podState is nil.
+    public func connectToActivePod() {
+        podStateLock.lock()
+        let identifier = podState?.bleIdentifier
+        podStateLock.unlock()
+        guard let identifier else {
+            log.error("connectToActivePod: no podState; cannot connect")
+            return
+        }
+        bluetoothManager.connectToDevice(uuidString: identifier)
+    }
+
+    /// B.2.e: Disconnects from the currently-known pod's BLE peripheral.
+    /// Used by OmniBLEOwnership.releaseBLE() when this side stops being the driver.
+    /// Does NOT clear podState.
+    public func disconnectFromActivePod() {
+        podStateLock.lock()
+        let identifier = podState?.bleIdentifier
+        podStateLock.unlock()
+        guard let identifier else { return }
+        bluetoothManager.disconnectFromDevice(uuidString: identifier)
+    }
+
     /// Handle any dosing and pump event cleanup when discarding a pod without going thru normal pod deactivation
     func handleDiscardedPodDosing(podTime: TimeInterval, reservoirLevel: Double?) {
         guard podState != nil else {

@@ -117,6 +117,20 @@ public struct OmniBLEPumpManagerState: RawRepresentable, Equatable {
         self.maximumTempBasalRate = maximumTempBasalRate
     }
 
+    /// B.2.e: Returns a minimal default state suitable for the watch's lazy-
+    /// instantiated OmniBLEPumpManager. The actual podState gets hydrated by
+    /// OmniBLEOwnership.acquireBLE() from the cached OmniBLEHandoffPayload
+    /// received via WCSession.
+    public static var watchSideDefault: OmniBLEPumpManagerState {
+        return OmniBLEPumpManagerState(
+            podState: nil,                         // hydrated post-construction
+            timeZone: TimeZone.current,
+            basalSchedule: BasalSchedule(entries: []),
+            insulinType: nil,                      // hydrated with podState
+            maximumTempBasalRate: 0
+        )
+    }
+
     public init?(rawValue: RawValue) {
 
         guard let version = rawValue["version"] as? Int else {
