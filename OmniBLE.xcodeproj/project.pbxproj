@@ -123,6 +123,9 @@
 		WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000009 /* HandoffSettingsTests.swift */; };
 		WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */; };
 		WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000B /* HandoffStateMachineTests.swift */; };
+		WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000C /* OmniBLEOwnership.swift */; };
+		WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000D /* MockOmniBLEPumpManager.swift */; };
+		WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000E /* OmniBLEOwnershipTests.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
 		C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */; };
@@ -402,6 +405,9 @@
 		WB2D000000000000009 /* HandoffSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettingsTests.swift; sourceTree = "<group>"; };
 		WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEHandoffPayloadTests.swift; sourceTree = "<group>"; };
 		WB2D00000000000000B /* HandoffStateMachineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachineTests.swift; sourceTree = "<group>"; };
+		WB2D00000000000000C /* OmniBLEOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnership.swift; sourceTree = "<group>"; };
+		WB2D00000000000000D /* MockOmniBLEPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOmniBLEPumpManager.swift; sourceTree = "<group>"; };
+		WB2D00000000000000E /* OmniBLEOwnershipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnershipTests.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLETests.swift; sourceTree = "<group>"; };
@@ -659,6 +665,8 @@
 				WB2D000000000000009 /* HandoffSettingsTests.swift */,
 				WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */,
 				WB2D00000000000000B /* HandoffStateMachineTests.swift */,
+				WB2D00000000000000D /* MockOmniBLEPumpManager.swift */,
+				WB2D00000000000000E /* OmniBLEOwnershipTests.swift */,
 				D802CD0427DD98C10072E3A1 /* PodCommsSessionTests.swift */,
 				D802CD0127DD98C10072E3A1 /* PodInfoTests.swift */,
 				D802CD0227DD98C10072E3A1 /* PodStateTests.swift */,
@@ -778,6 +786,7 @@
 				WB2D000000000000006 /* HandoffEvent.swift */,
 				WB2D000000000000007 /* HandoffSideEffect.swift */,
 				WB2D000000000000008 /* HandoffStateMachine.swift */,
+				WB2D00000000000000C /* OmniBLEOwnership.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1270,6 +1279,7 @@
 				WB2D000000000000016 /* HandoffEvent.swift in Sources */,
 				WB2D000000000000017 /* HandoffSideEffect.swift in Sources */,
 				WB2D000000000000018 /* HandoffStateMachine.swift in Sources */,
+				WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */,
 				C1F67E9227975B830017487F /* BasalStateView.swift in Sources */,
 				1024E32B27446DB000DE01F2 /* MessagePacket.swift in Sources */,
 				10289E7B2739F886000339E6 /* EapMessage.swift in Sources */,
@@ -1327,6 +1337,8 @@
 				WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */,
 				WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */,
 				WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */,
+				WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */,
+				WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */,
 				A9A5BCF2276C1E6D00B02C86 /* PayloadSplitterTest.swift in Sources */,
 				D802CD0A27DD98C10072E3A1 /* TempBasalTests.swift in Sources */,
 				A9A5BCEF276C1E2D00B02C86 /* TestUtilities.swift in Sources */,
