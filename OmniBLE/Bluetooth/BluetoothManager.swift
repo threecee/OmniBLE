@@ -98,7 +98,19 @@ class BluetoothManager: NSObject {
 
     /// Isolated to `managerQueue`
     private var manager: CBMCentralManager! = nil
-    
+
+    /// Test-only accessor for the underlying CBMCentralManager. Used by
+    /// T.1 integration tests to install a queue-bouncing delegate wrapper
+    /// that works around CoreBluetoothMock's main-thread delegate delivery
+    /// (which trips the dispatchPrecondition checks throughout this class).
+    /// NOT for production use.
+    internal var centralManagerForTesting: CBMCentralManager! { manager }
+
+    /// Test-only accessor for the private background managerQueue. The
+    /// queue-bouncing wrapper needs this to dispatch CBM callbacks back
+    /// onto the queue OmniBLE expects. NOT for production use.
+    internal var managerQueueForTesting: DispatchQueue { managerQueue }
+
     /// Isolated to `managerQueue`
     private var devices: [OmniBLE] = []
     

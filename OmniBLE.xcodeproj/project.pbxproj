@@ -255,6 +255,7 @@
 		T1P4000000000000007 /* PodSimulatorTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000008 /* PodSimulatorTestCase.swift */; };
 		T1P4000000000000009 /* PodConnectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P400000000000000A /* PodConnectionTests.swift */; };
 		T1P500000000000000B /* PodActivationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P500000000000000C /* PodActivationTests.swift */; };
+		T1P5B0000000000001 /* QueueBouncingCentralDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -508,6 +509,7 @@
 		T1P4000000000000008 /* PodSimulatorTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorTestCase.swift; sourceTree = "<group>"; };
 		T1P400000000000000A /* PodConnectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodConnectionTests.swift; sourceTree = "<group>"; };
 		T1P500000000000000C /* PodActivationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodActivationTests.swift; sourceTree = "<group>"; };
+		T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueueBouncingCentralDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -713,6 +715,7 @@
 				T1P4000000000000004 /* DashServiceUUIDs.swift */,
 				T1P4000000000000006 /* MockOmnipodPeripheral.swift */,
 				T1P4000000000000008 /* PodSimulatorTestCase.swift */,
+				T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */,
 			);
 			path = PodSimulator;
 			sourceTree = "<group>";
@@ -1441,6 +1444,7 @@
 				T1P4000000000000007 /* PodSimulatorTestCase.swift in Sources */,
 				T1P4000000000000009 /* PodConnectionTests.swift in Sources */,
 				T1P500000000000000B /* PodActivationTests.swift in Sources */,
+				T1P5B0000000000001 /* QueueBouncingCentralDelegate.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

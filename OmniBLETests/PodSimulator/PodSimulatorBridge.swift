@@ -50,8 +50,13 @@ final class PodSimulatorBridge {
     /// Read end of the child's stderr pipe (parent reads here).
     private let stderrReadFD: Int32
 
-    /// Buffer for partial frames received from stdout.
+    /// Buffer for partial frames received from stdout. Guarded by `rxLock`.
     private var rxBuffer = Data()
+
+    /// Serializes `receive(...)` calls so the persistent NOTIFY drain thread
+    /// in MockOmnipodPeripheral and one-shot connect/disconnect drains in
+    /// the spec delegate don't corrupt rxBuffer when interleaved.
+    private let rxLock = NSLock()
 
     /// Captured stderr (for diagnostics on subprocess crash).
     private var stderrBuffer = Data()
@@ -155,7 +160,10 @@ final class PodSimulatorBridge {
 
     /// Receive the next complete frame, blocking up to `timeout` seconds.
     /// Polls stdout non-blockingly; sleeps 5ms between polls.
+    /// Thread-safe — multiple callers serialize via rxLock.
     func receive(timeout: TimeInterval) throws -> (type: BridgeMessageType, payload: Data) {
+        rxLock.lock()
+        defer { rxLock.unlock() }
         let deadline = Date().addingTimeInterval(timeout)
 
         // Make stdout non-blocking

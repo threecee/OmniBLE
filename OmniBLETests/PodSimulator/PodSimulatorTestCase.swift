@@ -37,6 +37,26 @@ class PodSimulatorTestCase: XCTestCase {
         bridge = nil
         mockPeripheral = nil
         CBMCentralManagerMock.tearDownSimulation()
+
+        // Drain the main runloop so any DispatchQueue.main.async blocks queued
+        // by CBMCentralManagerMock.startAdvertising (its Timer.scheduledTimer
+        // creation is deferred to main-async) actually fire BEFORE the next
+        // test starts. Then call tearDownSimulation again to clear any
+        // advertisement timers those late-firing async blocks just registered.
+        //
+        // Without this, the previous test's startAdvertising async re-runs
+        // post-teardown and re-registers an advertisement timer for the
+        // PREVIOUS test's spec — which then leaks into the next test's scan
+        // results, causing OmniBLE's BluetoothManager to discover BOTH the
+        // old and new peripherals. Pairing then deadlocks because the central
+        // ends up auto-connecting to the wrong one OR the multi-peripheral
+        // scan callbacks corrupt internal sequencing.
+        let drainDeadline = Date().addingTimeInterval(0.3)
+        while Date() < drainDeadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        CBMCentralManagerMock.tearDownSimulation()
+
         try super.tearDownWithError()
     }
 

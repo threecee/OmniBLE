@@ -15,6 +15,11 @@
 //    `pumpManager.podCommsForTesting` directly and drive the pairing flow at
 //    the PodComms level, bypassing the public-API short-circuit.
 //
+//  Also installs a `QueueBouncingCentralDelegate` to work around a CBM
+//  library limitation where scan-result callbacks fire on main thread
+//  instead of the per-manager dispatch queue (would otherwise crash
+//  OmniBLE's BluetoothManager dispatchPrecondition checks).
+//
 
 import XCTest
 import CoreBluetooth
@@ -24,97 +29,52 @@ import LoopKit
 
 final class PodActivationTests: PodSimulatorTestCase {
 
-    /// Phase 5's marquee test. Full activation from a fresh, unpaired pod:
-    /// connectToNewPod (BLE discovery + connect) → pairAndSetupPod (LTK exchange,
-    /// EAP-AKA session establishment, SetupPod encrypted command). Pod ends in
-    /// the `.podPaired` setup state.
+    /// Held for the lifetime of each test so CBM (which uses weak delegate
+    /// references) doesn't drop our queue-bouncing wrapper.
+    private var queueBouncer: QueueBouncingCentralDelegate?
+
+    override func tearDownWithError() throws {
+        queueBouncer = nil
+        try super.tearDownWithError()
+    }
+
+    /// Phase 5b's marquee test (Phase 5a was escalated due to a CBM
+    /// threading bug; the QueueBouncingCentralDelegate workaround unblocks
+    /// it). Full activation from a fresh, unpaired pod:
+    /// connectToNewPod (BLE discovery + connect) → pairAndSetupPod (LTK
+    /// exchange, EAP-AKA session establishment, SetupPod encrypted command).
+    /// Pod ends in setupProgress.isPaired.
     ///
-    /// **CURRENTLY SKIPPED — see ESCALATION below.**
-    ///
-    /// Phase 5 progress made (preserved in this branch):
-    ///   1. Identified that `OmniBLEPumpManager.pairAndPrime` short-circuits
-    ///      to a mock-only path under `#if targetEnvironment(simulator)`.
-    ///      Added `OmniBLEPumpManager.podCommsForTesting` (internal accessor)
-    ///      so this test can drive `PodComms.pairAndSetupPod` directly,
-    ///      bypassing the simulator guard.
-    ///   2. Discovered CoreBluetoothMock was statically linked into BOTH the
-    ///      OmniBLE framework AND the OmniBLETests bundle, giving them
-    ///      separate static `managerState`. Removed the duplicate link from
-    ///      OmniBLETests so both share the OmniBLE framework's CBM symbols.
-    ///   3. Fixed the mock peripheral's advertisement to include the
-    ///      DASH-advertisement UUID (00004024-...) that OmniBLE's
-    ///      BluetoothManager scans for, in addition to the full service UUID.
-    ///   4. Made the pod-sim build script's codesign idempotent (--force),
-    ///      so re-builds don't fail on already-signed binaries.
-    ///
-    /// **ESCALATION — true blocker discovered:**
-    ///
-    /// `BluetoothManager.centralManager(_:didDiscover:...)` and similar
-    /// delegate methods in OmniBLE's production code call
-    /// `dispatchPrecondition(condition: .onQueue(managerQueue))`. The
-    /// CoreBluetoothMock library (`CBMCentralManagerMock.notify(_:for:)`,
-    /// line 247) calls these delegates **synchronously from a main-thread
-    /// NSTimer**, without dispatching to the per-manager queue that was
-    /// passed at init time. The dispatchPrecondition then crashes with
-    /// `_dispatch_assert_queue_fail`.
-    ///
-    /// This is a CBM library limitation, NOT a Pi-sim/OmniBLE protocol
-    /// mismatch. It would affect ANY test that drives OmniBLE's
-    /// BluetoothManager via its real delegate path.
-    ///
-    /// **Fallback options** (per T.1 spec Q1):
-    ///   - (a) Extend budget: investigate whether CBM upstream has fixed this
-    ///         in a newer version, OR write a wrapper delegate that bounces
-    ///         every callback onto the right queue (intrusive — touches all
-    ///         BluetoothManager delegate methods + similar in PeripheralManager).
-    ///   - (b) Port `pkg/encrypt`/`pkg/message`/`pkg/pair` from Go to Swift,
-    ///         then test the encrypted protocol layer in pure-Swift unit
-    ///         tests without needing CBM at all.
-    ///   - (c) Descope T.1 marquee test; rely on existing direct-CBM tests
-    ///         (PodConnectionTests) to validate the wire-level protocol and
-    ///         on hardware integration testing (real pod) to validate the
-    ///         encrypted layer.
-    ///
-    /// Recommendation: **(a) with bounded budget** — the wrapper-delegate
-    /// approach is concrete (~1-2 days). If it doesn't work cleanly, fall
-    /// back to (c) and document.
+    /// **This test exercises the encrypted protocol end-to-end.** If it
+    /// doesn't pass after debugging, the Pi sim's encryption layer doesn't
+    /// match what OmniBLE expects, and we need to fall back to porting
+    /// `pkg/encrypt`/`pkg/message` to Swift (T.1 spec Q1 fallback option b).
     func testFullActivationFlow() throws {
-        try XCTSkipIf(
-            true,
-            """
-            ESCALATED — see file header.
-            CoreBluetoothMock fires its scan/connect delegate callbacks on the
-            main thread (from NSTimer) without honoring the per-manager dispatch
-            queue. OmniBLE's BluetoothManager has dispatchPrecondition checks
-            on a private background managerQueue, causing _dispatch_assert_queue_fail
-            on first didDiscover.
-
-            Phase 5 reached this gate after fixing 4 prior infra issues
-            (simulator guard, CBM duplicate-linking, advertisement UUID,
-            codesign idempotency). The marquee test wiring is in place —
-            commented-out body below — and ready for whichever fallback the
-            user picks. Recommend option (a): wrapper delegate that bounces
-            CBM callbacks onto the expected queue.
-            """
-        )
-
-        // --- Marquee test body — kept for the eventual unblocking, do not
-        //     delete. Wired up correctly through the discovered blocker. ---
-        /*
         let manager = makeUnpairedPumpManager()
         let podComms = manager.podCommsForTesting
+
+        // Install the queue-bouncing CBM delegate wrapper. This MUST happen
+        // after OmniBLEPumpManager init (which spins up the BluetoothManager
+        // and its CBMCentralManager) and BEFORE we call connectToNewPod.
+        queueBouncer = installQueueBouncingDelegate(on: manager)
+
+        // Brief settle so the wrapper's centralManagerDidUpdateState
+        // re-fire reaches the BluetoothManager on its managerQueue.
         waitForBluetoothPoweredOn(timeout: 1.0)
 
+        // Step 1: BLE discovery + connect to the mock peripheral.
         let connectExp = expectation(description: "connectToNewPod")
         var connectResult: Result<OmniBLE, Error>?
         podComms.connectToNewPod { result in
             connectResult = result
             connectExp.fulfill()
         }
+        // discoverPods waits up to 10s for a pod to appear.
         wait(for: [connectExp], timeout: 15.0)
 
         switch connectResult {
-        case .success: break
+        case .success:
+            break
         case .failure(let error):
             XCTFail("connectToNewPod failed: \(error)\nstderr: \(self.bridge.stderrTail())")
             return
@@ -123,6 +83,10 @@ final class PodActivationTests: PodSimulatorTestCase {
             return
         }
 
+        // Step 2: drive encrypted pairing. This is the marquee — LTK exchange
+        // followed by EAP-AKA session establishment followed by the encrypted
+        // SetupPod command. Failure here means a Pi-sim-vs-OmniBLE protocol
+        // mismatch in `pkg/pair`, `pkg/eap`, or `pkg/encrypt`.
         let pairExp = expectation(description: "pairAndSetupPod")
         var pairResult: PodComms.SessionRunResult?
         podComms.pairAndSetupPod(
@@ -133,48 +97,50 @@ final class PodActivationTests: PodSimulatorTestCase {
             pairResult = result
             pairExp.fulfill()
         }
+        // The spec budgets up to 30s for the full pairing flow.
         wait(for: [pairExp], timeout: 30.0)
 
         switch pairResult {
         case .success:
+            // Verify the pod state ended in podPaired (or further).
             let podState = manager.state.podState
             XCTAssertNotNil(podState, "no podState after pair")
             XCTAssertNotNil(podState?.ltk, "no LTK after pair")
             XCTAssertGreaterThanOrEqual(podState?.ltk.count ?? 0, 16, "LTK should be 16+ bytes")
+            // setupProgress should reflect at least podPaired
             if let progress = podState?.setupProgress {
-                XCTAssertTrue(progress.isPaired, "expected setupProgress.isPaired, got \(progress)")
+                XCTAssertTrue(
+                    progress.isPaired,
+                    "expected setupProgress.isPaired after pairAndSetupPod, got \(progress)"
+                )
             }
         case .failure(let error):
             XCTFail("pairAndSetupPod failed: \(error)\nstderr: \(self.bridge.stderrTail())")
         case nil:
             XCTFail("pairAndSetupPod did not call completion")
         }
-        */
     }
 
     /// TOML pre-load with corrupted LTK; pair should fail with a specific error.
     /// Skipped: the bridge's TOML pre-load infra isn't yet wired into
-    /// PodSimulatorTestCase, AND it depends on testFullActivationFlow's
-    /// blocker being resolved first (this test exercises the same code path).
+    /// PodSimulatorTestCase. Once testFullActivationFlow is solidly passing,
+    /// this is straightforward to add.
     func testPairingFailsWithBadLTK() throws {
         try XCTSkipIf(
             true,
             "Skipped: needs PodSimulatorTestCase support for spawning the bridge with -state " +
-            "<custom-toml> AND depends on testFullActivationFlow's CBM-threading blocker " +
-            "being resolved first (same code path)."
+            "<custom-toml> and a TOML schema for injecting a corrupted LTK. Defer to follow-up."
         )
     }
 
     /// Disconnect mid-activation; reconnect; resume; assert success.
     /// Skipped: precise mid-flow timing is hard to engineer without
-    /// instrumentation hooks the production code doesn't expose, AND it
-    /// depends on the same CBM-threading blocker.
+    /// instrumentation hooks the production code doesn't expose.
     func testActivationResumesAfterInterruption() throws {
         try XCTSkipIf(
             true,
             "Skipped: requires precise mid-flow disconnect timing that PodComms doesn't " +
-            "expose AND depends on testFullActivationFlow's CBM-threading blocker " +
-            "being resolved first (same code path)."
+            "expose. Defer to a follow-up phase that adds disconnect-injection hooks."
         )
     }
 

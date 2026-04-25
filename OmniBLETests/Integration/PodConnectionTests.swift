@@ -34,7 +34,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
         // Scan + connect
         let connExp = expectation(description: "connected")
         cd.onConnect = { _ in connExp.fulfill() }
-        manager.scanForPeripherals(withServices: [DashServiceUUIDs.service])
+        manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
         wait(for: [connExp], timeout: 5.0)
 
         XCTAssertNotNil(cd.connectedPeripheral)
@@ -55,7 +55,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
         // Connect
         let connExp = expectation(description: "connected")
         cd.onConnect = { _ in connExp.fulfill() }
-        manager.scanForPeripherals(withServices: [DashServiceUUIDs.service])
+        manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
         wait(for: [connExp], timeout: 5.0)
         guard let peripheral = cd.connectedPeripheral else {
             XCTFail("no peripheral after connect; stderr: \(self.bridge.stderrTail())")
@@ -94,7 +94,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
         // 1st connect
         let conn1Exp = expectation(description: "first connected")
         cd.onConnect = { _ in conn1Exp.fulfill() }
-        manager.scanForPeripherals(withServices: [DashServiceUUIDs.service])
+        manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
         wait(for: [conn1Exp], timeout: 5.0)
         guard let peripheral = cd.connectedPeripheral else {
             XCTFail("no peripheral after first connect; stderr: \(self.bridge.stderrTail())")
@@ -145,7 +145,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
             XCTFail("connection unexpectedly succeeded with dead bridge")
         }
         cd.onFailToConnect = { _, _ in failExp.fulfill() }
-        manager.scanForPeripherals(withServices: [DashServiceUUIDs.service])
+        manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
 
         // Wait up to 3 seconds for failure callback. If neither succeed nor
         // fail-to-connect fires, the test will still pass via timeout — but

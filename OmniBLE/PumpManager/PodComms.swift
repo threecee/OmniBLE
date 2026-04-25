@@ -54,7 +54,13 @@ public class PodComms: CustomDebugStringConvertible {
     private var needsSessionEstablishment: Bool = false
 
     private let bluetoothManager = BluetoothManager()
-    
+
+    /// Test-only accessor for the BluetoothManager. Used by T.1 integration
+    /// tests to install a queue-bouncing CBM delegate wrapper that works
+    /// around the CBM library's main-thread delegate delivery. NOT for
+    /// production use.
+    internal var bluetoothManagerForTesting: BluetoothManager { bluetoothManager }
+
     private var myId: UInt32
     private var podId: UInt32
 
