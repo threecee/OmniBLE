@@ -14,7 +14,13 @@ import CoreBluetooth
 import CoreBluetoothMock
 
 enum DashServiceUUIDs {
-    /// Primary DASH service UUID.
+    /// Advertisement UUID — what OmniBLE's BluetoothManager.startScanning
+    /// passes to scanForPeripherals(withServices:). The pod advertises this
+    /// short UUID in its advertisement packet, distinct from the full service UUID.
+    /// Matches OmnipodServiceUUID.advertisement = "00004024-0000-1000-8000-00805f9b34fb"
+    static let advertisement = CBUUID(string: "00004024-0000-1000-8000-00805f9b34fb")
+
+    /// Primary DASH service UUID — used after connection to discover services.
     /// Matches OmnipodServiceUUID.service = "1A7E4024-E3ED-4464-8B7E-751E03D0DC5F"
     static let service = CBUUID(string: "1A7E4024-E3ED-4464-8B7E-751E03D0DC5F")
 

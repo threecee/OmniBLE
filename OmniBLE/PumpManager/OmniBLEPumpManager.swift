@@ -194,6 +194,15 @@ public class OmniBLEPumpManager: DeviceManager {
     }
     private let lockedPodComms: Locked<PodComms>
 
+    /// Test-only accessor for direct PodComms exercise. Lets integration tests
+    /// (T.1 PodActivationTests) bypass the `#if targetEnvironment(simulator)`
+    /// short-circuit on `pairAndPrime`/`insertCannula` and drive the real
+    /// encrypted pairing flow against the Pi-sim subprocess.
+    ///
+    /// NOT for production use — production callers should always go through
+    /// the public `pairAndPrime`/`insertCannula` API.
+    internal var podCommsForTesting: PodComms { podComms }
+
     private let podStateObservers = WeakSynchronizedSet<PodStateObserver>()
 
     // Primarily used for testing

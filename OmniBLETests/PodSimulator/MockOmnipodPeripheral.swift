@@ -46,7 +46,14 @@ final class MockOmnipodPeripheral {
             .advertising(
                 advertisementData: [
                     CBMAdvertisementDataLocalNameKey: "Pod-mock",
-                    CBMAdvertisementDataServiceUUIDsKey: [DashServiceUUIDs.service],
+                    // Advertise BOTH the advertisement UUID (what OmniBLE's
+                    // BluetoothManager scans for) and the full service UUID
+                    // (so direct CBM-level scans in PodConnectionTests still
+                    // discover us).
+                    CBMAdvertisementDataServiceUUIDsKey: [
+                        DashServiceUUIDs.advertisement,
+                        DashServiceUUIDs.service,
+                    ],
                     CBMAdvertisementDataIsConnectable: true
                 ],
                 withInterval: 0.250,

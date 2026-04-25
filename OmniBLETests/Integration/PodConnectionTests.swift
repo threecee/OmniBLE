@@ -140,6 +140,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
 
         // Try to connect — expect failure rather than success
         let failExp = expectation(description: "didFailToConnect or stays disconnected")
+        failExp.assertForOverFulfill = false  // CBM may retry/fire multiple times
         cd.onConnect = { _ in
             XCTFail("connection unexpectedly succeeded with dead bridge")
         }

@@ -86,7 +86,6 @@
 		84752EE826ED13F5009FD801 /* PairMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752ED526ED13F5009FD801 /* PairMessage.swift */; };
 		8475306E26ED15DE009FD801 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8475306D26ED15DE009FD801 /* CryptoSwift */; };
 		T1CBM0000000000001 /* CoreBluetoothMock in Frameworks (OmniBLE) */ = {isa = PBXBuildFile; productRef = T1CBM0000000000003 /* CoreBluetoothMock */; };
-		T1CBM0000000000002 /* CoreBluetoothMock in Frameworks (OmniBLETests) */ = {isa = PBXBuildFile; productRef = T1CBM0000000000004 /* CoreBluetoothMock */; };
 		847530F626ED65DD009FD801 /* LoopKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F426ED65DD009FD801 /* LoopKit.framework */; };
 		847530F826ED65DD009FD801 /* LoopKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F526ED65DD009FD801 /* LoopKitUI.framework */; platformFilter = ios; };
 		8475315326EDA193009FD801 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314626EDA193009FD801 /* TimeInterval.swift */; };
@@ -255,6 +254,7 @@
 		T1P4000000000000005 /* MockOmnipodPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000006 /* MockOmnipodPeripheral.swift */; };
 		T1P4000000000000007 /* PodSimulatorTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000008 /* PodSimulatorTestCase.swift */; };
 		T1P4000000000000009 /* PodConnectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P400000000000000A /* PodConnectionTests.swift */; };
+		T1P500000000000000B /* PodActivationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P500000000000000C /* PodActivationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -507,6 +507,7 @@
 		T1P4000000000000006 /* MockOmnipodPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockOmnipodPeripheral.swift; sourceTree = "<group>"; };
 		T1P4000000000000008 /* PodSimulatorTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorTestCase.swift; sourceTree = "<group>"; };
 		T1P400000000000000A /* PodConnectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodConnectionTests.swift; sourceTree = "<group>"; };
+		T1P500000000000000C /* PodActivationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodActivationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -526,7 +527,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				T1CBM0000000000002 /* CoreBluetoothMock in Frameworks (OmniBLETests) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -721,6 +721,7 @@
 			isa = PBXGroup;
 			children = (
 				T1P400000000000000A /* PodConnectionTests.swift */,
+				T1P500000000000000C /* PodActivationTests.swift */,
 			);
 			path = Integration;
 			sourceTree = "<group>";
@@ -1058,7 +1059,6 @@
 			);
 			name = OmniBLETests;
 			packageProductDependencies = (
-				T1CBM0000000000004 /* CoreBluetoothMock */,
 			);
 			productName = OmniBLETests;
 			productReference = 84752E8B26ED0FFE009FD801 /* OmniBLETests.xctest */;
@@ -1235,7 +1235,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build the Go pod simulator binary from the vendored submodule.\n# Output goes to BUILT_PRODUCTS_DIR so the test bundle can find it via\n# Bundle.bundleURL.deletingLastPathComponent().appendingPathComponent(\"pod-sim\")\nset -euo pipefail\n\n# Find go on common Homebrew + system paths\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/local/go/bin:$HOME/go-local/go/bin:$PATH\"\nif ! command -v go >/dev/null 2>&1; then\n  echo \"error: 'go' not found on PATH. Install with 'brew install go' (one-time).\"\n  exit 1\nfi\n\ncd \"$SRCROOT/Vendor/omnipod-pod-simulator-bridge\"\ngo build -o \"$BUILT_PRODUCTS_DIR/pod-sim\" .\ncodesign --sign - \"$BUILT_PRODUCTS_DIR/pod-sim\"\necho \"Built and signed: $BUILT_PRODUCTS_DIR/pod-sim\"\n";
+			shellScript = "# Build the Go pod simulator binary from the vendored submodule.\n# Output goes to BUILT_PRODUCTS_DIR so the test bundle can find it via\n# Bundle.bundleURL.deletingLastPathComponent().appendingPathComponent(\"pod-sim\")\nset -euo pipefail\n\n# Find go on common Homebrew + system paths\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/local/go/bin:$HOME/go-local/go/bin:$PATH\"\nif ! command -v go >/dev/null 2>&1; then\n  echo \"error: 'go' not found on PATH. Install with 'brew install go' (one-time).\"\n  exit 1\nfi\n\ncd \"$SRCROOT/Vendor/omnipod-pod-simulator-bridge\"\ngo build -o \"$BUILT_PRODUCTS_DIR/pod-sim\" .\ncodesign --force --sign - \"$BUILT_PRODUCTS_DIR/pod-sim\"\necho \"Built and signed: $BUILT_PRODUCTS_DIR/pod-sim\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1440,6 +1440,7 @@
 				T1P4000000000000005 /* MockOmnipodPeripheral.swift in Sources */,
 				T1P4000000000000007 /* PodSimulatorTestCase.swift in Sources */,
 				T1P4000000000000009 /* PodConnectionTests.swift in Sources */,
+				T1P500000000000000B /* PodActivationTests.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2003,11 +2004,6 @@
 			productName = CryptoSwift;
 		};
 		T1CBM0000000000003 /* CoreBluetoothMock (OmniBLE) */ = {
-				isa = XCSwiftPackageProductDependency;
-				package = T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */;
-				productName = CoreBluetoothMock;
-			};
-		T1CBM0000000000004 /* CoreBluetoothMock (OmniBLETests) */ = {
 				isa = XCSwiftPackageProductDependency;
 				package = T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */;
 				productName = CoreBluetoothMock;
