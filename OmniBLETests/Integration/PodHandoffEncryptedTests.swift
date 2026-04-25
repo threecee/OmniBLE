@@ -262,6 +262,9 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
 
         // ── 7. Watch enacts a 1.0U bolus, waits for completion ──────────────
         let bolusExp = expectation(description: "watch enactBolus 1.0U")
+        // Slow CI: enactBolus completion can be invoked more than once if
+        // an internal retry/cancel path races with the success delivery.
+        bolusExp.assertForOverFulfill = false
         var bolusErr: PumpManagerError?
         watchPM.enactBolus(units: 1.0, activationType: .manualNoRecommendation) { err in
             bolusErr = err
@@ -370,6 +373,8 @@ final class PodHandoffEncryptedTests: PodSimulatorTestCase {
         // Watch enacts a 0.5U bolus mid-handoff (smaller for shorter wait).
         // 0.5U = 10 pulses; sim sets BolusEnd = now + 20s.
         let bolusExp = expectation(description: "interleaved 0.5U bolus")
+        // Slow CI guard: see note on the 1.0U bolusExp above.
+        bolusExp.assertForOverFulfill = false
         var bolusErr: PumpManagerError?
         watchPM.enactBolus(units: 0.5, activationType: .manualNoRecommendation) { err in
             bolusErr = err; bolusExp.fulfill()

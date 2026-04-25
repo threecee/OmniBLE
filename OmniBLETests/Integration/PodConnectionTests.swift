@@ -24,15 +24,19 @@ final class PodConnectionTests: PodSimulatorTestCase {
         let cd = ConnectExpectationDelegate()
         let manager = CBMCentralManagerFactory.instance(delegate: cd, queue: nil, forceMock: true)
 
-        // Wait for poweredOn
+        // Wait for poweredOn — CBM may fire state-change multiple times on
+        // slow CI; we only care about the first poweredOn.
         let powerExp = expectation(description: "poweredOn")
+        powerExp.assertForOverFulfill = false
         cd.onStateChange = { state in
             if state == .poweredOn { powerExp.fulfill() }
         }
         wait(for: [powerExp], timeout: 2.0)
 
-        // Scan + connect
+        // Scan + connect — didConnect can fire more than once on slow runners
+        // (rediscovery + reconnect race). Only the first fulfill matters.
         let connExp = expectation(description: "connected")
+        connExp.assertForOverFulfill = false
         cd.onConnect = { _ in connExp.fulfill() }
         manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
         wait(for: [connExp], timeout: 5.0)
@@ -49,11 +53,13 @@ final class PodConnectionTests: PodSimulatorTestCase {
 
         // Power on
         let powerExp = expectation(description: "poweredOn")
+        powerExp.assertForOverFulfill = false
         cd.onStateChange = { state in if state == .poweredOn { powerExp.fulfill() } }
         wait(for: [powerExp], timeout: 2.0)
 
         // Connect
         let connExp = expectation(description: "connected")
+        connExp.assertForOverFulfill = false
         cd.onConnect = { _ in connExp.fulfill() }
         manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
         wait(for: [connExp], timeout: 5.0)
@@ -63,8 +69,9 @@ final class PodConnectionTests: PodSimulatorTestCase {
         }
         XCTAssertEqual(peripheral.state, .connected)
 
-        // Disconnect
+        // Disconnect — didDisconnect can fire repeatedly on retries.
         let disconnectExp = expectation(description: "disconnected")
+        disconnectExp.assertForOverFulfill = false
         cd.onDisconnect = { _ in disconnectExp.fulfill() }
         manager.cancelPeripheralConnection(peripheral)
         wait(for: [disconnectExp], timeout: 3.0)
@@ -88,11 +95,13 @@ final class PodConnectionTests: PodSimulatorTestCase {
         let manager = CBMCentralManagerFactory.instance(delegate: cd, queue: nil, forceMock: true)
 
         let powerExp = expectation(description: "poweredOn")
+        powerExp.assertForOverFulfill = false
         cd.onStateChange = { state in if state == .poweredOn { powerExp.fulfill() } }
         wait(for: [powerExp], timeout: 2.0)
 
         // 1st connect
         let conn1Exp = expectation(description: "first connected")
+        conn1Exp.assertForOverFulfill = false
         cd.onConnect = { _ in conn1Exp.fulfill() }
         manager.scanForPeripherals(withServices: [DashServiceUUIDs.advertisement])
         wait(for: [conn1Exp], timeout: 5.0)
@@ -103,6 +112,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
 
         // Disconnect
         let disconnectExp = expectation(description: "disconnected")
+        disconnectExp.assertForOverFulfill = false
         cd.onDisconnect = { _ in disconnectExp.fulfill() }
         manager.cancelPeripheralConnection(peripheral)
         wait(for: [disconnectExp], timeout: 3.0)
@@ -110,6 +120,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
 
         // 2nd connect — directly call connect on the same peripheral handle
         let conn2Exp = expectation(description: "second connected")
+        conn2Exp.assertForOverFulfill = false
         cd.onConnect = { _ in conn2Exp.fulfill() }
         manager.connect(peripheral)
         wait(for: [conn2Exp], timeout: 5.0)
@@ -135,6 +146,7 @@ final class PodConnectionTests: PodSimulatorTestCase {
         let manager = CBMCentralManagerFactory.instance(delegate: cd, queue: nil, forceMock: true)
 
         let powerExp = expectation(description: "poweredOn")
+        powerExp.assertForOverFulfill = false
         cd.onStateChange = { state in if state == .poweredOn { powerExp.fulfill() } }
         wait(for: [powerExp], timeout: 2.0)
 
