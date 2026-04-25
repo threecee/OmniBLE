@@ -121,6 +121,17 @@ class BluetoothManager: NSObject {
     private var autoConnectIDs: Set<String> = [] {
         didSet {
             updateConnections()
+            // T.1 finding: if a new ID was added, kick off a scan so we can
+            // discover the peripheral. Without this, watch-side handoff hangs
+            // forever because centralManagerDidUpdateState already fired during
+            // init with an empty set (so hasDiscoveredAllAutoConnectDevices was
+            // vacuously true and no scan started). Adding an ID later doesn't
+            // re-trigger that callback, so we have to nudge the scan ourselves.
+            if manager?.state == .poweredOn
+                && !hasDiscoveredAllAutoConnectDevices
+                && !(manager?.isScanning ?? false) {
+                startScanning()
+            }
         }
     }
     
