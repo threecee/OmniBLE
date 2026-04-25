@@ -14,21 +14,24 @@ final class HandoffSettingsTests: XCTestCase {
         return UserDefaults(suiteName: suiteName)!
     }
 
-    func testDefaultModeIsManual() {
+    func testDefaultModeIsAutomatic() {
+        // B.2.e Phase 7 lifted the BETA gate — defaultMode flipped from
+        // .manual to .automatic. Existing users keep their setting; only
+        // new installs default to .automatic.
         let settings = HandoffSettings()
-        XCTAssertEqual(settings.mode, .manual)
+        XCTAssertEqual(settings.mode, .automatic)
     }
 
     func testRoundTripsThroughDefaults() throws {
         let defaults = freshDefaults()
-        let original = HandoffSettings(mode: .automatic)
+        let original = HandoffSettings(mode: .manual)   // explicit non-default value
         try original.save(to: defaults)
         let loaded = HandoffSettings.load(from: defaults)
-        XCTAssertEqual(loaded.mode, .automatic)
+        XCTAssertEqual(loaded.mode, .manual)
     }
 
     func testLoadFromEmptyDefaultsReturnsDefault() {
         let loaded = HandoffSettings.load(from: freshDefaults())
-        XCTAssertEqual(loaded.mode, .manual)
+        XCTAssertEqual(loaded.mode, .automatic)
     }
 }
