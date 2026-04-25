@@ -12,6 +12,7 @@ import LoopKit
 import UserNotifications
 import os.log
 import CoreBluetooth
+import CoreBluetoothMock
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -354,12 +355,12 @@ public class OmniBLEPumpManager: DeviceManager {
         notifyPodConnectionStateDidChange(isConnected: true)
     }
 
-    func omnipodPeripheralDidDisconnect(peripheral: CBPeripheral, error: Error?) {
+    func omnipodPeripheralDidDisconnect(peripheral: CBMPeripheral, error: Error?) {
         logDeviceCommunication("Pod disconnected \(peripheral.identifier.uuidString) \(String(describing: error))", type: .connection)
         notifyPodConnectionStateDidChange(isConnected: false)
     }
 
-    func omnipodPeripheralDidFailToConnect(peripheral: CBPeripheral, error: Error?) {
+    func omnipodPeripheralDidFailToConnect(peripheral: CBMPeripheral, error: Error?) {
         logDeviceCommunication("Pod failed to connect \(peripheral.identifier.uuidString), \(String(describing: error))", type: .connection)
     }
 

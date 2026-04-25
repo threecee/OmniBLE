@@ -14,6 +14,7 @@ import os.log
 import UIKit
 #endif
 import CoreBluetooth
+import CoreBluetoothMock
 
 protocol PodCommsDelegate: OmniBLEConnectionDelegate {
     func podComms(_ podComms: PodComms, didChange podState: PodState?)
@@ -164,7 +165,7 @@ public class PodComms: CustomDebugStringConvertible {
 
     public func forgetPod() {
         if let manager = manager {
-            self.log.default("Removing %{public}@ from auto-connect ids", manager.peripheral)
+            self.log.default("Removing %{public}@ from auto-connect ids", manager.peripheral.identifier.uuidString)
             bluetoothManager.disconnectFromDevice(uuidString: manager.peripheral.identifier.uuidString)
         }
 
@@ -568,14 +569,14 @@ extension PodComms: OmniBLEConnectionDelegate {
         }
     }
 
-    func omnipodPeripheralDidDisconnect(peripheral: CBPeripheral, error: Error?) {
+    func omnipodPeripheralDidDisconnect(peripheral: CBMPeripheral, error: Error?) {
         if let podState = podState, peripheral.identifier.uuidString == podState.bleIdentifier {
             self.delegate?.omnipodPeripheralDidDisconnect(peripheral: peripheral, error: error)
             log.debug("omnipodPeripheralDidDisconnect... will auto-reconnect")
         }
     }
 
-    func omnipodPeripheralDidFailToConnect(peripheral: CBPeripheral, error: Error?) {
+    func omnipodPeripheralDidFailToConnect(peripheral: CBMPeripheral, error: Error?) {
         if let podState = podState, peripheral.identifier.uuidString == podState.bleIdentifier {
             self.delegate?.omnipodPeripheralDidFailToConnect(peripheral: peripheral, error: error)
             log.debug("omnipodPeripheralDidDisconnect... will auto-reconnect")

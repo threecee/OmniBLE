@@ -8,6 +8,7 @@
 //
 
 import CoreBluetooth
+import CoreBluetoothMock
 import Foundation
 import os.log
 
@@ -17,14 +18,14 @@ class PeripheralManager: NSObject {
     let log = OSLog(category: "DashPeripheralManager")
 
     ///
-    /// This is mutable, because CBPeripheral instances can seemingly become invalid, and need to be periodically re-fetched from CBCentralManager
-    var peripheral: CBPeripheral {
+    /// This is mutable, because CBMPeripheral instances can seemingly become invalid, and need to be periodically re-fetched from CBMCentralManager
+    var peripheral: CBMPeripheral {
         didSet {
             guard oldValue !== peripheral else {
                 return
             }
 
-            log.error("Replacing peripheral reference %{public}@ -> %{public}@", oldValue, peripheral)
+            log.error("Replacing peripheral reference %{public}@ -> %{public}@", oldValue.identifier.uuidString, peripheral.identifier.uuidString)
 
             oldValue.delegate = nil
             peripheral.delegate = self
@@ -68,7 +69,7 @@ class PeripheralManager: NSObject {
     /// Any error surfaced during the active operation
     private var commandError: Error?
 
-    private(set) weak var central: CBCentralManager?
+    private(set) weak var central: CBMCentralManager?
 
     let configuration: Configuration
 
@@ -77,7 +78,7 @@ class PeripheralManager: NSObject {
 
     weak var delegate: PeripheralManagerDelegate?
 
-    init(peripheral: CBPeripheral, configuration: Configuration, centralManager: CBCentralManager) {
+    init(peripheral: CBMPeripheral, configuration: Configuration, centralManager: CBMCentralManager) {
         self.peripheral = peripheral
         self.central = centralManager
         self.configuration = configuration
@@ -101,8 +102,8 @@ extension PeripheralManager {
 
     enum CommandCondition {
         case notificationStateUpdate(characteristicUUID: CBUUID, enabled: Bool)
-        case valueUpdate(characteristic: CBCharacteristic, matching: ((Data?) -> Bool)?)
-        case write(characteristic: CBCharacteristic)
+        case valueUpdate(characteristic: CBMCharacteristic, matching: ((Data?) -> Bool)?)
+        case write(characteristic: CBMCharacteristic)
         case discoverServices
         case discoverCharacteristicsForService(serviceUUID: CBUUID)
         case connect
@@ -131,7 +132,7 @@ extension PeripheralManager {
             }
 
             if !self.needsConfiguration && self.peripheral.services == nil {
-                self.log.error("Configured peripheral has no services. Reconfiguring %{public}@", self.peripheral)
+                self.log.error("Configured peripheral has no services. Reconfiguring %{public}@", self.peripheral.identifier.uuidString)
             }
 
             if self.needsConfiguration || self.peripheral.services == nil {
@@ -209,7 +210,7 @@ extension PeripheralManager {
         // Prelude
         dispatchPrecondition(condition: .onQueue(queue))
         guard central?.state == .poweredOn && peripheral.state == .connected else {
-            self.log.info("runCommand guard failed - bluetooth not running or peripheral not connected: peripheral %@", peripheral)
+            self.log.info("runCommand guard failed - bluetooth not running or peripheral not connected: peripheral %@", peripheral.identifier.uuidString)
             throw PeripheralManagerError.notReady
         }
 
@@ -271,7 +272,7 @@ extension PeripheralManager {
         }
     }
 
-    func discoverCharacteristics(_ characteristicUUIDs: [CBUUID], for service: CBService, timeout: TimeInterval) throws {
+    func discoverCharacteristics(_ characteristicUUIDs: [CBUUID], for service: CBMService, timeout: TimeInterval) throws {
         let characteristicsToDiscover = peripheral.characteristicsToDiscover(from: characteristicUUIDs, for: service)
 
         guard characteristicsToDiscover.count > 0 else {
@@ -293,7 +294,7 @@ extension PeripheralManager {
     }
 
     /// - Throws: PeripheralManagerError
-    func setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic, timeout: TimeInterval) throws {
+    func setNotifyValue(_ enabled: Bool, for characteristic: CBMCharacteristic, timeout: TimeInterval) throws {
         try runCommand(timeout: timeout) {
             addCondition(.notificationStateUpdate(characteristicUUID: characteristic.uuid, enabled: enabled))
 
@@ -302,7 +303,7 @@ extension PeripheralManager {
     }
 
     /// - Throws: PeripheralManagerError
-    func readValue(for characteristic: CBCharacteristic, timeout: TimeInterval) throws -> Data? {
+    func readValue(for characteristic: CBMCharacteristic, timeout: TimeInterval) throws -> Data? {
         try runCommand(timeout: timeout) {
             addCondition(.valueUpdate(characteristic: characteristic, matching: nil))
 
@@ -313,7 +314,7 @@ extension PeripheralManager {
     }
 
     /// - Throws: PeripheralManagerError
-    func writeValue(_ value: Data, for characteristic: CBCharacteristic, type: CBCharacteristicWriteType, timeout: TimeInterval) throws {
+    func writeValue(_ value: Data, for characteristic: CBMCharacteristic, type: CBCharacteristicWriteType, timeout: TimeInterval) throws {
         try runCommand(timeout: timeout) {
             if case .withResponse = type {
                 addCondition(.write(characteristic: characteristic))
@@ -338,9 +339,9 @@ extension PeripheralManager {
 }
 
 // MARK: - Delegate methods executed on the central's queue
-extension PeripheralManager: CBPeripheralDelegate {
+extension PeripheralManager: CBMPeripheralDelegate {
 
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+    func peripheral(_ peripheral: CBMPeripheral, didDiscoverServices error: Error?) {
         log.default("didDiscoverServices")
         commandLock.lock()
 
@@ -362,7 +363,7 @@ extension PeripheralManager: CBPeripheralDelegate {
         commandLock.unlock()
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    func peripheral(_ peripheral: CBMPeripheral, didDiscoverCharacteristicsFor service: CBMService, error: Error?) {
         commandLock.lock()
 
         if let index = commandConditions.firstIndex(where: { (condition) -> Bool in
@@ -383,7 +384,7 @@ extension PeripheralManager: CBPeripheralDelegate {
         commandLock.unlock()
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+    func peripheral(_ peripheral: CBMPeripheral, didUpdateNotificationStateFor characteristic: CBMCharacteristic, error: Error?) {
         commandLock.lock()
 
         if let index = commandConditions.firstIndex(where: { (condition) -> Bool in
@@ -404,7 +405,7 @@ extension PeripheralManager: CBPeripheralDelegate {
         commandLock.unlock()
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+    func peripheral(_ peripheral: CBMPeripheral, didWriteValueFor characteristic: CBMCharacteristic, error: Error?) {
         commandLock.lock()
         
         if let index = commandConditions.firstIndex(where: { (condition) -> Bool in
@@ -425,7 +426,7 @@ extension PeripheralManager: CBPeripheralDelegate {
         commandLock.unlock()
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    func peripheral(_ peripheral: CBMPeripheral, didUpdateValueFor characteristic: CBMCharacteristic, error: Error?) {
         commandLock.lock()
         
         if let macro = configuration.valueUpdateMacros[characteristic.uuid] {
@@ -451,7 +452,7 @@ extension PeripheralManager: CBPeripheralDelegate {
 
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+    func peripheral(_ peripheral: CBMPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
         guard error == nil else {
             self.log.error("Error reading rssi: %{public}@", String(describing: RSSI))
             return
@@ -477,14 +478,14 @@ extension PeripheralManager {
         queueLock.unlock()
     }
 
-    func centralManager(_ central: CBCentralManager, didDisconnect peripheral: CBPeripheral, error: Error?) {
+    func centralManager(_ central: CBMCentralManager, didDisconnect peripheral: CBMPeripheral, error: Error?) {
         self.queue.async {
             self.idleStart = nil
         }
     }
 
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        self.log.debug("PeripheralManager - didConnect: %@", peripheral)
+    func centralManager(_ central: CBMCentralManager, didConnect peripheral: CBMPeripheral) {
+        self.log.debug("PeripheralManager - didConnect: %@", peripheral.identifier.uuidString)
         switch peripheral.state {
         case .connected:
             clearCommsQueues()
@@ -513,8 +514,8 @@ extension PeripheralManager {
     }
 }
 
-extension CBPeripheral {
-    func getCommandCharacteristic() -> CBCharacteristic? {
+extension CBMPeripheral {
+    func getCommandCharacteristic() -> CBMCharacteristic? {
         guard let service = services?.itemWithUUID(OmnipodServiceUUID.service.cbUUID) else {
             return nil
         }
@@ -522,7 +523,7 @@ extension CBPeripheral {
         return service.characteristics?.itemWithUUID(OmnipodCharacteristicUUID.command.cbUUID)
     }
 
-    func getDataCharacteristic() -> CBCharacteristic? {
+    func getDataCharacteristic() -> CBMCharacteristic? {
         guard let service = services?.itemWithUUID(OmnipodServiceUUID.service.cbUUID) else {
             return nil
         }
