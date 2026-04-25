@@ -42,6 +42,7 @@ final class OmniBLEHandoffPayloadTests: XCTestCase {
             serializedPodState: serialized,
             lastBolusSequence: 42,
             lastBasalScheduleId: UUID(),
+            validUntil: Date.distantFuture,
             createdAt: fixedDate
         )
         let data = try encoder.encode(original)
@@ -49,8 +50,8 @@ final class OmniBLEHandoffPayloadTests: XCTestCase {
         XCTAssertEqual(decoded, original)
     }
 
-    func testCurrentFormatVersionIsOne() {
-        XCTAssertEqual(OmniBLEHandoffPayload.currentFormatVersion, 1)
+    func testCurrentFormatVersionIsTwo() {
+        XCTAssertEqual(OmniBLEHandoffPayload.currentFormatVersion, 2)
     }
 
     func testNewPayloadUsesCurrentFormatVersion() {
@@ -58,7 +59,8 @@ final class OmniBLEHandoffPayloadTests: XCTestCase {
             podSerial: "X",
             serializedPodState: Data(),
             lastBolusSequence: nil,
-            lastBasalScheduleId: nil
+            lastBasalScheduleId: nil,
+            validUntil: Date(timeIntervalSinceNow: 60)
         )
         XCTAssertEqual(payload.formatVersion, OmniBLEHandoffPayload.currentFormatVersion)
     }
@@ -70,6 +72,7 @@ final class OmniBLEHandoffPayloadTests: XCTestCase {
         {
           "formatVersion": 99,
           "createdAt": 1700000000,
+          "validUntil": 1700003600,
           "podSerial": "X",
           "serializedPodState": "",
           "lastBolusSequence": null,
@@ -89,10 +92,38 @@ final class OmniBLEHandoffPayloadTests: XCTestCase {
             podSerial: "X",
             serializedPodState: serialized,
             lastBolusSequence: nil,
-            lastBasalScheduleId: nil
+            lastBasalScheduleId: nil,
+            validUntil: Date(timeIntervalSinceNow: 60)
         )
         let dict = try payload.decodePodStateRawValue()
         XCTAssertEqual(dict["address"] as? UInt32, 0xABCDEF12)
         XCTAssertEqual(dict["podId"] as? UInt32, 0xDEADBEEF)
+    }
+
+    func testIsValidNowChecksAgainstValidUntil() {
+        let p = OmniBLEHandoffPayload(
+            podSerial: "X",
+            serializedPodState: Data(),
+            lastBolusSequence: nil,
+            lastBasalScheduleId: nil,
+            validUntil: Date(timeIntervalSinceNow: 60)
+        )
+        XCTAssertTrue(p.isValid(now: Date()))
+        XCTAssertFalse(p.isValid(now: Date(timeIntervalSinceNow: 120)))
+    }
+
+    func testEncodedRoundTripsViaJSON() throws {
+        let p = OmniBLEHandoffPayload(
+            podSerial: "TEST_POD_X",
+            serializedPodState: Data("dummy".utf8),
+            lastBolusSequence: 42,
+            lastBasalScheduleId: UUID(),
+            validUntil: Date(timeIntervalSinceNow: 60)
+        )
+        let data = try p.encoded()
+        let decoded = try JSONDecoder().decode(OmniBLEHandoffPayload.self, from: data)
+        XCTAssertEqual(decoded.podSerial, p.podSerial)
+        XCTAssertEqual(decoded.lastBolusSequence, p.lastBolusSequence)
+        XCTAssertEqual(decoded.lastBasalScheduleId, p.lastBasalScheduleId)
     }
 }
