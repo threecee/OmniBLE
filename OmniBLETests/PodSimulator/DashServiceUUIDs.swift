@@ -10,6 +10,7 @@
 //  connection failure.
 //
 
+import CoreBluetooth
 import CoreBluetoothMock
 
 enum DashServiceUUIDs {

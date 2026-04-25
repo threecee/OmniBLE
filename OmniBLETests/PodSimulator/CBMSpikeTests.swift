@@ -8,6 +8,7 @@
 //
 
 import XCTest
+import CoreBluetooth
 import CoreBluetoothMock
 @testable import OmniBLE
 
