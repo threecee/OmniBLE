@@ -247,6 +247,9 @@
 		D8C72C052A50D96800268D82 /* Pod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325327185EE4007A3BC2 /* Pod.swift */; };
 		D8C72C062A50D97500268D82 /* PodProgressStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325627185EE4007A3BC2 /* PodProgressStatus.swift */; };
 		WA7C4006000000000000001 /* ReservoirLevelHighlightState.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */; };
+		T1PS000000000000002 /* MessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000001 /* MessageType.swift */; };
+		T1PS000000000000004 /* PodSimulatorBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000003 /* PodSimulatorBridgeTests.swift */; };
+		T1PS000000000000006 /* PodSimulatorBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000005 /* PodSimulatorBridge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -491,6 +494,9 @@
 		D897B06C29347EE500FDB009 /* InsulinTableEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsulinTableEntry.swift; sourceTree = "<group>"; };
 		D8C72BD92A50D7D700268D82 /* OmniBLEParser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OmniBLEParser; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8C72BDB2A50D7D700268D82 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		T1PS000000000000001 /* MessageType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageType.swift; sourceTree = "<group>"; };
+		T1PS000000000000003 /* PodSimulatorBridgeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorBridgeTests.swift; sourceTree = "<group>"; };
+		T1PS000000000000005 /* PodSimulatorBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorBridge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -680,11 +686,23 @@
 				D802CD0327DD98C10072E3A1 /* StatusTests.swift */,
 				D802CD0527DD98C10072E3A1 /* TempBasalTests.swift */,
 				A9D054D427651D2400FAFEFB /* TestUtilities.swift */,
+				T1PS000000000000007 /* PodSimulator */,
 				D800CF1827E682E90090EADB /* ZeroBasalScheduleTest.swift */,
 			);
 			path = OmniBLETests;
 			sourceTree = "<group>";
 		};
+		T1PS000000000000007 /* PodSimulator */ = {
+			isa = PBXGroup;
+			children = (
+				T1PS000000000000001 /* MessageType.swift */,
+				T1PS000000000000005 /* PodSimulatorBridge.swift */,
+				T1PS000000000000003 /* PodSimulatorBridgeTests.swift */,
+			);
+			path = PodSimulator;
+			sourceTree = "<group>";
+		};
+
 		84752E9C26ED10A0009FD801 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1391,6 +1409,9 @@
 				A9A5BCF7276C1E7000B02C86 /* KeyExchangeTests.swift in Sources */,
 				D802CD1027DD99AB0072E3A1 /* CRC16Tests.swift in Sources */,
 				A9A5BCF5276C1E6D00B02C86 /* PayloadSplitJoinTests.swift in Sources */,
+				T1PS000000000000002 /* MessageType.swift in Sources */,
+				T1PS000000000000006 /* PodSimulatorBridge.swift in Sources */,
+				T1PS000000000000004 /* PodSimulatorBridgeTests.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
