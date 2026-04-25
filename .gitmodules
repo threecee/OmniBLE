@@ -1,0 +1,3 @@
+[submodule "Vendor/omnipod-pod-simulator-bridge"]
+	path = Vendor/omnipod-pod-simulator-bridge
+	url = https://github.com/threecee/omnipod-pod-simulator-bridge.git
