@@ -2,9 +2,9 @@ name: Build matrix (iOS + watchOS)
 
 on:
   push:
-    branches: [watchos-support]
+    branches: [watchos-support, t1-implementation]
   pull_request:
-    branches: [watchos-support, dev, main]
+    branches: [watchos-support, dev, main, t1-implementation]
   workflow_dispatch:
 
 # OmniBLE can't build on its own — it links against LoopKit and
@@ -82,6 +82,18 @@ jobs:
           set -euo pipefail
           git fetch --no-tags origin "${{ github.sha }}" || git fetch --no-tags origin "${{ github.ref }}"
           git checkout --force "${{ github.sha }}"
+          # Initialize nested submodules (e.g., Vendor/omnipod-pod-simulator-bridge)
+          # that are only present at this commit, not at LoopWorkspace's pinned OmniBLE ref.
+          git submodule update --init --recursive
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: LoopWorkspace/OmniBLE/Vendor/omnipod-pod-simulator-bridge/go.sum
+
+      - name: Verify Go on PATH
+        run: go version && which go
 
       - name: Run iOS tests
         working-directory: LoopWorkspace
