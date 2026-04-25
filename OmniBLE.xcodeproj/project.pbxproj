@@ -256,6 +256,9 @@
 		T1P4000000000000009 /* PodConnectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P400000000000000A /* PodConnectionTests.swift */; };
 		T1P500000000000000B /* PodActivationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P500000000000000C /* PodActivationTests.swift */; };
 		T1P5B0000000000001 /* QueueBouncingCentralDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */; };
+		T1P600000000000001 /* PodStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P600000000000002 /* PodStatusTests.swift */; };
+		T1P600000000000003 /* PodBolusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P600000000000004 /* PodBolusTests.swift */; };
+		T1P600000000000005 /* MockPumpManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P600000000000006 /* MockPumpManagerDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -510,6 +513,9 @@
 		T1P400000000000000A /* PodConnectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodConnectionTests.swift; sourceTree = "<group>"; };
 		T1P500000000000000C /* PodActivationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodActivationTests.swift; sourceTree = "<group>"; };
 		T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueueBouncingCentralDelegate.swift; sourceTree = "<group>"; };
+		T1P600000000000002 /* PodStatusTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodStatusTests.swift; sourceTree = "<group>"; };
+		T1P600000000000004 /* PodBolusTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodBolusTests.swift; sourceTree = "<group>"; };
+		T1P600000000000006 /* MockPumpManagerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockPumpManagerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -716,6 +722,7 @@
 				T1P4000000000000006 /* MockOmnipodPeripheral.swift */,
 				T1P4000000000000008 /* PodSimulatorTestCase.swift */,
 				T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */,
+				T1P600000000000006 /* MockPumpManagerDelegate.swift */,
 			);
 			path = PodSimulator;
 			sourceTree = "<group>";
@@ -725,6 +732,8 @@
 			children = (
 				T1P400000000000000A /* PodConnectionTests.swift */,
 				T1P500000000000000C /* PodActivationTests.swift */,
+				T1P600000000000002 /* PodStatusTests.swift */,
+				T1P600000000000004 /* PodBolusTests.swift */,
 			);
 			path = Integration;
 			sourceTree = "<group>";
@@ -1444,6 +1453,9 @@
 				T1P4000000000000007 /* PodSimulatorTestCase.swift in Sources */,
 				T1P4000000000000009 /* PodConnectionTests.swift in Sources */,
 				T1P500000000000000B /* PodActivationTests.swift in Sources */,
+				T1P600000000000001 /* PodStatusTests.swift in Sources */,
+				T1P600000000000003 /* PodBolusTests.swift in Sources */,
+				T1P600000000000005 /* MockPumpManagerDelegate.swift in Sources */,
 				T1P5B0000000000001 /* QueueBouncingCentralDelegate.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 			);

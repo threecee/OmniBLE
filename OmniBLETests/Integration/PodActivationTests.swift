@@ -29,15 +29,6 @@ import LoopKit
 
 final class PodActivationTests: PodSimulatorTestCase {
 
-    /// Held for the lifetime of each test so CBM (which uses weak delegate
-    /// references) doesn't drop our queue-bouncing wrapper.
-    private var queueBouncer: QueueBouncingCentralDelegate?
-
-    override func tearDownWithError() throws {
-        queueBouncer = nil
-        try super.tearDownWithError()
-    }
-
     /// Phase 5b's marquee test (Phase 5a was escalated due to a CBM
     /// threading bug; the QueueBouncingCentralDelegate workaround unblocks
     /// it). Full activation from a fresh, unpaired pod:
@@ -50,7 +41,7 @@ final class PodActivationTests: PodSimulatorTestCase {
     /// match what OmniBLE expects, and we need to fall back to porting
     /// `pkg/encrypt`/`pkg/message` to Swift (T.1 spec Q1 fallback option b).
     func testFullActivationFlow() throws {
-        let manager = makeUnpairedPumpManager()
+        let manager = makeFreshPumpManager()
         let podComms = manager.podCommsForTesting
 
         // Install the queue-bouncing CBM delegate wrapper. This MUST happen
@@ -60,7 +51,7 @@ final class PodActivationTests: PodSimulatorTestCase {
 
         // Brief settle so the wrapper's centralManagerDidUpdateState
         // re-fire reaches the BluetoothManager on its managerQueue.
-        waitForBluetoothPoweredOn(timeout: 1.0)
+        waitForBluetoothSettle(timeout: 1.0)
 
         // Step 1: BLE discovery + connect to the mock peripheral.
         let connectExp = expectation(description: "connectToNewPod")
@@ -144,34 +135,4 @@ final class PodActivationTests: PodSimulatorTestCase {
         )
     }
 
-    // MARK: - Helpers
-
-    /// Brief settling pause to let CBMCentralManagerMock's per-instance
-    /// initialization async dispatch fire on whatever queue OmniBLE's
-    /// BluetoothManager passed at init time (it's a private background queue
-    /// we can't observe directly). 500ms is plenty in practice.
-    private func waitForBluetoothPoweredOn(timeout: TimeInterval = 1.0) {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
-            Thread.sleep(forTimeInterval: 0.05)
-        }
-    }
-
-    /// Build a fresh unpaired OmniBLEPumpManager wired to use the CBM-mock
-    /// BluetoothManager (CBMCentralManagerFactory returns the mock under
-    /// targetEnvironment(simulator), so OmniBLE's BluetoothManager picks up
-    /// our registered MockOmnipodPeripheral automatically).
-    private func makeUnpairedPumpManager() -> OmniBLEPumpManager {
-        let state = OmniBLEPumpManagerState(
-            podState: nil,
-            timeZone: .currentFixed,
-            basalSchedule: BasalSchedule(entries: [
-                BasalScheduleEntry(rate: 1.0, startTime: 0)
-            ]),
-            insulinType: .novolog,
-            maximumTempBasalRate: 5.0
-        )
-        return OmniBLEPumpManager(state: state)
-    }
 }
