@@ -91,6 +91,11 @@ private final class PodMockDelegate: CBMPeripheralSpecDelegate {
     func peripheral(_ peripheral: CBMPeripheralSpec, didDisconnect error: Error?) {
         connected = false
         try? bridge.send(type: .disconnect, payload: Data())
+        // Drain DISCONNECT_ACK so it isn't sitting in the buffer when the next
+        // CONNECT cycle starts (otherwise the next peripheralDidReceiveConnectionRequest
+        // reads DISCONNECT_ACK instead of CONNECT_ACK and the connect appears to fail).
+        // Best-effort; if the bridge is dead this just times out cleanly.
+        _ = try? bridge.receive(timeout: 0.5)
     }
 
     func peripheral(_ peripheral: CBMPeripheralSpec,
