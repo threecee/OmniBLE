@@ -85,6 +85,8 @@
 		84752EE726ED13F5009FD801 /* PairResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752ED426ED13F5009FD801 /* PairResult.swift */; };
 		84752EE826ED13F5009FD801 /* PairMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752ED526ED13F5009FD801 /* PairMessage.swift */; };
 		8475306E26ED15DE009FD801 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8475306D26ED15DE009FD801 /* CryptoSwift */; };
+		T1CBM0000000000001 /* CoreBluetoothMock in Frameworks (OmniBLE) */ = {isa = PBXBuildFile; productRef = T1CBM0000000000003 /* CoreBluetoothMock */; };
+		T1CBM0000000000002 /* CoreBluetoothMock in Frameworks (OmniBLETests) */ = {isa = PBXBuildFile; productRef = T1CBM0000000000004 /* CoreBluetoothMock */; };
 		847530F626ED65DD009FD801 /* LoopKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F426ED65DD009FD801 /* LoopKit.framework */; };
 		847530F826ED65DD009FD801 /* LoopKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F526ED65DD009FD801 /* LoopKitUI.framework */; platformFilter = ios; };
 		8475315326EDA193009FD801 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314626EDA193009FD801 /* TimeInterval.swift */; };
@@ -500,6 +502,7 @@
 				847530F626ED65DD009FD801 /* LoopKit.framework in Frameworks */,
 				8475306E26ED15DE009FD801 /* CryptoSwift in Frameworks */,
 				847530F826ED65DD009FD801 /* LoopKitUI.framework in Frameworks */,
+				T1CBM0000000000001 /* CoreBluetoothMock in Frameworks (OmniBLE) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,6 +510,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				T1CBM0000000000002 /* CoreBluetoothMock in Frameworks (OmniBLETests) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -991,6 +995,7 @@
 			packageProductDependencies = (
 				8475306D26ED15DE009FD801 /* CryptoSwift */,
 				2742C7042AD875B100E67833 /* SlideButton */,
+				T1CBM0000000000003 /* CoreBluetoothMock */,
 			);
 			productName = OmniBLE;
 			productReference = 84752E8226ED0FFE009FD801 /* OmniBLE.framework */;
@@ -1010,6 +1015,9 @@
 				84752E8E26ED0FFE009FD801 /* PBXTargetDependency */,
 			);
 			name = OmniBLETests;
+			packageProductDependencies = (
+				T1CBM0000000000004 /* CoreBluetoothMock */,
+			);
 			productName = OmniBLETests;
 			productReference = 84752E8B26ED0FFE009FD801 /* OmniBLETests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1114,6 +1122,7 @@
 			packageReferences = (
 				8475306C26ED15DE009FD801 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 				2742C7032AD875B100E67833 /* XCRemoteSwiftPackageReference "SlideButton" */,
+				T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */,
 			);
 			productRefGroup = 84752E8326ED0FFE009FD801 /* Products */;
 			projectDirPath = "";
@@ -1898,6 +1907,14 @@
 				minimumVersion = 1.4.1;
 			};
 		};
+		T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */ = {
+				isa = XCRemoteSwiftPackageReference;
+				repositoryURL = "https://github.com/NordicSemiconductor/IOS-CoreBluetooth-Mock.git";
+				requirement = {
+					kind = upToNextMajorVersion;
+					minimumVersion = 0.18.0;
+				};
+			};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1911,6 +1928,16 @@
 			package = 8475306C26ED15DE009FD801 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
+		T1CBM0000000000003 /* CoreBluetoothMock (OmniBLE) */ = {
+				isa = XCSwiftPackageProductDependency;
+				package = T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */;
+				productName = CoreBluetoothMock;
+			};
+		T1CBM0000000000004 /* CoreBluetoothMock (OmniBLETests) */ = {
+				isa = XCSwiftPackageProductDependency;
+				package = T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */;
+				productName = CoreBluetoothMock;
+			};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 84752E7926ED0FFE009FD801 /* Project object */;
