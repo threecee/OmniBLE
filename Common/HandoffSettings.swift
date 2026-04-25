@@ -15,7 +15,7 @@ public struct HandoffSettings: Codable, Equatable {
     /// Default mode is `.manual` until B.2.e ships actual BLE take-over.
     /// After B.2.e, the default flips to `.automatic` per the user's
     /// preference recorded in the B.2.d spec §1.
-    public static let defaultMode: HandoffMode = .manual
+    public static let defaultMode: HandoffMode = .automatic
 
     public init(mode: HandoffMode = HandoffSettings.defaultMode) {
         self.mode = mode
