@@ -56,18 +56,30 @@ final class HandoffStateMachineTests: XCTestCase {
         XCTAssertTrue(effects.contains { if case .sendPairingHandoff = $0 { return true }; return false })
     }
 
-    func testPhoneDriver_incomingModeSwitchToWatchDriver_transitionsViaHandoffPending() {
-        // Watch initiated takeover; phone receives mode switch → enters handoffPending.
-        let m = machine(role: .phone)
-        let id = UUID()
+    func testPhoneDriver_incomingModeSwitchToWatchDriver_selfCompletes() {
+        // After B.2.e Phase 1: receiver self-completes to .watchDriver in one event
+        // (was: stayed in .handoffPending awaiting initiator ack that never came).
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let tid = UUID()
         let ms = PhoneWatchModeSwitch(
-            protocolVersion: 1, sentAt: now,
-            requestedBy: .watch, targetMode: .watchDriver, transitionId: id)
-        _ = m.handle(.incomingModeSwitch(ms), now: now)
-        if case .handoffPending(direction: .phoneToWatch, transitionId: let recordedId, _) = m.state {
-            XCTAssertEqual(recordedId, id)
-        } else {
-            XCTFail("expected handoffPending(phoneToWatch, id=\(id)), got \(m.state)")
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: tid
+        )
+        let effects = sm.handle(.incomingModeSwitch(ms))
+
+        if case .watchDriver = sm.state {} else {
+            XCTFail("Expected .watchDriver after self-completion; got \(sm.state)")
+        }
+
+        // Confirm modeSwitch went out (from enterPending), and final notifyUI
+        // reflects the completed state.
+        XCTAssertTrue(effects.contains { if case .sendModeSwitch = $0 { return true }; return false },
+                      "Expected sendModeSwitch (confirm) from enterPending")
+        if case .notifyUI(let last) = effects.last, case .watchDriver = last {} else {
+            XCTFail("Expected last effect to be notifyUI(.watchDriver); got \(String(describing: effects.last))")
         }
     }
 
@@ -175,17 +187,23 @@ final class HandoffStateMachineTests: XCTestCase {
         XCTAssertTrue(effects.contains { if case .sendPairingHandoff = $0 { return true }; return false })
     }
 
-    func testWatchDriver_incomingModeSwitchToPhoneDriver_transitionsViaHandoffPending() {
-        let m = machine(role: .watch, initial: .watchDriver)
-        let id = UUID()
+    func testWatchDriver_incomingModeSwitchToPhoneDriver_selfCompletes() {
+        let sm = HandoffStateMachine(initialState: .watchDriver, role: .phone)
+        let tid = UUID()
         let ms = PhoneWatchModeSwitch(
-            protocolVersion: 1, sentAt: now,
-            requestedBy: .phone, targetMode: .phoneDriver, transitionId: id)
-        _ = m.handle(.incomingModeSwitch(ms), now: now)
-        if case .handoffPending(direction: .watchToPhone, transitionId: let recordedId, _) = m.state {
-            XCTAssertEqual(recordedId, id)
-        } else {
-            XCTFail("expected handoffPending(watchToPhone), got \(m.state)")
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            requestedBy: .watch,
+            targetMode: .phoneDriver,
+            transitionId: tid
+        )
+        let effects = sm.handle(.incomingModeSwitch(ms))
+
+        if case .phoneDriver = sm.state {} else {
+            XCTFail("Expected .phoneDriver after self-completion; got \(sm.state)")
+        }
+        if case .notifyUI(let last) = effects.last, case .phoneDriver = last {} else {
+            XCTFail("Expected last effect to be notifyUI(.phoneDriver); got \(String(describing: effects.last))")
         }
     }
 
@@ -351,5 +369,70 @@ final class HandoffStateMachineTests: XCTestCase {
         let m = machine(initial: .recovering(
             reason: .timeoutWaitingForConfirmation, lastKnownOwner: .watch))
         XCTAssertEqual(m.lastKnownOwner, .watch)
+    }
+
+    // MARK: - B.2.e Phase 1: receiver-side self-completion
+
+    func testInitiatorSideStillCompletesOnReceivedConfirmModeSwitch() {
+        // Pre-existing line-62-65 case (initiator side) MUST still work after the
+        // receiver-side fix — initiator completes when it receives the receiver's
+        // confirm modeSwitch with matching transitionId.
+        let initialId = UUID()
+        let sm = HandoffStateMachine(
+            initialState: .handoffPending(direction: .phoneToWatch,
+                                           transitionId: initialId,
+                                           deadline: Date().addingTimeInterval(30)),
+            role: .phone
+        )
+        let confirm = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            requestedBy: .watch,
+            targetMode: .watchDriver,
+            transitionId: initialId
+        )
+        let effects = sm.handle(.incomingModeSwitch(confirm))
+        if case .watchDriver = sm.state {} else {
+            XCTFail("Initiator should complete to .watchDriver on confirm; got \(sm.state)")
+        }
+        XCTAssertEqual(effects.count, 1, "Initiator's completeHandoff emits only notifyUI (no resumeIssuingPodCommands since role=.phone but new owner=.watch)")
+    }
+
+    func testReceiverSelfCompletionEffectsOrderHasNotifyUIWatchDriverLast() {
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: UUID()
+        )
+        let effects = sm.handle(.incomingModeSwitch(ms))
+
+        // Order matters for OmniBLEOwnership wiring: ownership.update must see
+        // the FINAL state after all other effects have been processed. So the
+        // last notifyUI must be .watchDriver (not .handoffPending).
+        if case .notifyUI(let last) = effects.last, case .watchDriver = last {} else {
+            XCTFail("Last effect must be notifyUI(.watchDriver) for ownership.update wiring")
+        }
+        // resumeIssuingPodCommands SHOULD be present because role=.watch and new owner=.watch
+        XCTAssertTrue(effects.contains { if case .resumeIssuingPodCommands = $0 { return true }; return false },
+                      "Expected resumeIssuingPodCommands since this side is now the driver")
+    }
+
+    func testNonInitiatorSideRejectsModeSwitchWithWrongTargetMode() {
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            requestedBy: .phone,
+            targetMode: .phoneDriver,    // wrong target — already in phoneDriver
+            transitionId: UUID()
+        )
+        let effects = sm.handle(.incomingModeSwitch(ms))
+        if case .phoneDriver = sm.state {} else {
+            XCTFail("State should remain .phoneDriver when target doesn't match")
+        }
+        XCTAssertTrue(effects.isEmpty, "No effects for no-op handle")
     }
 }

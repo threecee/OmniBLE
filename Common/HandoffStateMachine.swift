@@ -48,14 +48,17 @@ public final class HandoffStateMachine {
 
         case (.phoneDriver, .incomingModeSwitch(let ms))
             where ms.targetMode == .watchDriver:
-            // Incoming handoff request: someone (phone or watch user) triggered a
-            // handover to the watch. We transition to handoffPending using the
-            // incoming transitionId (so subsequent confirm references same id).
+            // Two-step transition in one event: pending (sends confirm modeSwitch back)
+            // then immediately complete to .watchDriver. Closes the protocol gap from
+            // B.2.d where the receiver-side would otherwise wait for an ack from the
+            // initiator that never comes (the initiator transitions on receiving our
+            // confirm; without this self-completion we'd time out on this side).
             // `ms.requestedBy` is informational only — the transition is the same
             // regardless of which side initiated.
             effects = enterPending(direction: .phoneToWatch,
                                    transitionId: ms.transitionId,
                                    now: now)
+                    + completeHandoff(to: .watch, now: now)
 
         case (.phoneDriver, .shadowStateRefreshDue):
             effects = [.sendPairingHandoff(buildPairingHandoff(now: now,
@@ -79,11 +82,12 @@ public final class HandoffStateMachine {
 
         case (.watchDriver, .incomingModeSwitch(let ms))
             where ms.targetMode == .phoneDriver:
-            // Symmetric to the phoneDriver → watchDriver case above. Accept handover
-            // requests from either side; `ms.requestedBy` is informational only.
+            // Symmetric to the phoneDriver → watchDriver case above. Two-step
+            // transition; receiver self-completes.
             effects = enterPending(direction: .watchToPhone,
                                    transitionId: ms.transitionId,
                                    now: now)
+                    + completeHandoff(to: .phone, now: now)
 
         case (.watchDriver, .shadowStateRefreshDue):
             effects = [.sendPairingHandoff(buildPairingHandoff(now: now,
