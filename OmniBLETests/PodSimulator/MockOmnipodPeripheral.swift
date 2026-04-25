@@ -46,7 +46,8 @@ final class MockOmnipodPeripheral {
             .advertising(
                 advertisementData: [
                     CBMAdvertisementDataLocalNameKey: "Pod-mock",
-                    CBMAdvertisementDataServiceUUIDsKey: [DashServiceUUIDs.service]
+                    CBMAdvertisementDataServiceUUIDsKey: [DashServiceUUIDs.service],
+                    CBMAdvertisementDataIsConnectable: true
                 ],
                 withInterval: 0.250,
                 alsoWhenConnected: false

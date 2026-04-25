@@ -107,7 +107,10 @@ final class CBMSpikeTests: XCTestCase {
         return CBMPeripheralSpec
             .simulatePeripheral(identifier: UUID(), proximity: .immediate)
             .advertising(
-                advertisementData: [CBMAdvertisementDataServiceUUIDsKey: [serviceUUID]],
+                advertisementData: [
+                    CBMAdvertisementDataServiceUUIDsKey: [serviceUUID],
+                    CBMAdvertisementDataIsConnectable: true
+                ],
                 withInterval: 0.250,
                 alsoWhenConnected: false
             )
