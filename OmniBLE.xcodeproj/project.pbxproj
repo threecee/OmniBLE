@@ -1194,7 +1194,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build the Go pod simulator binary from the vendored submodule.\n# Output goes to BUILT_PRODUCTS_DIR so the test bundle can find it via\n# Bundle.bundleURL.deletingLastPathComponent().appendingPathComponent(\"pod-sim\")\nset -euo pipefail\n\n# Find go on common Homebrew + system paths\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/local/go/bin:$PATH\"\nif ! command -v go >/dev/null 2>&1; then\n  echo \"error: 'go' not found on PATH. Install with 'brew install go' (one-time).\"\n  exit 1\nfi\n\ncd \"$SRCROOT/Vendor/omnipod-pod-simulator-bridge\"\ngo build -o \"$BUILT_PRODUCTS_DIR/pod-sim\" .\ncodesign --sign - \"$BUILT_PRODUCTS_DIR/pod-sim\"\necho \"Built and signed: $BUILT_PRODUCTS_DIR/pod-sim\"\n";
+			shellScript = "# Build the Go pod simulator binary from the vendored submodule.\n# Output goes to BUILT_PRODUCTS_DIR so the test bundle can find it via\n# Bundle.bundleURL.deletingLastPathComponent().appendingPathComponent(\"pod-sim\")\nset -euo pipefail\n\n# Find go on common Homebrew + system paths\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/local/go/bin:$HOME/go-local/go/bin:$PATH\"\nif ! command -v go >/dev/null 2>&1; then\n  echo \"error: 'go' not found on PATH. Install with 'brew install go' (one-time).\"\n  exit 1\nfi\n\ncd \"$SRCROOT/Vendor/omnipod-pod-simulator-bridge\"\ngo build -o \"$BUILT_PRODUCTS_DIR/pod-sim\" .\ncodesign --sign - \"$BUILT_PRODUCTS_DIR/pod-sim\"\necho \"Built and signed: $BUILT_PRODUCTS_DIR/pod-sim\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
