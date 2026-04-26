@@ -130,6 +130,9 @@
 		WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000D /* MockOmniBLEPumpManager.swift */; };
 		WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000E /* OmniBLEOwnershipTests.swift */; };
 		WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */; };
+		B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000001 /* PodHandoffSafetyTests.swift */; };
+		B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */; };
+		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
 		C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */; };
@@ -433,6 +436,9 @@
 		WB2D00000000000000D /* MockOmniBLEPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOmniBLEPumpManager.swift; sourceTree = "<group>"; };
 		WB2D00000000000000E /* OmniBLEOwnershipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnershipTests.swift; sourceTree = "<group>"; };
 		WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffRoundTripIntegrationTests.swift; sourceTree = "<group>"; };
+		B3A800000000000001 /* PodHandoffSafetyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodHandoffSafetyTests.swift; sourceTree = "<group>"; };
+		B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = B3aRemoteCommandIntegrationTest.swift; sourceTree = "<group>"; };
+		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLETests.swift; sourceTree = "<group>"; };
@@ -713,6 +719,8 @@
 				WB2D00000000000000D /* MockOmniBLEPumpManager.swift */,
 				WB2D00000000000000E /* OmniBLEOwnershipTests.swift */,
 				WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */,
+				B3A800000000000010 /* Integration */,
+				B3A800000000000011 /* PodSimulator */,
 				D802CD0427DD98C10072E3A1 /* PodCommsSessionTests.swift */,
 				D802CD0127DD98C10072E3A1 /* PodInfoTests.swift */,
 				D802CD0227DD98C10072E3A1 /* PodStateTests.swift */,
@@ -738,6 +746,7 @@
 				T1P4000000000000008 /* PodSimulatorTestCase.swift */,
 				T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */,
 				T1P600000000000006 /* MockPumpManagerDelegate.swift */,
+				B3A800000000000003 /* MockNightscoutHTTPServer.swift */,
 			);
 			path = PodSimulator;
 			sourceTree = "<group>";
@@ -754,6 +763,8 @@
 				T1P700000000000006 /* PodAlertsTests.swift */,
 				T1P700000000000008 /* PodDeactivationTests.swift */,
 				T1P800000000000002 /* PodHandoffEncryptedTests.swift */,
+				B3A800000000000001 /* PodHandoffSafetyTests.swift */,
+				B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */,
 			);
 			path = Integration;
 			sourceTree = "<group>";
@@ -1453,6 +1464,9 @@
 				WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */,
 				WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */,
 				WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */,
+				B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */,
+				B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */,
+				B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */,
 				A9A5BCF2276C1E6D00B02C86 /* PayloadSplitterTest.swift in Sources */,
 				D802CD0A27DD98C10072E3A1 /* TempBasalTests.swift in Sources */,
 				A9A5BCEF276C1E2D00B02C86 /* TestUtilities.swift in Sources */,
