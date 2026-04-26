@@ -455,4 +455,50 @@ final class HandoffStateMachineTests: XCTestCase {
         XCTAssertNil(restored?.podState, "Restored state should still have nil pod")
         XCTAssertEqual(restored?.maximumTempBasalRate, 0)
     }
+
+    // MARK: - B.3.a Phase 6: settings sync wiring
+
+    /// Verifies that when the phone state machine enters .handoffPending(phoneToWatch)
+    /// the resulting effects include a notifyUI(.handoffPending(phoneToWatch, ...)) which
+    /// is the signal the orchestrator uses (trigger point 3) to fire emitSettingsSync().
+    /// This confirms the side-effect-observation contract between the state machine and
+    /// the orchestrator without requiring the state machine to know about settings.
+    func testPhoneDriver_beginHandoff_notifyUIContainsHandoffPendingPhoneToWatch() {
+        let m = machine(role: .phone)
+        let effects = m.handle(.userRequestedHandoff(target: .watch), now: now)
+
+        let notifyUIEffects = effects.compactMap { effect -> HandoffState? in
+            if case .notifyUI(let state) = effect { return state }; return nil
+        }
+        XCTAssertFalse(notifyUIEffects.isEmpty, "Expected at least one notifyUI effect")
+
+        let hasPendingPhoneToWatch = notifyUIEffects.contains {
+            if case .handoffPending(direction: .phoneToWatch, _, _) = $0 { return true }
+            return false
+        }
+        XCTAssertTrue(hasPendingPhoneToWatch,
+                      "beginHandoff emits notifyUI(.handoffPending(phoneToWatch,...)) " +
+                      "— the orchestrator observes this to trigger settings sync emission")
+    }
+
+    /// Confirms HandoffSideEffect.sendSettingsSync(_:) is equatable so
+    /// orchestrator tests can pattern-match it without special infrastructure.
+    func testHandoffSideEffectSendSettingsSyncIsEquatable() throws {
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: now,
+            basalScheduleItems: [],
+            insulinSensitivityScheduleItems: [],
+            carbRatioScheduleItems: [],
+            glucoseTargetRangeScheduleItems: [],
+            maximumBolusUnits: 5.0,
+            maximumBasalRatePerHourUnits: 2.0,
+            suspendThresholdMgdL: nil,
+            nightscoutConfig: nil
+        )
+        let effectA = HandoffSideEffect.sendSettingsSync(sync)
+        let effectB = HandoffSideEffect.sendSettingsSync(sync)
+        XCTAssertEqual(effectA, effectB,
+                       "HandoffSideEffect.sendSettingsSync must be Equatable")
+    }
 }

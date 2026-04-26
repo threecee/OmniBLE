@@ -13,6 +13,8 @@ public enum PhoneWatchMessage: Codable, Equatable {
     case heartbeat(PhoneWatchHeartbeat)
     case modeSwitch(PhoneWatchModeSwitch)
     case pairingHandoff(PhoneWatchPairingHandoff)
+    /// B.3.a Phase 6: phone → watch settings synchronization.
+    case settingsSync(PhoneWatchSettingsSync)
 
     // MARK: Codable (manual implementation — Swift's automatic enum Codable
     // uses a structure we want to pin explicitly for transport stability).
@@ -26,6 +28,7 @@ public enum PhoneWatchMessage: Codable, Equatable {
         case heartbeat
         case modeSwitch
         case pairingHandoff
+        case settingsSync
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -40,6 +43,9 @@ public enum PhoneWatchMessage: Codable, Equatable {
         case .pairingHandoff(let p):
             try container.encode(Kind.pairingHandoff, forKey: .kind)
             try container.encode(p, forKey: .payload)
+        case .settingsSync(let s):
+            try container.encode(Kind.settingsSync, forKey: .kind)
+            try container.encode(s, forKey: .payload)
         }
     }
 
@@ -53,6 +59,8 @@ public enum PhoneWatchMessage: Codable, Equatable {
             self = .modeSwitch(try container.decode(PhoneWatchModeSwitch.self, forKey: .payload))
         case .pairingHandoff:
             self = .pairingHandoff(try container.decode(PhoneWatchPairingHandoff.self, forKey: .payload))
+        case .settingsSync:
+            self = .settingsSync(try container.decode(PhoneWatchSettingsSync.self, forKey: .payload))
         }
     }
 }
