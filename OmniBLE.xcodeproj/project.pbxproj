@@ -112,7 +112,9 @@
 		B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */; };
 		B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */; };
 		B2C0E00000000000024 /* PhoneWatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000005 /* PhoneWatchMessage.swift */; };
+		B2C0E00000000000025 /* PhoneWatchSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */; };
 		B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000010 /* PhoneWatchMessageTests.swift */; };
+		B2C0E00000000000031 /* PhoneWatchSettingsSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */; };
 		WB2D000000000000011 /* HandoffOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000001 /* HandoffOwner.swift */; };
 		WB2D000000000000012 /* HandoffMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000002 /* HandoffMode.swift */; };
 		WB2D000000000000013 /* HandoffSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000003 /* HandoffSettings.swift */; };
@@ -413,7 +415,9 @@
 		B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchModeSwitch.swift; sourceTree = "<group>"; };
 		B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchPairingHandoff.swift; sourceTree = "<group>"; };
 		B2C0E00000000000005 /* PhoneWatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessage.swift; sourceTree = "<group>"; };
+		B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSettingsSync.swift; sourceTree = "<group>"; };
 		B2C0E00000000000010 /* PhoneWatchMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessageTests.swift; sourceTree = "<group>"; };
+		B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSettingsSyncTests.swift; sourceTree = "<group>"; };
 		WB2D000000000000001 /* HandoffOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOwner.swift; sourceTree = "<group>"; };
 		WB2D000000000000002 /* HandoffMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffMode.swift; sourceTree = "<group>"; };
 		WB2D000000000000003 /* HandoffSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettings.swift; sourceTree = "<group>"; };
@@ -702,6 +706,7 @@
 				D802CCFF27DD98B80072E3A1 /* MessageTests.swift */,
 				C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */,
 				B2C0E00000000000010 /* PhoneWatchMessageTests.swift */,
+				B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */,
 				WB2D000000000000009 /* HandoffSettingsTests.swift */,
 				WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */,
 				WB2D00000000000000B /* HandoffStateMachineTests.swift */,
@@ -854,6 +859,7 @@
 				B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */,
 				B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */,
 				B2C0E00000000000005 /* PhoneWatchMessage.swift */,
+				B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */,
 				WB2D000000000000001 /* HandoffOwner.swift */,
 				WB2D000000000000002 /* HandoffMode.swift */,
 				WB2D000000000000003 /* HandoffSettings.swift */,
@@ -1376,6 +1382,7 @@
 				B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */,
 				B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */,
 				B2C0E00000000000024 /* PhoneWatchMessage.swift in Sources */,
+				B2C0E00000000000025 /* PhoneWatchSettingsSync.swift in Sources */,
 				WB2D000000000000011 /* HandoffOwner.swift in Sources */,
 				WB2D000000000000012 /* HandoffMode.swift in Sources */,
 				WB2D000000000000013 /* HandoffSettings.swift in Sources */,
@@ -1439,6 +1446,7 @@
 				D802CD0827DD98C10072E3A1 /* StatusTests.swift in Sources */,
 				C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */,
 				B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */,
+				B2C0E00000000000031 /* PhoneWatchSettingsSyncTests.swift in Sources */,
 				WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */,
 				WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */,
 				WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */,
