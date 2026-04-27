@@ -120,16 +120,83 @@ final class PodActivationTests: PodSimulatorTestCase {
         }
     }
 
-    /// TOML pre-load with corrupted LTK; pair should fail with a specific error.
-    /// Skipped: the bridge's TOML pre-load infra isn't yet wired into
-    /// PodSimulatorTestCase. Once testFullActivationFlow is solidly passing,
-    /// this is straightforward to add.
+    /// Spawn the bridge with a TOML that carries a non-nil LTK (16 zero bytes).
+    ///
+    /// The Go sim sees `ltk != nil` → skips pairing → goes straight to EAP-AKA.
+    /// OmniBLE (fresh manager, no stored LTK) sends the SP1SP2 pairing initiation.
+    /// The Go sim's EAP-AKA path receives the wrong message type and calls
+    /// log.Fatalf, killing the subprocess. OmniBLE observes the subprocess exit
+    /// and returns an error from pairAndSetupPod. We assert that error is non-nil.
+    ///
+    /// Note: the error shape is "subprocess exited" (a comms/transport error),
+    /// not a higher-level "bad LTK" semantic error — the Go sim doesn't do
+    /// graceful crypto-mismatch recovery.
     func testPairingFailsWithBadLTK() throws {
-        try XCTSkipIf(
-            true,
-            "Skipped: needs PodSimulatorTestCase support for spawning the bridge with -state " +
-            "<custom-toml> and a TOML schema for injecting a corrupted LTK. Defer to follow-up."
-        )
+        // Spawn bridge with a 16-zero-byte LTK so the sim thinks the pod is
+        // already paired and skips the pairing handshake.
+        let badLTKToml = """
+        ltk = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        eap_aka_seq = 1
+        """
+        try spawnBridgeWithTOML(badLTKToml)
+
+        let manager = makeFreshPumpManager()
+        let podComms = manager.podCommsForTesting
+
+        queueBouncer = installQueueBouncingDelegate(on: manager)
+        waitForBluetoothSettle(timeout: 1.0)
+
+        // Connect — this should succeed (BLE layer connects fine).
+        let connectExp = expectation(description: "connectToNewPod")
+        connectExp.assertForOverFulfill = false
+        var connectResult: Result<OmniBLE, Error>?
+        podComms.connectToNewPod { result in
+            connectResult = result
+            connectExp.fulfill()
+        }
+        wait(for: [connectExp], timeout: 15.0)
+
+        // Connect may succeed or fail depending on timing; either way, we proceed.
+        if case .failure(let e) = connectResult {
+            // Connection itself failed — still counts as "pair fails" since we
+            // never got to pairAndSetupPod.
+            XCTAssertNotNil(e, "Expected a connection error with bad LTK state")
+            return
+        }
+
+        // Pair — this should fail because the sim expects EAP-AKA but OmniBLE
+        // sends SP1SP2. The subprocess crashes; OmniBLE returns a comms error.
+        let pairExp = expectation(description: "pairAndSetupPod")
+        pairExp.assertForOverFulfill = false
+        var pairResult: PodComms.SessionRunResult?
+        podComms.pairAndSetupPod(
+            timeZone: .currentFixed,
+            insulinType: .novolog,
+            messageLogger: nil
+        ) { result in
+            pairResult = result
+            pairExp.fulfill()
+        }
+        wait(for: [pairExp], timeout: 15.0)
+
+        switch pairResult {
+        case .failure:
+            // Expected: pair fails when the sim has a stale/mismatched LTK.
+            break
+        case .success:
+            XCTFail(
+                "pairAndSetupPod unexpectedly succeeded with a bad-LTK TOML state. " +
+                "The Go sim should have crashed trying to parse SP1SP2 as an EAP-AKA " +
+                "challenge.\nstderr: \(self.bridge.stderrTail())"
+            )
+        case nil:
+            // No completion — could mean the subprocess died before the callback.
+            // That's also a "fail" in spirit; assert it's not a hang.
+            XCTFail(
+                "pairAndSetupPod did not call completion within 15s — possible hang " +
+                "or subprocess died silently.\nstderr: \(self.bridge.stderrTail())"
+            )
+        }
     }
 
     /// Disconnect mid-activation; reconnect; resume; assert success.

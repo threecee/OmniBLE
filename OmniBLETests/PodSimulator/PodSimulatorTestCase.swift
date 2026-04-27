@@ -69,7 +69,155 @@ class PodSimulatorTestCase: XCTestCase {
         }
         CBMCentralManagerMock.tearDownSimulation()
 
+        // Clean up any temp TOML files written by spawnBridgeWithTOML /
+        // pairThenRespawnWithMutatedTOML.
+        for url in tomlTempFiles {
+            try? FileManager.default.removeItem(at: url)
+        }
+        tomlTempFiles.removeAll()
+
         try super.tearDownWithError()
+    }
+
+    // MARK: - TOML pre-load helpers
+
+    /// Tracks temp files written by `spawnBridgeWithTOML` so tearDown can
+    /// clean them up.
+    var tomlTempFiles: [URL] = []
+
+    /// Spawn the pod-sim subprocess with a pre-loaded TOML state instead of
+    /// `-fresh`. The TOML content is written to a unique temp file; the bridge
+    /// is respawned with `-state <tempfile>` (omitting `-fresh`).
+    ///
+    /// Tear down the existing bridge from setUpWithError first (if any), then
+    /// rebuild `self.bridge` and `self.mockPeripheral` with the new subprocess.
+    ///
+    /// Use this for tests that need the pod in a specific non-default state.
+    /// Call from the test body before doing any BLE operations.
+    func spawnBridgeWithTOML(_ tomlContent: String) throws {
+        // 1. Write tomlContent to a unique temp file.
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("pod-sim-\(UUID().uuidString).toml")
+        try tomlContent.write(to: tempURL, atomically: true, encoding: .utf8)
+        tomlTempFiles.append(tempURL)
+
+        // 2. Tear down the existing subprocess (spawned in setUpWithError).
+        bridge?.terminate()
+        bridge = nil
+        CBMCentralManagerMock.tearDownSimulation()
+        // Brief drain so CBM internals can settle before we re-configure.
+        let drainDeadline = Date().addingTimeInterval(0.2)
+        while Date() < drainDeadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        CBMCentralManagerMock.tearDownSimulation()
+
+        // 3. Locate the pod-sim binary (same path as setUpWithError uses).
+        let bundle = Bundle(for: type(of: self))
+        let binaryURL = bundle.bundleURL.deletingLastPathComponent().appendingPathComponent("pod-sim")
+
+        // 4. Respawn with -state <tempfile> (no -fresh).
+        bridge = try PodSimulatorBridge(binaryURL: binaryURL, freshState: false, stateFileURL: tempURL, autoDisconnect: false)
+
+        // 5. Re-configure CBM with the new bridge.
+        CBMCentralManagerMock.simulateInitialState(.poweredOn)
+        mockPeripheral = MockOmnipodPeripheral(bridge: bridge)
+        CBMCentralManagerMock.simulatePeripherals([mockPeripheral.makeSpec()])
+    }
+
+    /// Pair a fresh pod, save its state, terminate the subprocess, mutate the
+    /// saved TOML (e.g., inject a fault code), then respawn with the mutated state.
+    ///
+    /// Returns the `OmniBLEPumpManager` from the initial pairing. Because the
+    /// manager holds the real LTK from pairing, it can reconnect to the new
+    /// (respawned) subprocess via EAP-AKA without re-pairing. Callers must
+    /// re-install a `QueueBouncingCentralDelegate` on the returned manager and
+    /// settle before calling `runSession` or any BLE operation.
+    ///
+    /// On return, `self.bridge` and `self.mockPeripheral` point at the new
+    /// subprocess running the mutated state.
+    ///
+    /// Use this to pre-load a fully-paired pod state with selective mutations
+    /// (e.g., inject a fault code). The two-phase approach is necessary because
+    /// the crypto state (LTK, CK, nonces) can only be generated via a real
+    /// pairing exchange — it cannot be synthesised synthetically.
+    @discardableResult
+    func pairThenRespawnWithMutatedTOML(
+        mutateTOML: (inout String) -> Void,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) throws -> OmniBLEPumpManager {
+        // 1. Use a unique temp path for the state file so we know where saves land.
+        let stateTempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("pod-sim-state-\(UUID().uuidString).toml")
+        tomlTempFiles.append(stateTempURL)
+
+        // Tear down the bridge spawned in setUpWithError and respawn with
+        // the same temp state file path (still fresh — the sim writes to it
+        // after pairing completes).
+        bridge?.terminate()
+        bridge = nil
+        CBMCentralManagerMock.tearDownSimulation()
+        let drainDeadline = Date().addingTimeInterval(0.2)
+        while Date() < drainDeadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        CBMCentralManagerMock.tearDownSimulation()
+
+        let bundle = Bundle(for: type(of: self))
+        let binaryURL = bundle.bundleURL.deletingLastPathComponent().appendingPathComponent("pod-sim")
+
+        // Spawn fresh with the temp state path so Save() writes there.
+        bridge = try PodSimulatorBridge(
+            binaryURL: binaryURL,
+            freshState: true,
+            stateFileURL: stateTempURL,
+            autoDisconnect: false
+        )
+        CBMCentralManagerMock.simulateInitialState(.poweredOn)
+        mockPeripheral = MockOmnipodPeripheral(bridge: bridge)
+        CBMCentralManagerMock.simulatePeripherals([mockPeripheral.makeSpec()])
+
+        // 2. Pair and fully activate. By the end, stateTempURL holds the
+        //    fully-activated session state (LTK, CK, nonces, PodProgress, etc.).
+        let pairedManager = try pairFreshPod(file: file, line: line)
+
+        // 3. Terminate the subprocess cleanly. The state file is already written.
+        bridge.terminate()
+        bridge = nil
+        CBMCentralManagerMock.tearDownSimulation()
+        let drainDeadline2 = Date().addingTimeInterval(0.3)
+        while Date() < drainDeadline2 {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        CBMCentralManagerMock.tearDownSimulation()
+
+        // 4. Read the saved TOML, apply caller's mutation, write back.
+        var toml = try String(contentsOf: stateTempURL, encoding: .utf8)
+        mutateTOML(&toml)
+        try toml.write(to: stateTempURL, atomically: true, encoding: .utf8)
+
+        // 5. Respawn with the mutated state. The Go sim will read the real LTK
+        //    and go directly to EAP-AKA on next connect. The returned manager
+        //    also holds the real LTK, so EAP-AKA will succeed on reconnect.
+        //
+        //    IMPORTANT: reuse the same peripheral UUID from the pairing session.
+        //    podComms stores the paired pod's BLE identifier and will only
+        //    auto-reconnect to a peripheral with that exact UUID. If we registered
+        //    a new UUID, reconnect would never match.
+        let pairedPeripheralID = mockPeripheral.identifier
+
+        bridge = try PodSimulatorBridge(
+            binaryURL: binaryURL,
+            freshState: false,
+            stateFileURL: stateTempURL,
+            autoDisconnect: false
+        )
+        CBMCentralManagerMock.simulateInitialState(.poweredOn)
+        mockPeripheral = MockOmnipodPeripheral(bridge: bridge, identifier: pairedPeripheralID)
+        CBMCentralManagerMock.simulatePeripherals([mockPeripheral.makeSpec()])
+
+        return pairedManager
     }
 
     // MARK: - pairFreshPod

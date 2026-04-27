@@ -66,7 +66,18 @@ final class PodSimulatorBridge {
     private var stderrThread: Thread?
     private var terminated = false
 
-    init(binaryURL: URL, freshState: Bool, autoDisconnect: Bool = false) throws {
+    /// Spawn the pod-sim with optional TOML state pre-load.
+    ///
+    /// - Parameters:
+    ///   - binaryURL: Path to the `pod-sim` binary.
+    ///   - freshState: If true, passes `-fresh` (blank pod). Mutually
+    ///     exclusive with `stateFileURL`.
+    ///   - stateFileURL: If provided, passes `-state <path>` so the sim
+    ///     starts from a pre-built TOML state. Do NOT also pass `freshState`
+    ///     when using this — they are logically exclusive.
+    ///   - autoDisconnect: If false (default for tests), passes
+    ///     `-no-auto-disconnect`.
+    init(binaryURL: URL, freshState: Bool, stateFileURL: URL? = nil, autoDisconnect: Bool = false) throws {
         guard FileManager.default.fileExists(atPath: binaryURL.path) else {
             throw PodSimulatorBridgeError.binaryNotFound(binaryURL)
         }
@@ -74,6 +85,10 @@ final class PodSimulatorBridge {
         // Build argument list
         var args: [String] = ["-q"]
         if freshState { args.append("-fresh") }
+        if let stateURL = stateFileURL {
+            args.append("-state")
+            args.append(stateURL.path)
+        }
         if !autoDisconnect { args.append("-no-auto-disconnect") }
 
         // Create pipes: [read_end, write_end]

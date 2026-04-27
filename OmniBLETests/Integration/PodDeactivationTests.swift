@@ -82,27 +82,59 @@ final class PodDeactivationTests: PodSimulatorTestCase {
 
     // MARK: - 20. testDeactivateFaultedPod
 
-    /// Skipped: requires TOML pre-load to spawn the Go sim bridge with a pod
-    /// already in a faulted state (FaultEvent != 0).
+    /// Two-phase test: pair fresh pod; inject FaultEvent = 0xae via TOML mutation;
+    /// respawn; reconnect with same manager; call deactivatePod; assert success.
     ///
-    /// What would be tested:
-    ///   - Spawn bridge with FaultEvent = 0xae (reservoir-empty fault)
-    ///   - Call manager.deactivatePod()
-    ///   - Assert deactivation completes without error (PodCommsSession.deactivatePod
-    ///     explicitly catches .podFault errors and continues through to the
-    ///     DeactivatePodCommand, so a faulted pod should still be deactivatable)
-    ///   - Call forgetPod, assert hasActivePod == false
-    ///
-    /// The Go sim's SetFault() is not exposed via the bridge wire protocol; TOML
-    /// pre-load via the -state flag is the only way to pre-configure a fault.
-    /// PodSimulatorBridge currently only supports -fresh spawn. Defer to the
-    /// follow-up phase that adds TOML pre-load support.
+    /// PodCommsSession.deactivatePod explicitly catches .podFault errors and
+    /// continues through to the 0x1c DeactivatePodCommand, so a faulted pod
+    /// should still be deactivatable. After deactivation, forgetPod clears pod state.
     func testDeactivateFaultedPod() throws {
-        try XCTSkipIf(
-            true,
-            "Skipped: requires PodSimulatorBridge -state <toml> spawn support to pre-load a " +
-            "faulted pod state (FaultEvent != 0). The Go sim's SetFault() is not exposed via " +
-            "the bridge wire protocol. Defer to a follow-up phase adding TOML pre-load support."
+        let manager = try pairThenRespawnWithMutatedTOML { toml in
+            if toml.contains("fault =") {
+                toml = toml.replacingOccurrences(
+                    of: #"fault = \d+"#,
+                    with: "fault = 174",
+                    options: .regularExpression
+                )
+            } else {
+                toml += "\nfault = 174\n"
+            }
+        }
+
+        queueBouncer = installQueueBouncingDelegate(on: manager)
+        waitForBluetoothSettle(timeout: 1.0)
+
+        XCTAssertTrue(manager.hasActivePod, "pod should be active after respawn with fault")
+
+        // Deactivate — should succeed even with FaultEvent = 0xae because
+        // PodCommsSession.deactivatePod tolerates .podFault errors.
+        let deactivateExp = expectation(description: "deactivatePod on faulted pod")
+        var deactivateError: OmniBLEPumpManagerError?
+
+        manager.deactivatePod { error in
+            deactivateError = error
+            deactivateExp.fulfill()
+        }
+        wait(for: [deactivateExp], timeout: 30.0)
+
+        if let error = deactivateError {
+            XCTFail(
+                "deactivatePod on faulted pod failed: \(error)\n" +
+                "stderr: \(self.bridge.stderrTail())\n" +
+                "Note: PodCommsSession.deactivatePod catches .podFault — if this fails with " +
+                "a comms error the issue may be reconnect timing to the respawned subprocess."
+            )
+            return
+        }
+
+        // forgetPod to clear state.
+        let forgetExp = expectation(description: "forgetPod")
+        manager.forgetPod { forgetExp.fulfill() }
+        wait(for: [forgetExp], timeout: 10.0)
+
+        XCTAssertFalse(
+            manager.hasActivePod,
+            "hasActivePod should be false after deactivatePod + forgetPod on faulted pod"
         )
     }
 }

@@ -245,23 +245,35 @@ final class PodBolusTests: PodSimulatorTestCase {
 
     // MARK: - 9. testBolusFailsWhenInsufficientInsulin
 
-    /// Skipped: requires TOML pre-load infrastructure to spawn the bridge with a
-    /// low-reservoir pod state. PodSimulatorBridge currently only supports
-    /// -fresh (blank pod) or -state <file> flags, and PodSimulatorTestCase's
-    /// setUp always uses -fresh. Adding a per-test TOML spawn path is feasible
-    /// (it's a bridge init variant) but non-trivial to wire up safely for a
-    /// single test. Deferred to a follow-up phase.
+    /// Skipped: the Go pod simulator (pkg/pod/pod.go) does not validate
+    /// reservoir capacity before accepting a ProgramInsulin command. The
+    /// handler at line 433 unconditionally does:
     ///
-    /// What would be tested: spawn with reservoir = 0.5U TOML, attempt
-    /// enactBolus(2.0U), assert PumpManagerError.deviceState or similar
-    /// insufficient-insulin error from OmniBLE's pre-flight checks.
+    ///     p.state.Reservoir -= c.Pulses
+    ///
+    /// with no underflow check — a 2.0U bolus request on a 0.5U reservoir
+    /// causes uint16 wraparound (reservoir becomes 65,526) and the sim
+    /// returns a success response. OmniBLE's session.bolus() has no pre-flight
+    /// reservoir check either (it defers to the pod). The bolus appears to
+    /// "succeed" from OmniBLE's perspective.
+    ///
+    /// To implement this test properly, the Go sim would need to:
+    ///   a) Reject ProgramInsulin with a fault/NAK when Pulses > Reservoir, OR
+    ///   b) OmniBLE would need to read reservoir from the last status response
+    ///      and short-circuit before sending the command.
+    ///
+    /// Neither is the case today. This test remains skipped as a Pi-sim
+    /// limitation. TOML pre-load infrastructure is available (use
+    /// pairThenRespawnWithMutatedTOML) but the sim-side behavior defeats the
+    /// test goal.
     func testBolusFailsWhenInsufficientInsulin() throws {
         try XCTSkipIf(
             true,
-            "Skipped: requires PodSimulatorTestCase support for spawning the bridge with " +
-            "-state <toml> pre-loaded with reservoir = 0.5U. The Go sim's PODState.Reservoir " +
-            "field (TOML key 'reservoir', uint16 in 0.05U/pulse units) would need to be set " +
-            "to 10 (= 0.5U). Defer to a follow-up phase that adds per-test TOML spawn support."
+            "Skipped: Go sim (pkg/pod/pod.go ProgramInsulin handler) does not reject " +
+            "a bolus when reservoir < requested pulses — it just underflows uint16. " +
+            "OmniBLE has no pre-flight reservoir check either. The test goal (bolus returns " +
+            "an error) cannot be met without a sim-side fix. TOML pre-load infra is " +
+            "available but sim behavior defeats the assertion."
         )
     }
 }
