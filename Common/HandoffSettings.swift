@@ -22,7 +22,7 @@ public struct HandoffSettings: Codable, Equatable {
     }
 
     public static let userDefaultsKey = "loop-and-learn.handoffSettings"
-    public static let appGroupIdentifier = "group.com.threecee.loopGroup"
+    public static let appGroupIdentifier = "group.com.threecee.loop.LoopGroup"
 
     public static func load(from defaults: UserDefaults) -> HandoffSettings {
         guard let data = defaults.data(forKey: userDefaultsKey),
