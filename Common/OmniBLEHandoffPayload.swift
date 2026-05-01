@@ -85,6 +85,10 @@ extension OmniBLEHandoffPayload {
     /// B.2.e: Constructs a payload from a current PodState by serializing its
     /// rawValue via PropertyListSerialization. Used by HandoffOrchestrator's
     /// fillPayload helper to populate outgoing pairing-handoff messages.
+    ///
+    /// Default `validUntil` is 600s (10 min) = 2× the 5-minute shadow-state
+    /// refresh interval. Closes the "single missed refresh" stale-payload
+    /// window while still failing closed after two consecutive misses (B.4 #6).
     public init(podState: PodState,
                 lastBolusSequence: UInt32? = nil,
                 lastBasalScheduleId: UUID? = nil,
