@@ -88,7 +88,7 @@ extension OmniBLEHandoffPayload {
     public init(podState: PodState,
                 lastBolusSequence: UInt32? = nil,
                 lastBasalScheduleId: UUID? = nil,
-                validUntil: Date = Date(timeIntervalSinceNow: 60)) throws {
+                validUntil: Date = Date(timeIntervalSinceNow: 600)) throws {
         let data = try PropertyListSerialization.data(
             fromPropertyList: podState.rawValue, format: .binary, options: 0)
         self.init(

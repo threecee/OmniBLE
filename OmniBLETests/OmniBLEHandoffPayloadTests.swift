@@ -126,4 +126,71 @@ final class OmniBLEHandoffPayloadTests: XCTestCase {
         XCTAssertEqual(decoded.lastBolusSequence, p.lastBolusSequence)
         XCTAssertEqual(decoded.lastBasalScheduleId, p.lastBasalScheduleId)
     }
+
+    // MARK: - B.4 Issue #6: validity boundary
+
+    /// Default validity is 600s (10 min). At T+599s, payload is still valid.
+    func test_defaultValidity_atNineFiftyNineSeconds_isFresh() {
+        let createdAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let validUntil = createdAt.addingTimeInterval(600)
+        let payload = OmniBLEHandoffPayload(
+            podSerial: "POD123",
+            serializedPodState: Data(),
+            lastBolusSequence: nil,
+            lastBasalScheduleId: nil,
+            validUntil: validUntil,
+            createdAt: createdAt
+        )
+        let testTime = createdAt.addingTimeInterval(599)
+        XCTAssertTrue(payload.isValid(now: testTime),
+                      "Payload at T+599s of a 600s window should still be fresh")
+    }
+
+    /// At T+601s, payload has expired.
+    func test_defaultValidity_atTenMinutesOneSecond_isStale() {
+        let createdAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let validUntil = createdAt.addingTimeInterval(600)
+        let payload = OmniBLEHandoffPayload(
+            podSerial: "POD123",
+            serializedPodState: Data(),
+            lastBolusSequence: nil,
+            lastBasalScheduleId: nil,
+            validUntil: validUntil,
+            createdAt: createdAt
+        )
+        let testTime = createdAt.addingTimeInterval(601)
+        XCTAssertFalse(payload.isValid(now: testTime),
+                       "Payload at T+601s of a 600s window should be stale")
+    }
+
+    /// Explicit-validUntil callers are unaffected: passing a custom 60s window
+    /// still yields a 60s-bound payload, so existing call sites don't change behavior.
+    func test_explicitValidUntil_overridesDefault() {
+        let createdAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let payload = OmniBLEHandoffPayload(
+            podSerial: "POD123",
+            serializedPodState: Data(),
+            lastBolusSequence: nil,
+            lastBasalScheduleId: nil,
+            validUntil: createdAt.addingTimeInterval(60),
+            createdAt: createdAt
+        )
+        XCTAssertTrue(payload.isValid(now: createdAt.addingTimeInterval(59)))
+        XCTAssertFalse(payload.isValid(now: createdAt.addingTimeInterval(61)))
+    }
+
+    /// Default validity is now 600s (B.4 Issue #6). Verify by inspecting the
+    /// source for the constant, since the convenience init that uses the
+    /// default requires a real PodState which is expensive to construct in a test.
+    func test_convenienceInit_defaultIs600Seconds() throws {
+        let sourcePath = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Common/OmniBLEHandoffPayload.swift")
+        let source = try String(contentsOf: sourcePath, encoding: .utf8)
+        XCTAssertTrue(source.contains("Date(timeIntervalSinceNow: 600)"),
+                      "Convenience init default validity should be 600s (B.4 Issue #6)")
+        XCTAssertFalse(source.contains("Date(timeIntervalSinceNow: 60)"),
+                       "Old 60s default should be gone")
+    }
 }
