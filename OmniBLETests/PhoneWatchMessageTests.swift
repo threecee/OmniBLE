@@ -21,8 +21,10 @@ final class PhoneWatchMessageTests: XCTestCase {
 
     // MARK: - Protocol version
 
-    func testCurrentVersionIsOne() {
-        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 1)
+    func testCurrentVersionIsTwo() {
+        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 2,
+                       "B.4 Issue #3 bumped the protocol version from 1 to 2 to signal " +
+                       "the new automaticDosingEnabled / isAutomaticDosingAllowed fields.")
     }
 
     // MARK: - Heartbeat
@@ -116,13 +118,15 @@ final class PhoneWatchMessageTests: XCTestCase {
 
     // MARK: - Version negotiation
 
-    func testAcceptsLowerProtocolVersion() {
+    func testAcceptsLowerOrCurrentProtocolVersion() {
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 0))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 1))
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 2),
+                      "Current version (2) must accept itself.")
     }
 
     func testRejectsHigherProtocolVersion() {
-        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 2))
+        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 3))
         XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 99))
     }
 }

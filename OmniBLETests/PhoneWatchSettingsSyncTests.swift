@@ -71,4 +71,79 @@ final class PhoneWatchSettingsSyncTests: XCTestCase {
         XCTAssertNil(decoded.nightscoutConfig)
         XCTAssertNil(decoded.suspendThresholdMgdL)
     }
+
+    // MARK: - B.4 Issue #3: automaticDosing field round-trip
+
+    /// Encoding then decoding a sync with both flags set preserves their values.
+    func testCodableRoundTripPreservesAutomaticDosingFlags() throws {
+        let original = PhoneWatchSettingsSync(
+            protocolVersion: 2,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            basalScheduleItems: [],
+            insulinSensitivityScheduleItems: [],
+            carbRatioScheduleItems: [],
+            glucoseTargetRangeScheduleItems: [],
+            maximumBolusUnits: 10,
+            maximumBasalRatePerHourUnits: 4,
+            suspendThresholdMgdL: 72,
+            nightscoutConfig: nil,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(PhoneWatchSettingsSync.self, from: data)
+        XCTAssertEqual(decoded.automaticDosingEnabled, true)
+        XCTAssertEqual(decoded.isAutomaticDosingAllowed, true)
+        XCTAssertEqual(decoded, original)
+    }
+
+    /// A v1-shaped JSON payload (no new fields present) decodes successfully
+    /// with both flags = nil. This is the new-watch-receiving-old-phone case.
+    func testCodableDecodesV1PayloadWithNilAutomaticDosingFlags() throws {
+        let v1Json = """
+        {
+          "protocolVersion": 1,
+          "sentAt": 1700000000,
+          "basalScheduleItems": [],
+          "insulinSensitivityScheduleItems": [],
+          "carbRatioScheduleItems": [],
+          "glucoseTargetRangeScheduleItems": [],
+          "maximumBolusUnits": 10,
+          "maximumBasalRatePerHourUnits": 4,
+          "suspendThresholdMgdL": 72,
+          "nightscoutConfig": null
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(PhoneWatchSettingsSync.self, from: v1Json)
+        XCTAssertNil(decoded.automaticDosingEnabled,
+                     "v1 payload (no field) should decode as nil — old phone, new watch")
+        XCTAssertNil(decoded.isAutomaticDosingAllowed,
+                     "v1 payload (no field) should decode as nil — old phone, new watch")
+    }
+
+    /// A v2-shaped JSON payload with both flags set decodes correctly.
+    func testCodableProtocolVersion2DecodesCleanly() throws {
+        let v2Json = """
+        {
+          "protocolVersion": 2,
+          "sentAt": 1700000000,
+          "basalScheduleItems": [],
+          "insulinSensitivityScheduleItems": [],
+          "carbRatioScheduleItems": [],
+          "glucoseTargetRangeScheduleItems": [],
+          "maximumBolusUnits": 10,
+          "maximumBasalRatePerHourUnits": 4,
+          "suspendThresholdMgdL": 72,
+          "nightscoutConfig": null,
+          "automaticDosingEnabled": true,
+          "isAutomaticDosingAllowed": false
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(PhoneWatchSettingsSync.self, from: v2Json)
+        XCTAssertEqual(decoded.protocolVersion, 2)
+        XCTAssertEqual(decoded.automaticDosingEnabled, true)
+        XCTAssertEqual(decoded.isAutomaticDosingAllowed, false)
+    }
 }

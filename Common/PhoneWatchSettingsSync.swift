@@ -38,6 +38,16 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
     /// receiving side MUST NOT start Nightscout polling when nil.
     public let nightscoutConfig: NightscoutConfig?
 
+    /// B.4 Issue #3: Whether the phone has automatic dosing enabled.
+    /// Optional + nil-default for backward compatibility with v1 senders;
+    /// receivers should treat nil as `false` (fail-closed).
+    public let automaticDosingEnabled: Bool?
+
+    /// B.4 Issue #3: Whether automatic dosing is currently allowed
+    /// (not blocked by, e.g., a pump comms failure). Optional for
+    /// backward compatibility; receivers should treat nil as `false`.
+    public let isAutomaticDosingAllowed: Bool?
+
     public init(
         protocolVersion: Int,
         sentAt: Date,
@@ -48,7 +58,9 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
         maximumBolusUnits: Double,
         maximumBasalRatePerHourUnits: Double,
         suspendThresholdMgdL: Double?,
-        nightscoutConfig: NightscoutConfig?
+        nightscoutConfig: NightscoutConfig?,
+        automaticDosingEnabled: Bool? = nil,
+        isAutomaticDosingAllowed: Bool? = nil
     ) {
         self.protocolVersion = protocolVersion
         self.sentAt = sentAt
@@ -60,6 +72,8 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
         self.maximumBasalRatePerHourUnits = maximumBasalRatePerHourUnits
         self.suspendThresholdMgdL = suspendThresholdMgdL
         self.nightscoutConfig = nightscoutConfig
+        self.automaticDosingEnabled = automaticDosingEnabled
+        self.isAutomaticDosingAllowed = isAutomaticDosingAllowed
     }
 
     public struct NightscoutConfig: Codable, Equatable {
