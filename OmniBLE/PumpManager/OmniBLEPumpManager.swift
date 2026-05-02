@@ -1891,6 +1891,12 @@ extension OmniBLEPumpManager: PumpManager {
     // A nil suspendReminder is untimed with no reminders beeps, a suspendReminder of 0 is untimed using reminders beeps, otherwise it
     // specifies a suspend duration implemented using an appropriate combination of suspended reminder and suspend time expired beeps.
     public func suspendDelivery(withSuspendReminders suspendReminder: TimeInterval? = nil, completion: @escaping (Error?) -> Void) {
+        // B.5.2 Issue #5b: gate user-driven delivery suspension during handoff transitions.
+        if let check = commandsAllowedCheck, !check() {
+            log.default("suspendDelivery suppressed: commandsAllowed=false (handoff in progress)")
+            completion(PumpManagerError.uncertainDelivery)
+            return
+        }
         guard self.hasActivePod else {
             completion(OmniBLEPumpManagerError.noPodPaired)
             return
@@ -2112,6 +2118,12 @@ extension OmniBLEPumpManager: PumpManager {
     }
 
     public func cancelBolus(completion: @escaping (PumpManagerResult<DoseEntry?>) -> Void) {
+        // B.5.2 Issue #5b: gate user-driven bolus cancellation during handoff transitions.
+        if let check = commandsAllowedCheck, !check() {
+            log.default("cancelBolus suppressed: commandsAllowed=false (handoff in progress)")
+            completion(.failure(.uncertainDelivery))
+            return
+        }
         guard self.hasActivePod else {
             completion(.failure(.deviceState(OmniBLEPumpManagerError.noPodPaired)))
             return
@@ -2186,6 +2198,12 @@ extension OmniBLEPumpManager: PumpManager {
     }
 
     public func runTemporaryBasalProgram(unitsPerHour: Double, for duration: TimeInterval, automatic: Bool, completion: @escaping (PumpManagerError?) -> Void) {
+        // B.5.2 Issue #5b: gate user/algorithm-driven temp basal during handoff transitions.
+        if let check = commandsAllowedCheck, !check() {
+            log.default("runTemporaryBasalProgram suppressed: commandsAllowed=false (handoff in progress)")
+            completion(.uncertainDelivery)
+            return
+        }
 
         guard self.hasActivePod else {
             completion(.configuration(OmniBLEPumpManagerError.noPodPaired))

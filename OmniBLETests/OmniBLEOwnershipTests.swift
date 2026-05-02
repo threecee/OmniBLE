@@ -291,6 +291,75 @@ final class OmniBLEOwnershipTests: XCTestCase {
         }
     }
 
+    // MARK: - B.5.2 Issue #5b: gate firing in runTemporaryBasalProgram / cancelBolus / suspendDelivery
+
+    /// When commandsAllowedCheck returns false, runTemporaryBasalProgram completes
+    /// synchronously with .uncertainDelivery and never reaches the BLE comms.
+    func testRunTemporaryBasalProgram_shortCircuitsWhenCommandsNotAllowed() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        pumpManager.commandsAllowedCheck = { false }
+
+        let exp = expectation(description: "runTemporaryBasalProgram completion")
+        var receivedError: PumpManagerError?
+        pumpManager.runTemporaryBasalProgram(unitsPerHour: 1.0, for: 30 * 60, automatic: false) { error in
+            receivedError = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.5)  // synchronous — should fire immediately
+
+        guard case .uncertainDelivery = receivedError else {
+            return XCTFail("Expected .uncertainDelivery; got \(String(describing: receivedError))")
+        }
+    }
+
+    /// When commandsAllowedCheck returns false, cancelBolus completes synchronously
+    /// with .failure(.uncertainDelivery) and never reaches the BLE comms.
+    func testCancelBolus_shortCircuitsWhenCommandsNotAllowed() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        pumpManager.commandsAllowedCheck = { false }
+
+        let exp = expectation(description: "cancelBolus completion")
+        var receivedResult: PumpManagerResult<DoseEntry?>?
+        pumpManager.cancelBolus { result in
+            receivedResult = result
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.5)
+
+        switch receivedResult {
+        case .failure(let error):
+            guard case .uncertainDelivery = error else {
+                return XCTFail("Expected .uncertainDelivery; got \(String(describing: error))")
+            }
+        case .success, .none:
+            XCTFail("Expected .failure; got \(String(describing: receivedResult))")
+        }
+    }
+
+    /// When commandsAllowedCheck returns false, suspendDelivery completes synchronously
+    /// with a non-nil error and never reaches the BLE comms.
+    func testSuspendDelivery_shortCircuitsWhenCommandsNotAllowed() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        pumpManager.commandsAllowedCheck = { false }
+
+        let exp = expectation(description: "suspendDelivery completion")
+        var receivedError: Error?
+        pumpManager.suspendDelivery { error in
+            receivedError = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.5)
+
+        XCTAssertNotNil(receivedError, "Expected non-nil error from suppressed suspendDelivery")
+        if let pmError = receivedError as? PumpManagerError {
+            guard case .uncertainDelivery = pmError else {
+                return XCTFail("Expected PumpManagerError.uncertainDelivery; got \(pmError)")
+            }
+        } else {
+            XCTFail("Expected PumpManagerError; got \(String(describing: receivedError))")
+        }
+    }
+
     // MARK: - Helpers
 
     private func makeTestPayload(validUntil: Date = Date(timeIntervalSinceNow: 60)) -> OmniBLEHandoffPayload {
