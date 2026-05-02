@@ -196,8 +196,20 @@ public class OmniBLEPumpManager: DeviceManager {
 
     /// B.5 Issue #1: Optional callback wired by OmniBLEOwnership at handoff
     /// time. When the closure returns false, enactBolus + enactTempBasal
-    /// short-circuit with PumpManagerError.uncertainDelivery (retryable).
-    /// Default nil = always-allow, preserves backwards compat for tests + early init.
+    /// short-circuit with PumpManagerError.uncertainDelivery — Loop treats
+    /// this case as retryable (DeviceDataManager.swift:833 special-cases
+    /// .uncertainDelivery to suppress the bolus-failure notification, so
+    /// the user doesn't see a misleading "delivery uncertain" alert during
+    /// a handoff window). Default nil = always-allow, preserves backwards
+    /// compat for tests + early init.
+    ///
+    /// SCOPE GAP (B.5.1 or B.7 followup): only enactBolus + enactTempBasal
+    /// are gated. UI-driven manual paths like runTemporaryBasalProgram,
+    /// cancelBolus, suspendDelivery, resumeDelivery are NOT gated. The
+    /// rationale: handoff window is sub-second + UI paths are low-frequency
+    /// + the user is consciously triggering them. Widening the gate is
+    /// plan-changes territory, not Phase 2A scope. File as B.5.1 if the
+    /// gap matters in practice.
     public var commandsAllowedCheck: (() -> Bool)?
 
     /// Test-only accessor for direct PodComms exercise. Lets integration tests

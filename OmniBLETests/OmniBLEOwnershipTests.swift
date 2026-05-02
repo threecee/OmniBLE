@@ -1,4 +1,5 @@
 import XCTest
+import LoopKit
 @testable import OmniBLE
 
 @MainActor
@@ -248,6 +249,46 @@ final class OmniBLEOwnershipTests: XCTestCase {
         // ownership now deallocated; callback's [weak self] returns nil → ?? true
         XCTAssertTrue(pumpManager.commandsAllowedCheck?() ?? true,
                       "Callback should default-allow when ownership is gone (?? true)")
+    }
+
+    // MARK: - B.5 Issue #1: gate firing in enactBolus / enactTempBasal
+
+    /// When commandsAllowedCheck returns false, enactBolus completes
+    /// synchronously with .uncertainDelivery and never reaches the BLE comms.
+    func testEnactBolus_shortCircuitsWhenCommandsNotAllowed() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        pumpManager.commandsAllowedCheck = { false }
+
+        let exp = expectation(description: "enactBolus completion")
+        var receivedError: PumpManagerError?
+        pumpManager.enactBolus(units: 1.0, activationType: .automatic) { error in
+            receivedError = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.5)  // synchronous — should fire immediately
+
+        guard case .uncertainDelivery = receivedError else {
+            return XCTFail("Expected .uncertainDelivery; got \(String(describing: receivedError))")
+        }
+    }
+
+    /// Same for enactTempBasal: callback false → .uncertainDelivery synchronously,
+    /// no BLE comms attempted.
+    func testEnactTempBasal_shortCircuitsWhenCommandsNotAllowed() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        pumpManager.commandsAllowedCheck = { false }
+
+        let exp = expectation(description: "enactTempBasal completion")
+        var receivedError: PumpManagerError?
+        pumpManager.enactTempBasal(unitsPerHour: 2.0, for: 30 * 60) { error in
+            receivedError = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.5)
+
+        guard case .uncertainDelivery = receivedError else {
+            return XCTFail("Expected .uncertainDelivery; got \(String(describing: receivedError))")
+        }
     }
 
     // MARK: - Helpers
