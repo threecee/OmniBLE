@@ -186,6 +186,70 @@ final class OmniBLEOwnershipTests: XCTestCase {
                        ".recovering with lastKnownOwner=.watch keeps watch as driver")
     }
 
+    // MARK: - B.5 Issue #1: commandsAllowed gate
+
+    /// commandsAllowed defaults to true on a fresh OmniBLEOwnership.
+    func testCommandsAllowed_defaultsToTrue() {
+        let ownership = OmniBLEOwnership(
+            role: .phone,
+            appGroupDefaults: defaults,
+            initialState: .phoneDriver
+        )
+        XCTAssertTrue(ownership.commandsAllowed)
+    }
+
+    /// Setting commandsAllowed to false flips the @Published value.
+    func testCommandsAllowed_canBeSetFalse() {
+        let ownership = OmniBLEOwnership(
+            role: .phone,
+            appGroupDefaults: defaults,
+            initialState: .phoneDriver
+        )
+        ownership.commandsAllowed = false
+        XCTAssertFalse(ownership.commandsAllowed)
+    }
+
+    /// When ownership wires commandsAllowedCheck into the pump manager,
+    /// the closure reads the live ownership.commandsAllowed value.
+    func testCommandsAllowedCheck_wiringReflectsLiveValue() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        let ownership = OmniBLEOwnership(
+            role: .watch,
+            pumpManager: nil,  // wire via setPumpManager so we exercise that path
+            appGroupDefaults: defaults,
+            initialState: .watchDriver
+        )
+        ownership.setPumpManager(pumpManager)
+
+        // Default true after wiring.
+        XCTAssertTrue(pumpManager.commandsAllowedCheck?() ?? false,
+                      "Callback should return true when commandsAllowed defaults to true")
+
+        // Flip ownership flag → callback reflects.
+        ownership.commandsAllowed = false
+        XCTAssertFalse(pumpManager.commandsAllowedCheck?() ?? true,
+                       "Callback should return false after ownership.commandsAllowed = false")
+    }
+
+    /// When ownership is deallocated, the callback returns the default-allow
+    /// value (true) — guards against use-after-free.
+    func testCommandsAllowedCheck_returnsTrueWhenOwnershipDeallocated() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        do {
+            let ownership = OmniBLEOwnership(
+                role: .watch,
+                pumpManager: nil,
+                appGroupDefaults: defaults,
+                initialState: .watchDriver
+            )
+            ownership.setPumpManager(pumpManager)
+            ownership.commandsAllowed = false  // would suppress if alive
+        }
+        // ownership now deallocated; callback's [weak self] returns nil → ?? true
+        XCTAssertTrue(pumpManager.commandsAllowedCheck?() ?? true,
+                      "Callback should default-allow when ownership is gone (?? true)")
+    }
+
     // MARK: - Helpers
 
     private func makeTestPayload(validUntil: Date = Date(timeIntervalSinceNow: 60)) -> OmniBLEHandoffPayload {

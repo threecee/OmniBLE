@@ -12,6 +12,7 @@
 
 import Foundation
 import os.log
+import Combine
 
 // MARK: - Protocol
 
@@ -37,6 +38,12 @@ public final class OmniBLEOwnership {
     public private(set) var pumpManager: OmniBLEPodOwner?
     public private(set) var cachedPayload: OmniBLEHandoffPayload?
 
+    /// B.5 Issue #1: Gate flag for pod commands during handoff transitions.
+    /// Set to false on `.stopIssuingPodCommands` effect; true on
+    /// `.resumeIssuingPodCommands`. Wired into `OmniBLEPumpManager` via
+    /// `commandsAllowedCheck` callback (see `wireCommandsCallback`).
+    @Published public var commandsAllowed: Bool = true
+
     private let appGroupDefaults: UserDefaults
     private var lastSeenState: HandoffState
 
@@ -54,6 +61,10 @@ public final class OmniBLEOwnership {
         self.appGroupDefaults = appGroupDefaults
         self.lastSeenState = initialState
         self.cachedPayload = OmniBLEOwnership.loadCachedPayload(from: appGroupDefaults)
+        // B.5 Issue #1: wire callback if pumpManager supplied at init (iOS path).
+        if let pumpManager = pumpManager {
+            wireCommandsCallback(into: pumpManager)
+        }
     }
 
     // MARK: - Public API
@@ -83,6 +94,21 @@ public final class OmniBLEOwnership {
     /// transition to .watchDriver and calls this setter, then update(state:).
     public func setPumpManager(_ pumpManager: OmniBLEPodOwner) {
         self.pumpManager = pumpManager
+        wireCommandsCallback(into: pumpManager)
+    }
+
+    /// B.5 Issue #1: install the commandsAllowed callback into the pump manager.
+    /// Called from setPumpManager (watch path) and init (iOS path). Cast
+    /// through to OmniBLEPumpManager since the gate lives on the concrete
+    /// class — OmniBLEPodOwner only has BLE-control methods.
+    private func wireCommandsCallback(into podOwner: OmniBLEPodOwner) {
+        if let pumpManager = podOwner as? OmniBLEPumpManager {
+            pumpManager.commandsAllowedCheck = { [weak self] in
+                self?.commandsAllowed ?? true
+            }
+        }
+        // If podOwner is a test mock (not OmniBLEPumpManager), skip — the
+        // mock should expose its own way to verify "would have suppressed."
     }
 
     // MARK: - Internal transition logic

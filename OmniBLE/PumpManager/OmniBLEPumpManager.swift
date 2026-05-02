@@ -194,6 +194,12 @@ public class OmniBLEPumpManager: DeviceManager {
     }
     private let lockedPodComms: Locked<PodComms>
 
+    /// B.5 Issue #1: Optional callback wired by OmniBLEOwnership at handoff
+    /// time. When the closure returns false, enactBolus + enactTempBasal
+    /// short-circuit with PumpManagerError.uncertainDelivery (retryable).
+    /// Default nil = always-allow, preserves backwards compat for tests + early init.
+    public var commandsAllowedCheck: (() -> Bool)?
+
     /// Test-only accessor for direct PodComms exercise. Lets integration tests
     /// (T.1 PodActivationTests) bypass the `#if targetEnvironment(simulator)`
     /// short-circuit on `pairAndPrime`/`insertCannula` and drive the real
@@ -2013,6 +2019,12 @@ extension OmniBLEPumpManager: PumpManager {
     // MARK: - Programming Delivery
 
     public func enactBolus(units: Double, activationType: BolusActivationType, completion: @escaping (PumpManagerError?) -> Void) {
+        // B.5 Issue #1: gate on handoff command-allowed flag.
+        if let check = commandsAllowedCheck, !check() {
+            log.default("enactBolus suppressed: commandsAllowed=false (handoff in progress)")
+            completion(.uncertainDelivery)
+            return
+        }
         guard self.hasActivePod else {
             completion(.configuration(OmniBLEPumpManagerError.noPodPaired))
             return
@@ -2152,6 +2164,12 @@ extension OmniBLEPumpManager: PumpManager {
     }
 
     public func enactTempBasal(unitsPerHour: Double, for duration: TimeInterval, completion: @escaping (PumpManagerError?) -> Void) {
+        // B.5 Issue #1: gate on handoff command-allowed flag.
+        if let check = commandsAllowedCheck, !check() {
+            log.default("enactTempBasal suppressed: commandsAllowed=false (handoff in progress)")
+            completion(.uncertainDelivery)
+            return
+        }
         runTemporaryBasalProgram(unitsPerHour: unitsPerHour, for: duration, automatic: true, completion: completion)
     }
 
