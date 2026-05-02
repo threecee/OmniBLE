@@ -491,4 +491,172 @@ final class WatchAlgorithmEndToEndTests: PodSimulatorTestCase {
             )
         }
     }
+
+    // MARK: - Shared setup for gate sub-tests (B.6 Phase 5)
+
+    private struct GateTestSetup {
+        let watchPM: OmniBLEPumpManager
+        let driver: WatchAlgorithmDriver
+        let beforeDelivered: Double
+        let now: Date
+    }
+
+    /// Builds the full pod+watchPM+driver stack used by the gate-suppression
+    /// sub-tests, parameterised on the three gate inputs. Mirrors steps 1-6
+    /// of `testFullChain_algorithmRunsAndDoseEnactsOnEmulatedPod` so the
+    /// only difference between sub-tests is which gate is set to "fail".
+    private func makeGateSetup(
+        automaticDosingEnabled: Bool,
+        isAutomaticDosingAllowed: Bool,
+        isWarmingUp: Bool
+    ) throws -> GateTestSetup {
+        // 1. Pair fresh pod on the phone-side manager.
+        let phonePM = try pairFreshPod()
+        XCTAssertTrue(phonePM.hasActivePod, "phone pod should be active after pairing")
+
+        guard let phonePodState = phonePM.state.podState else {
+            let e = NSError(domain: "WatchAlgorithmEndToEndTests", code: 2,
+                            userInfo: [NSLocalizedDescriptionKey: "phone has no podState after pairFreshPod"])
+            XCTFail(e.localizedDescription)
+            throw e
+        }
+
+        // 2. Export handoff payload, then disconnect phone-side BLE.
+        let outboundPayload = try OmniBLEHandoffPayload(
+            podState: phonePodState,
+            lastBolusSequence: nil,
+            lastBasalScheduleId: nil,
+            validUntil: Date(timeIntervalSinceNow: 86_400)
+        )
+        let restoredPodState = try outboundPayload.decodedPodState()
+        phonePM.disconnectFromActivePod()
+        waitForBluetoothSettle(timeout: 1.5)
+
+        // 3. Build watch-side OmniBLEPumpManager + restore + reconnect.
+        let watchPM = makeWatchSidePumpManager(matching: phonePM)
+        self.watchPM = watchPM
+        installWatchQueueBouncer(on: watchPM)
+        waitForBluetoothSettle(timeout: 1.0)
+
+        watchPM.restorePodState(restoredPodState)
+        XCTAssertTrue(watchPM.hasActivePod, "watch should report active pod after restorePodState")
+
+        watchPM.connectToActivePod()
+        waitForReconnect(timeout: 8.0)
+
+        // 4. Capture the baseline insulinDelivered counter from the pod.
+        let beforeDelivered = try captureInsulinDelivered(from: watchPM, label: "before-gate-test")
+
+        // 5. Build canned algorithm inputs (same rising glucose / minimal
+        //    settings as the happy-path test — those are not what's under test
+        //    here; the gates should suppress regardless).
+        let now = Date()
+        let glucoseStore = makeRisingGlucoseStore(now: now)
+        let loopSettings = makeMinimalLoopSettings()
+        let snapshot = WatchSettingsSnapshot(
+            loopSettings: loopSettings,
+            storedSettings: StoredSettings(),
+            nightscoutConfig: nil,
+            automaticDosingEnabled: automaticDosingEnabled,
+            isAutomaticDosingAllowed: isAutomaticDosingAllowed
+        )
+        let doseStore = TestDoseStore()
+        let carbStore = TestCarbStore()
+        carbStore.carbRatioSchedule = loopSettings.carbRatioSchedule
+        carbStore.insulinSensitivitySchedule = loopSettings.insulinSensitivitySchedule
+        carbStore.carbRatioScheduleApplyingOverrideHistory = loopSettings.carbRatioSchedule
+        carbStore.insulinSensitivityScheduleApplyingOverrideHistory = loopSettings.insulinSensitivitySchedule
+
+        // 6. Construct driver with the parameterised gate values.
+        let driver = WatchAlgorithmDriver(
+            carbStore: carbStore,
+            doseStore: doseStore,
+            glucoseStore: glucoseStore,
+            dosingDecisionStore: TestDosingDecisionStore(),
+            settingsSnapshot: snapshot,
+            now: { now },
+            pumpManager: watchPM,
+            isWarmingUpOverride: isWarmingUp
+        )
+        self.driver = driver
+
+        return GateTestSetup(watchPM: watchPM, driver: driver,
+                             beforeDelivered: beforeDelivered, now: now)
+    }
+
+    /// Verify that after running the algorithm with the given gate setup,
+    /// the pod's insulinDelivered did NOT change AND no temp basal was
+    /// installed (i.e., the suppression worked end-to-end through the full
+    /// production plumbing, not just the unit-test mocks).
+    private func assertSuppressedEndToEnd(_ setup: GateTestSetup,
+                                          file: StaticString = #file,
+                                          line: UInt = #line) throws {
+        setup.driver.underlyingRunner.loop()
+
+        // Wait a generous interval to confirm nothing happens. The happy-path
+        // test sees a temp basal install within ~5-15s of `loop()`; we wait
+        // 8s here to give a successful (but suppressed) iteration ample time
+        // to complete its no-op pass before we sample the pod.
+        let waitDeadline = Date().addingTimeInterval(8.0)
+        while Date() < waitDeadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+            if case .tempBasal = setup.watchPM.status.basalDeliveryState {
+                // Bail out early — gate failed. Let the assertion below report.
+                break
+            }
+        }
+
+        let afterDelivered = try captureInsulinDelivered(from: setup.watchPM,
+                                                         label: "after-suppression-check")
+        XCTAssertEqual(
+            afterDelivered, setup.beforeDelivered,
+            "Gate suppression should prevent any insulin delivery; before=\(setup.beforeDelivered) after=\(afterDelivered)",
+            file: file, line: line
+        )
+
+        let finalState = setup.watchPM.status.basalDeliveryState
+        if case .tempBasal = finalState {
+            XCTFail("Gate suppression should prevent temp basal installation; got .tempBasal state",
+                    file: file, line: line)
+        }
+    }
+
+    // MARK: - B.6 Phase 5: gate suppression sub-tests
+    //
+    // Each test runs the full algorithm iteration with one gate set to
+    // "fail" and asserts that pod insulinDelivered did NOT change AND no
+    // temp basal was installed. Complements the gate-logic UNIT tests in
+    // Phase 2 (RecordingPumpManager mock) — these prove the gates
+    // actually prevent the dose from reaching the real pod through the
+    // full production plumbing.
+
+    /// Watch is in the warming-up window → no dose, even if other gates would pass.
+    func testGateSuppression_warmingUp_noDoseEnacted() throws {
+        let setup = try makeGateSetup(
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true,
+            isWarmingUp: true                  // KEY
+        )
+        try assertSuppressedEndToEnd(setup)
+    }
+
+    /// Phone reports automatic dosing is off → no dose.
+    func testGateSuppression_automaticDosingDisabled_noDoseEnacted() throws {
+        let setup = try makeGateSetup(
+            automaticDosingEnabled: false,    // KEY
+            isAutomaticDosingAllowed: true,
+            isWarmingUp: false
+        )
+        try assertSuppressedEndToEnd(setup)
+    }
+
+    /// Phone reports automatic dosing is currently disallowed → no dose.
+    func testGateSuppression_dosingNotAllowed_noDoseEnacted() throws {
+        let setup = try makeGateSetup(
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: false,  // KEY
+            isWarmingUp: false
+        )
+        try assertSuppressedEndToEnd(setup)
+    }
 }
