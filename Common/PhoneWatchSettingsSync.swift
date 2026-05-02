@@ -48,6 +48,14 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
     /// backward compatibility; receivers should treat nil as `false`.
     public let isAutomaticDosingAllowed: Bool?
 
+    /// B.5.2 Issue #3: Phone-side TimeZone identifier (e.g. "Europe/Copenhagen").
+    /// The watch uses this to align its schedule lookups to the phone's local
+    /// time when the two devices are in different time zones (or when iOS
+    /// has not yet propagated a TZ change to the watch). Optional + nil-default
+    /// for backward compatibility with v3 senders; receivers should fall back
+    /// to their own `TimeZone.current` when nil.
+    public let timeZone: String?
+
     public init(
         protocolVersion: Int,
         sentAt: Date,
@@ -60,7 +68,8 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
         suspendThresholdMgdL: Double?,
         nightscoutConfig: NightscoutConfig?,
         automaticDosingEnabled: Bool? = nil,
-        isAutomaticDosingAllowed: Bool? = nil
+        isAutomaticDosingAllowed: Bool? = nil,
+        timeZone: String? = nil
     ) {
         self.protocolVersion = protocolVersion
         self.sentAt = sentAt
@@ -74,6 +83,7 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
         self.nightscoutConfig = nightscoutConfig
         self.automaticDosingEnabled = automaticDosingEnabled
         self.isAutomaticDosingAllowed = isAutomaticDosingAllowed
+        self.timeZone = timeZone
     }
 
     public struct NightscoutConfig: Codable, Equatable {

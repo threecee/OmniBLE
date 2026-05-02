@@ -146,4 +146,54 @@ final class PhoneWatchSettingsSyncTests: XCTestCase {
         XCTAssertEqual(decoded.automaticDosingEnabled, true)
         XCTAssertEqual(decoded.isAutomaticDosingAllowed, false)
     }
+
+    // MARK: - B.5.2 Issue #3: timeZone field round-trip
+
+    /// Encoding then decoding a sync with timeZone set preserves the identifier.
+    func testTimeZoneRoundTripsThroughCodable() throws {
+        let original = PhoneWatchSettingsSync(
+            protocolVersion: 4,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            basalScheduleItems: [],
+            insulinSensitivityScheduleItems: [],
+            carbRatioScheduleItems: [],
+            glucoseTargetRangeScheduleItems: [],
+            maximumBolusUnits: 10,
+            maximumBasalRatePerHourUnits: 4,
+            suspendThresholdMgdL: 72,
+            nightscoutConfig: nil,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true,
+            timeZone: "Europe/Copenhagen"
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(PhoneWatchSettingsSync.self, from: data)
+        XCTAssertEqual(decoded.timeZone, "Europe/Copenhagen")
+        XCTAssertEqual(decoded, original)
+    }
+
+    /// A v3-shaped JSON payload (no timeZone field) decodes successfully
+    /// with timeZone = nil. This is the new-watch-receiving-old-phone case.
+    func testCodableV3PayloadDecodesWithNilTimeZone() throws {
+        let v3Json = """
+        {
+          "protocolVersion": 3,
+          "sentAt": 1700000000,
+          "basalScheduleItems": [],
+          "insulinSensitivityScheduleItems": [],
+          "carbRatioScheduleItems": [],
+          "glucoseTargetRangeScheduleItems": [],
+          "maximumBolusUnits": 10,
+          "maximumBasalRatePerHourUnits": 4,
+          "suspendThresholdMgdL": 72,
+          "nightscoutConfig": null,
+          "automaticDosingEnabled": true,
+          "isAutomaticDosingAllowed": false
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(PhoneWatchSettingsSync.self, from: v3Json)
+        XCTAssertNil(decoded.timeZone,
+                     "v3 payload (no field) should decode as nil — old phone, new watch")
+    }
 }
