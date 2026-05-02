@@ -659,4 +659,36 @@ final class WatchAlgorithmEndToEndTests: PodSimulatorTestCase {
         )
         try assertSuppressedEndToEnd(setup)
     }
+
+    // MARK: - B.5 Issue #1 verification (integration)
+
+    /// Pump manager's commandsAllowedCheck callback returns false → algorithm
+    /// runs but enactTempBasal short-circuits → pod state unchanged + no
+    /// suppressed decision recorded (the dose returned a retryable error,
+    /// which is different from gate-suppression).
+    func testCommandGate_blocksDoseWhenCommandsNotAllowed() throws {
+        let setup = try makeGateSetup(
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true,
+            isWarmingUp: false
+        )
+
+        // Simulate handoff in progress: explicitly disable commands at the pump.
+        // In production, OmniBLEOwnership.commandsAllowed = false would
+        // propagate via the wired callback. In this integration test we set
+        // the callback directly:
+        setup.watchPM.commandsAllowedCheck = { false }
+
+        setup.driver.underlyingRunner.loop()
+        Thread.sleep(forTimeInterval: 5.0)
+
+        let afterDelivered = try captureInsulinDelivered(from: setup.watchPM, label: "after-cmd-gate")
+        XCTAssertEqual(afterDelivered, setup.beforeDelivered,
+                       "Command gate should prevent insulin delivery")
+
+        let finalState = setup.watchPM.status.basalDeliveryState
+        if case .tempBasal = finalState {
+            XCTFail("Command gate should prevent temp basal installation")
+        }
+    }
 }
