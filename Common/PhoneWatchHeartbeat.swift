@@ -20,10 +20,20 @@ public struct PhoneWatchHeartbeat: Codable, Equatable {
     public let senderRole: PhoneWatchSenderRole
     public let appBuildNumber: String
 
-    public init(protocolVersion: Int, sentAt: Date, senderRole: PhoneWatchSenderRole, appBuildNumber: String) {
+    /// B.5 Issue #5: who the sender currently believes is the pod owner.
+    /// Optional + nil-default for backward compatibility with v2 senders;
+    /// receivers use this for split-brain detection (phone-wins arbitration).
+    public let claimedOwner: HandoffOwner?
+
+    public init(protocolVersion: Int,
+                sentAt: Date,
+                senderRole: PhoneWatchSenderRole,
+                appBuildNumber: String,
+                claimedOwner: HandoffOwner? = nil) {
         self.protocolVersion = protocolVersion
         self.sentAt = sentAt
         self.senderRole = senderRole
         self.appBuildNumber = appBuildNumber
+        self.claimedOwner = claimedOwner
     }
 }

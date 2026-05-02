@@ -21,10 +21,10 @@ final class PhoneWatchMessageTests: XCTestCase {
 
     // MARK: - Protocol version
 
-    func testCurrentVersionIsTwo() {
-        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 2,
-                       "B.4 Issue #3 bumped the protocol version from 1 to 2 to signal " +
-                       "the new automaticDosingEnabled / isAutomaticDosingAllowed fields.")
+    func testCurrentVersionIsThree() {
+        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 3,
+                       "B.5 Issue #5 bumped the protocol version from 2 to 3 to signal " +
+                       "the new claimedOwner heartbeat field for split-brain detection.")
     }
 
     // MARK: - Heartbeat
@@ -121,12 +121,47 @@ final class PhoneWatchMessageTests: XCTestCase {
     func testAcceptsLowerOrCurrentProtocolVersion() {
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 0))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 1))
-        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 2),
-                      "Current version (2) must accept itself.")
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 2))
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 3),
+                      "Current version (3) must accept itself.")
     }
 
     func testRejectsHigherProtocolVersion() {
-        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 3))
+        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 4))
         XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 99))
+    }
+
+    // MARK: - B.5 Issue #5: claimedOwner field round-trip
+
+    /// Encoding then decoding a heartbeat with claimedOwner set preserves it.
+    func testHeartbeat_codable_roundTrip_preservesClaimedOwner() throws {
+        let original = PhoneWatchHeartbeat(
+            protocolVersion: 3,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            senderRole: .phone,
+            appBuildNumber: "861",
+            claimedOwner: .phone
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(PhoneWatchHeartbeat.self, from: data)
+        XCTAssertEqual(decoded.claimedOwner, .phone)
+        XCTAssertEqual(decoded, original)
+    }
+
+    /// A v2-shaped JSON payload (no claimedOwner field) decodes successfully
+    /// with claimedOwner = nil. This is the new-receiver-receiving-old-sender case.
+    func testHeartbeat_codable_decodesV2Payload_withNilClaimedOwner() throws {
+        let v2Json = """
+        {
+          "protocolVersion": 2,
+          "sentAt": 1700000000,
+          "senderRole": "phone",
+          "appBuildNumber": "860"
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(PhoneWatchHeartbeat.self, from: v2Json)
+        XCTAssertNil(decoded.claimedOwner,
+                     "v2 payload (no field) should decode as nil — old sender, new receiver")
     }
 }

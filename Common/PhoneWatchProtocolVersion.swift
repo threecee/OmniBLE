@@ -12,7 +12,7 @@ import Foundation
 
 public enum PhoneWatchProtocol {
     /// Bumped on any incompatible change to message shapes or transport conventions.
-    public static let currentVersion: Int = 2
+    public static let currentVersion: Int = 3
 
     /// True if an incoming message at `incomingVersion` should be accepted.
     public static func shouldAccept(incomingVersion: Int) -> Bool {
