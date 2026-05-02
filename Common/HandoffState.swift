@@ -33,7 +33,7 @@ public enum HandoffRecoveryReason: String, Codable, Equatable {
     case localFailureDuringTransition
 }
 
-public enum HandoffState: Equatable {
+public enum HandoffState: Equatable, Codable {
     case phoneDriver
     case handoffPending(direction: HandoffDirection, transitionId: UUID, deadline: Date)
     case watchDriver

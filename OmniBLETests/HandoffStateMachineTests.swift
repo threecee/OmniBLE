@@ -10,9 +10,20 @@ final class HandoffStateMachineTests: XCTestCase {
 
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
+    // B.5 Issue #4: each machine() invocation gets a fresh, isolated
+    // UserDefaults suite so persisted state from prior tests doesn't
+    // leak into the next machine's init (which would otherwise restore
+    // the previous test's state instead of using `initial`).
+    private func isolatedDefaults() -> UserDefaults {
+        let suiteName = "com.LoopKit.OmniBLE.HandoffStateMachineTests.\(UUID().uuidString)"
+        return UserDefaults(suiteName: suiteName)!
+    }
+
     private func machine(role: HandoffRole = .phone,
                          initial: HandoffState = .phoneDriver) -> HandoffStateMachine {
-        HandoffStateMachine(initialState: initial, role: role)
+        return HandoffStateMachine(initialState: initial,
+                                   role: role,
+                                   appGroupDefaults: isolatedDefaults())
     }
 
     // MARK: - From PhoneDriver
@@ -59,7 +70,8 @@ final class HandoffStateMachineTests: XCTestCase {
     func testPhoneDriver_incomingModeSwitchToWatchDriver_selfCompletes() {
         // After B.2.e Phase 1: receiver self-completes to .watchDriver in one event
         // (was: stayed in .handoffPending awaiting initiator ack that never came).
-        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch,
+                                     appGroupDefaults: isolatedDefaults())
         let tid = UUID()
         let ms = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
@@ -188,7 +200,8 @@ final class HandoffStateMachineTests: XCTestCase {
     }
 
     func testWatchDriver_incomingModeSwitchToPhoneDriver_selfCompletes() {
-        let sm = HandoffStateMachine(initialState: .watchDriver, role: .phone)
+        let sm = HandoffStateMachine(initialState: .watchDriver, role: .phone,
+                                     appGroupDefaults: isolatedDefaults())
         let tid = UUID()
         let ms = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
@@ -382,7 +395,8 @@ final class HandoffStateMachineTests: XCTestCase {
             initialState: .handoffPending(direction: .phoneToWatch,
                                            transitionId: initialId,
                                            deadline: Date().addingTimeInterval(30)),
-            role: .phone
+            role: .phone,
+            appGroupDefaults: isolatedDefaults()
         )
         let confirm = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
@@ -399,7 +413,8 @@ final class HandoffStateMachineTests: XCTestCase {
     }
 
     func testReceiverSelfCompletionEffectsOrderHasNotifyUIWatchDriverLast() {
-        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch,
+                                     appGroupDefaults: isolatedDefaults())
         let ms = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
             sentAt: Date(),
@@ -421,7 +436,8 @@ final class HandoffStateMachineTests: XCTestCase {
     }
 
     func testNonInitiatorSideRejectsModeSwitchWithWrongTargetMode() {
-        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch,
+                                     appGroupDefaults: isolatedDefaults())
         let ms = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
             sentAt: Date(),
@@ -500,5 +516,42 @@ final class HandoffStateMachineTests: XCTestCase {
         let effectB = HandoffSideEffect.sendSettingsSync(sync)
         XCTAssertEqual(effectA, effectB,
                        "HandoffSideEffect.sendSettingsSync must be Equatable")
+    }
+
+    // MARK: - B.5 Issue #4: state persistence
+
+    func testInit_restoresPersistedStateOverInitialState() {
+        let suiteName = "com.LoopKit.OmniBLE.B5_StateMachineRestoreTest.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        // Persist .watchDriver from a prior session
+        HandoffStatePersistence.save(.watchDriver, to: defaults)
+
+        // New state machine constructed with .phoneDriver as initialState
+        // — but should restore .watchDriver from persistence.
+        let machine = HandoffStateMachine(
+            initialState: .phoneDriver,
+            role: .phone,
+            appGroupDefaults: defaults
+        )
+
+        XCTAssertEqual(machine.state, .watchDriver,
+                       "State machine should restore persisted state, not use initialState")
+    }
+
+    func testInit_usesInitialStateWhenNoPersistedState() {
+        let suiteName = "com.LoopKit.OmniBLE.B5_StateMachineRestoreTest_Empty.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        HandoffStatePersistence.clear(from: defaults)
+
+        let machine = HandoffStateMachine(
+            initialState: .phoneDriver,
+            role: .phone,
+            appGroupDefaults: defaults
+        )
+
+        XCTAssertEqual(machine.state, .phoneDriver)
     }
 }

@@ -126,6 +126,8 @@
 		WB2D000000000000016 /* HandoffEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000006 /* HandoffEvent.swift */; };
 		WB2D000000000000017 /* HandoffSideEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000007 /* HandoffSideEffect.swift */; };
 		WB2D000000000000018 /* HandoffStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000008 /* HandoffStateMachine.swift */; };
+		B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000001 /* HandoffStatePersistence.swift */; };
+		B5C0000000000000102 /* HandoffStatePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000002 /* HandoffStatePersistenceTests.swift */; };
 		WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000009 /* HandoffSettingsTests.swift */; };
 		WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */; };
 		WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000B /* HandoffStateMachineTests.swift */; };
@@ -436,6 +438,8 @@
 		WB2D000000000000006 /* HandoffEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffEvent.swift; sourceTree = "<group>"; };
 		WB2D000000000000007 /* HandoffSideEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSideEffect.swift; sourceTree = "<group>"; };
 		WB2D000000000000008 /* HandoffStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachine.swift; sourceTree = "<group>"; };
+		B5C0000000000000001 /* HandoffStatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistence.swift; sourceTree = "<group>"; };
+		B5C0000000000000002 /* HandoffStatePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistenceTests.swift; sourceTree = "<group>"; };
 		WB2D000000000000009 /* HandoffSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettingsTests.swift; sourceTree = "<group>"; };
 		WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEHandoffPayloadTests.swift; sourceTree = "<group>"; };
 		WB2D00000000000000B /* HandoffStateMachineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachineTests.swift; sourceTree = "<group>"; };
@@ -727,6 +731,7 @@
 				WB2D000000000000009 /* HandoffSettingsTests.swift */,
 				WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */,
 				WB2D00000000000000B /* HandoffStateMachineTests.swift */,
+				B5C0000000000000002 /* HandoffStatePersistenceTests.swift */,
 				WB2D00000000000000D /* MockOmniBLEPumpManager.swift */,
 				WB2D00000000000000E /* OmniBLEOwnershipTests.swift */,
 				WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */,
@@ -894,6 +899,7 @@
 				WB2D000000000000006 /* HandoffEvent.swift */,
 				WB2D000000000000007 /* HandoffSideEffect.swift */,
 				WB2D000000000000008 /* HandoffStateMachine.swift */,
+				B5C0000000000000001 /* HandoffStatePersistence.swift */,
 				WB2D00000000000000C /* OmniBLEOwnership.swift */,
 			);
 			path = Common;
@@ -1417,6 +1423,7 @@
 				WB2D000000000000016 /* HandoffEvent.swift in Sources */,
 				WB2D000000000000017 /* HandoffSideEffect.swift in Sources */,
 				WB2D000000000000018 /* HandoffStateMachine.swift in Sources */,
+				B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */,
 				WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */,
 				C1F67E9227975B830017487F /* BasalStateView.swift in Sources */,
 				1024E32B27446DB000DE01F2 /* MessagePacket.swift in Sources */,
@@ -1476,6 +1483,7 @@
 				WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */,
 				WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */,
 				WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */,
+				B5C0000000000000102 /* HandoffStatePersistenceTests.swift in Sources */,
 				WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */,
 				WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */,
 				WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */,

@@ -13,7 +13,14 @@ import Foundation
 
 public final class HandoffStateMachine {
 
-    public private(set) var state: HandoffState
+    /// B.5 Issue #4: didSet persists every state transition (including
+    /// transient .handoffPending states) to App Group UserDefaults so the
+    /// state machine can recover from crash mid-handoff.
+    public private(set) var state: HandoffState {
+        didSet {
+            HandoffStatePersistence.save(state, to: appGroupDefaults)
+        }
+    }
     public private(set) var lastKnownOwner: HandoffOwner
     public private(set) var transitionLog: [HandoffTransitionRecord] = []
 
@@ -21,11 +28,25 @@ public final class HandoffStateMachine {
     public static let logCapacity: Int = 10
 
     private let role: HandoffRole
+    private let appGroupDefaults: UserDefaults
 
-    public init(initialState: HandoffState = .phoneDriver, role: HandoffRole) {
-        self.state = initialState
+    public init(initialState: HandoffState = .phoneDriver,
+                role: HandoffRole,
+                appGroupDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? .standard) {
+        self.appGroupDefaults = appGroupDefaults
         self.role = role
-        switch initialState {
+        // B.5 Issue #4: restore persisted state if available; otherwise
+        // use supplied initialState. Note: didSet on `state` doesn't fire
+        // during init — first persistence happens on the first transition
+        // after init. (No double-write at construction; cleaner.)
+        let effectiveInitial: HandoffState
+        if let restored = HandoffStatePersistence.load(from: appGroupDefaults) {
+            effectiveInitial = restored
+        } else {
+            effectiveInitial = initialState
+        }
+        self.state = effectiveInitial
+        switch effectiveInitial {
         case .phoneDriver: self.lastKnownOwner = .phone
         case .watchDriver: self.lastKnownOwner = .watch
         case .recovering(_, let last): self.lastKnownOwner = last

@@ -52,7 +52,8 @@ final class HandoffRoundTripIntegrationTests: XCTestCase {
 
         // Phone starts as the driver (phoneDriver is the default initial state).
         phoneMockPump = MockOmniBLEPumpManager()
-        phoneStateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .phone)
+        phoneStateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .phone,
+                                                appGroupDefaults: phoneDefaults)
         phoneOwnership = OmniBLEOwnership(
             role: .phone,
             pumpManager: phoneMockPump,
@@ -63,7 +64,8 @@ final class HandoffRoundTripIntegrationTests: XCTestCase {
         // Watch starts as non-driver (also phoneDriver initial state — watch hasn't
         // been handed control yet).
         watchMockPump = MockOmniBLEPumpManager()
-        watchStateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        watchStateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .watch,
+                                                appGroupDefaults: watchDefaults)
         watchOwnership = OmniBLEOwnership(
             role: .watch,
             pumpManager: watchMockPump,
@@ -272,8 +274,10 @@ final class HandoffRoundTripIntegrationTests: XCTestCase {
     func testReverseHandoffWithoutCachedPayloadStillConnects() throws {
         // Start: watch is already driver (simulates a scenario where the watch
         // received driver at launch from a persisted state, not via a live handoff).
-        let wsm = HandoffStateMachine(initialState: .watchDriver, role: .watch)
-        let psm = HandoffStateMachine(initialState: .watchDriver, role: .phone)
+        let wsm = HandoffStateMachine(initialState: .watchDriver, role: .watch,
+                                      appGroupDefaults: watchDefaults)
+        let psm = HandoffStateMachine(initialState: .watchDriver, role: .phone,
+                                      appGroupDefaults: phoneDefaults)
 
         let watchOwnershipB = OmniBLEOwnership(
             role: .watch, pumpManager: watchMockPump,
