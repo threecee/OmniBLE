@@ -425,11 +425,12 @@ final class WatchAlgorithmEndToEndTests: PodSimulatorTestCase {
         )
         // The runner reads basalProfile / insulinSensitivitySchedule from
         // doseStore (not from settings) when computing dose recommendations,
-        // and fails with configurationError if they are nil. Populate the
-        // mock store so that production-style schedule access works.
+        // and fails with configurationError if they are nil. As of B.6
+        // Phase 4c (Loop commit <SHA>), WatchAlgorithmDriver.init copies
+        // these from settingsSnapshot.loopSettings into the supplied
+        // doseStore — so the mock no longer needs manual pre-population.
+        // This proves the production schedule-copy code path works.
         let doseStore = TestDoseStore()
-        doseStore.basalProfile = loopSettings.basalRateSchedule
-        doseStore.insulinSensitivitySchedule = loopSettings.insulinSensitivitySchedule
         // Carb store also reads schedule fields when carb-on-board curves
         // touch any glucose effect — mirror dose store population.
         let carbStore = TestCarbStore()
