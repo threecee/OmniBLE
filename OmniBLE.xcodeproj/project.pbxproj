@@ -88,6 +88,9 @@
 		T1CBM0000000000001 /* CoreBluetoothMock in Frameworks (OmniBLE) */ = {isa = PBXBuildFile; productRef = T1CBM0000000000003 /* CoreBluetoothMock */; };
 		847530F626ED65DD009FD801 /* LoopKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F426ED65DD009FD801 /* LoopKit.framework */; };
 		847530F826ED65DD009FD801 /* LoopKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F526ED65DD009FD801 /* LoopKitUI.framework */; platformFilter = ios; };
+		B6F2000000000001 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000004 /* WatchAlgorithmKit.framework */; };
+		B6F2000000000002 /* LoopAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000005 /* LoopAlgorithmCore.framework */; };
+		B6F2000000000003 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000006 /* LoopCore.framework */; };
 		8475315326EDA193009FD801 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314626EDA193009FD801 /* TimeInterval.swift */; };
 		8475315726EDA193009FD801 /* LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314A26EDA193009FD801 /* LocalizedString.swift */; };
 		8475315826EDA193009FD801 /* OSLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314B26EDA193009FD801 /* OSLog.swift */; };
@@ -132,6 +135,7 @@
 		WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */; };
 		B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000001 /* PodHandoffSafetyTests.swift */; };
 		B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */; };
+		B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */; };
 		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
@@ -394,6 +398,9 @@
 		84752ED526ED13F5009FD801 /* PairMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairMessage.swift; sourceTree = "<group>"; };
 		847530F426ED65DD009FD801 /* LoopKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		847530F526ED65DD009FD801 /* LoopKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6F2000000000004 /* WatchAlgorithmKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = WatchAlgorithmKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6F2000000000005 /* LoopAlgorithmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopAlgorithmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6F2000000000006 /* LoopCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8475314626EDA193009FD801 /* TimeInterval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
 		8475314A26EDA193009FD801 /* LocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalizedString.swift; sourceTree = "<group>"; };
 		8475314B26EDA193009FD801 /* OSLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OSLog.swift; sourceTree = "<group>"; };
@@ -438,6 +445,7 @@
 		WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffRoundTripIntegrationTests.swift; sourceTree = "<group>"; };
 		B3A800000000000001 /* PodHandoffSafetyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodHandoffSafetyTests.swift; sourceTree = "<group>"; };
 		B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = B3aRemoteCommandIntegrationTest.swift; sourceTree = "<group>"; };
+		B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmEndToEndTests.swift; sourceTree = "<group>"; };
 		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -555,6 +563,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6F2000000000001 /* WatchAlgorithmKit.framework in Frameworks */,
+				B6F2000000000002 /* LoopAlgorithmCore.framework in Frameworks */,
+				B6F2000000000003 /* LoopCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -765,6 +776,7 @@
 				T1P800000000000002 /* PodHandoffEncryptedTests.swift */,
 				B3A800000000000001 /* PodHandoffSafetyTests.swift */,
 				B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */,
+				B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */,
 			);
 			path = Integration;
 			sourceTree = "<group>";
@@ -775,6 +787,9 @@
 			children = (
 				847530F426ED65DD009FD801 /* LoopKit.framework */,
 				847530F526ED65DD009FD801 /* LoopKitUI.framework */,
+				B6F2000000000004 /* WatchAlgorithmKit.framework */,
+				B6F2000000000005 /* LoopAlgorithmCore.framework */,
+				B6F2000000000006 /* LoopCore.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1466,6 +1481,7 @@
 				WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */,
 				B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */,
 				B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */,
+				B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */,
 				B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */,
 				A9A5BCF2276C1E6D00B02C86 /* PayloadSplitterTest.swift in Sources */,
 				D802CD0A27DD98C10072E3A1 /* TempBasalTests.swift in Sources */,
