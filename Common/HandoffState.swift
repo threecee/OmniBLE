@@ -73,6 +73,21 @@ public extension HandoffState {
         case .recovering: return .recovering
         }
     }
+
+    /// B.4 Issue #2: derive the current owner from a HandoffState for use by
+    /// the policy engine's `markCurrentOwner` hook. Pending transitions are
+    /// still owned by the origin until commit; ambiguous states return nil.
+    var currentOwner: HandoffOwner? {
+        switch self {
+        case .phoneDriver: return .phone
+        case .watchDriver: return .watch
+        case .handoffPending(direction: let dir, _, _):
+            // Pending TO watch means phone is still owner until commit;
+            // pending TO phone means watch is still owner until commit.
+            return dir.origin
+        case .recovering: return nil  // ambiguous; don't update
+        }
+    }
 }
 
 public enum HandoffTransitionTrigger: String, Codable, Equatable {
