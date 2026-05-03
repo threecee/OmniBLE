@@ -21,10 +21,12 @@ final class PhoneWatchMessageTests: XCTestCase {
 
     // MARK: - Protocol version
 
-    func testCurrentVersionIsFour() {
-        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 4,
-                       "B.5.2 Issue #3 bumped the protocol version from 3 to 4 to signal " +
-                       "the new timeZone field on PhoneWatchSettingsSync.")
+    func testCurrentVersionIsFive() {
+        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 5,
+                       "B.8.2 bumped the protocol version from 4 to 5 to signal the " +
+                       "heartbeat encoder dateEncodingStrategy switch (.iso8601 → " +
+                       ".secondsSince1970) and applicationContext-delivered " +
+                       "AlgorithmStateSnapshot wire format.")
     }
 
     // MARK: - Heartbeat
@@ -123,12 +125,13 @@ final class PhoneWatchMessageTests: XCTestCase {
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 1))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 2))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 3))
-        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 4),
-                      "Current version (4) must accept itself.")
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 4))
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 5),
+                      "Current version (5) must accept itself.")
     }
 
     func testRejectsHigherProtocolVersion() {
-        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 5))
+        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 6))
         XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 99))
     }
 
