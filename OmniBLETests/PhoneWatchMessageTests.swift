@@ -166,3 +166,31 @@ final class PhoneWatchMessageTests: XCTestCase {
                      "v2 payload (no field) should decode as nil — old sender, new receiver")
     }
 }
+
+extension PhoneWatchMessageTests {
+    func test_algorithmStateSnapshot_roundTripsViaPhoneWatchMessage() throws {
+        let payload = AlgorithmStateSnapshot(
+            snapshotID: UUID(),
+            createdAt: Date(timeIntervalSince1970: 1_700_000_000),
+            phoneIterationDate: Date(timeIntervalSince1970: 1_700_000_000),
+            glucoseSamples: [],
+            doseHistory: [],
+            carbEntries: [],
+            pumpStatus: PumpStatusSnapshot(
+                reservoirUnitsRemaining: 100,
+                lastBasalRateUnitsPerHour: 0.5,
+                isSuspended: false,
+                lastReadingDate: Date(timeIntervalSince1970: 1_700_000_000)
+            ),
+            activeOverride: nil
+        )
+        let original: PhoneWatchMessage = .algorithmStateSnapshot(payload)
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(PhoneWatchMessage.self, from: data)
+        guard case .algorithmStateSnapshot(let decodedPayload) = decoded else {
+            XCTFail("Expected .algorithmStateSnapshot case after round-trip")
+            return
+        }
+        XCTAssertEqual(decodedPayload.snapshotID, payload.snapshotID)
+    }
+}
