@@ -41,14 +41,19 @@ public final class HandoffStateMachine {
         // after init. (No double-write at construction; cleaner.)
         let effectiveInitial: HandoffState
         if let restored = HandoffStatePersistence.load(from: appGroupDefaults) {
-            // B.8.1 Issue #3: a restored .handoffPending state whose
-            // deadline is past must be converted to a safe recovery state.
-            // Otherwise the machine wakes up still mid-handoff after the
-            // 30s window has long closed, leaving ownership unresolved
-            // and command suppression stuck.
-            if case .handoffPending(direction: let dir, _, deadline: let deadline) = restored,
-               deadline < Date() {
-                let recoveredOwner: HandoffOwner = (dir == .phoneToWatch) ? .phone : .watch
+            // B.8.2 M3: a restored .handoffPending state is *by definition*
+            // not recoverable across an app-restart boundary. The 30-second
+            // deadline can't be trusted across crash boundaries (wall-clock
+            // can drift, be NTP-corrected, or be manually set backward).
+            // Treat any restored pending as expired and surface a recovery
+            // banner. Annoyance over safety — a user who restarts within
+            // the legitimate 30s window sees recovery instead of completion,
+            // which is ergonomically worse but makes the stuck-pending
+            // failure mode impossible. (Vacuously closes M2: no path leaves
+            // init in .handoffPending, so no .scheduleTimeout re-emission
+            // is needed.)
+            if case .handoffPending(direction: let dir, _, _) = restored {
+                let recoveredOwner: HandoffOwner = dir.origin
                 effectiveInitial = .recovering(reason: .restoredExpiredPending,
                                                 lastKnownOwner: recoveredOwner)
                 // Clear stale persisted state so the next save (on first

@@ -623,24 +623,62 @@ final class HandoffStateMachineTests: XCTestCase {
         }
     }
 
-    // Negative case: a .handoffPending with a future deadline must be
-    // restored as-is — the deadline check only fires when the deadline
-    // is already past.
-    func testInit_withNotYetExpiredPending_preservesPendingState() {
-        let suiteName = "com.LoopKit.OmniBLE.B8.1_InitNotYetExpired.\(UUID().uuidString)"
+    // MARK: - B.8.2 M3: any restored .handoffPending recovers
+
+    // B.8.2 M3: a restored .handoffPending state is *by definition* not
+    // recoverable across an app-restart boundary. The 30-second deadline
+    // can't be trusted across crash boundaries (wall-clock can drift, be
+    // NTP-corrected, or be manually set backward). Treat any restored
+    // pending as expired and surface a recovery banner — annoyance over
+    // safety. This test documents the M3 invariant: even a future-dated
+    // deadline must produce .recovering, not preserve the pending state.
+    func testInit_withFutureDeadlinePending_recoversInsteadOfTrustingDeadline() {
+        let suiteName = "com.LoopKit.OmniBLE.B8.2_InitFutureDeadlinePending.\(UUID().uuidString)"
         let testDefaults = UserDefaults(suiteName: suiteName)!
         defer { testDefaults.removePersistentDomain(forName: suiteName) }
 
-        let futureDeadline = Date().addingTimeInterval(10)
-        let pendingState: HandoffState = .handoffPending(direction: .phoneToWatch,
-                                                         transitionId: UUID(),
-                                                         deadline: futureDeadline)
+        let futureDeadline = Date().addingTimeInterval(20)  // not yet expired by wall-clock
+        let pendingState: HandoffState = .handoffPending(
+            direction: .phoneToWatch,
+            transitionId: UUID(),
+            deadline: futureDeadline)
         HandoffStatePersistence.save(pendingState, to: testDefaults)
 
-        let machine = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
+        let m = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
 
-        XCTAssertEqual(machine.state, pendingState,
-                       "A pending state with a future deadline should be preserved on init")
+        if case .recovering(let reason, let lastKnownOwner) = m.state {
+            XCTAssertEqual(reason, .restoredExpiredPending,
+                           "M3: any restored .handoffPending recovers, regardless of deadline")
+            XCTAssertEqual(lastKnownOwner, .phone)
+        } else {
+            XCTFail("Expected .recovering(.restoredExpiredPending, .phone), got \(m.state)")
+        }
+    }
+
+    // M3 sweep: both deadline-past and deadline-future must surface
+    // .recovering(.restoredExpiredPending, ...).
+    func testInit_withAnyRestoredPending_alwaysRecovers() {
+        for delta in [-60.0, +20.0] {
+            let suiteName = "com.LoopKit.OmniBLE.B8.2_AnyRestoredPending.\(UUID().uuidString)"
+            let testDefaults = UserDefaults(suiteName: suiteName)!
+            defer { testDefaults.removePersistentDomain(forName: suiteName) }
+
+            let deadline = Date().addingTimeInterval(delta)
+            let pendingState: HandoffState = .handoffPending(
+                direction: .phoneToWatch,
+                transitionId: UUID(),
+                deadline: deadline)
+            HandoffStatePersistence.save(pendingState, to: testDefaults)
+
+            let m = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
+
+            if case .recovering(let reason, _) = m.state {
+                XCTAssertEqual(reason, .restoredExpiredPending,
+                               "Both past and future deadlines should recover (delta=\(delta))")
+            } else {
+                XCTFail("Expected recovering for delta=\(delta)")
+            }
+        }
     }
 
     // Codable round-trip for the new HandoffRecoveryReason case (Codable
