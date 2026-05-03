@@ -134,7 +134,16 @@ public final class HandoffStateMachine {
         // MARK: From Recovering
         case (.recovering(_, lastKnownOwner: let owner), .manualRecoveryDismiss):
             state = (owner == .phone) ? .phoneDriver : .watchDriver
-            effects = [.notifyUI(state: state)]
+            // B.8.1 Issue #2: re-emit .resumeIssuingPodCommands for the
+            // local side when it's the surviving owner, mirroring
+            // completeHandoff's resumeIfMine pattern. Without this, the
+            // surviving owner stays with commandsAllowed == false
+            // indefinitely after the user dismisses the recovery banner.
+            // Resume FIRST, then notify UI, so the UI sees commands
+            // enabled when it renders.
+            let resumeIfMine: [HandoffSideEffect] = (owner == role.asOwner)
+                ? [.resumeIssuingPodCommands] : []
+            effects = resumeIfMine + [.notifyUI(state: state)]
             recordTransition(from: priorState, to: state,
                              trigger: .userManual, now: now)
             return effects

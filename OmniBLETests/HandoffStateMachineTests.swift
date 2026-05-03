@@ -282,6 +282,47 @@ final class HandoffStateMachineTests: XCTestCase {
         XCTAssertEqual(m.state, .watchDriver)
     }
 
+    // B.8.1 Issue #2: manualRecoveryDismiss must re-emit
+    // .resumeIssuingPodCommands for the surviving owner, mirroring
+    // completeHandoff's resumeIfMine pattern. Without this fix, the surviving
+    // owner stays with commandsAllowed == false indefinitely.
+    func testRecovering_manualDismiss_resumesCommandsForLocalSide_whenPhone() {
+        let m = machine(role: .phone, initial: .recovering(
+            reason: .timeoutWaitingForConfirmation, lastKnownOwner: .phone))
+
+        let effects = m.handle(.manualRecoveryDismiss, now: now)
+
+        XCTAssertEqual(m.state, .phoneDriver, "Should transition to phoneDriver")
+        XCTAssertTrue(effects.contains(.resumeIssuingPodCommands),
+                      "Phone (local side, surviving owner) should resume pod commands")
+        XCTAssertTrue(effects.contains(where: { if case .notifyUI = $0 { return true }; return false }),
+                      "Should still notify UI")
+    }
+
+    func testRecovering_manualDismiss_resumesCommandsForLocalSide_whenWatch() {
+        let m = machine(role: .watch, initial: .recovering(
+            reason: .rejectedByCounterpart, lastKnownOwner: .watch))
+
+        let effects = m.handle(.manualRecoveryDismiss, now: now)
+
+        XCTAssertEqual(m.state, .watchDriver)
+        XCTAssertTrue(effects.contains(.resumeIssuingPodCommands),
+                      "Watch (local side, surviving owner) should resume pod commands")
+    }
+
+    func testRecovering_manualDismiss_doesNotResumeWhenOwnerIsRemote() {
+        // Phone-role machine sees lastKnownOwner = .watch (the surviving
+        // owner is remote). Phone must not resume — it isn't the owner.
+        let m = machine(role: .phone, initial: .recovering(
+            reason: .timeoutWaitingForConfirmation, lastKnownOwner: .watch))
+
+        let effects = m.handle(.manualRecoveryDismiss, now: now)
+
+        XCTAssertEqual(m.state, .watchDriver)
+        XCTAssertFalse(effects.contains(.resumeIssuingPodCommands),
+                       "Phone should not resume — watch is the surviving owner")
+    }
+
     func testRecovering_shadowRefresh_isNoop() {
         let m = machine(role: .phone, initial: .recovering(
             reason: .localFailureDuringTransition, lastKnownOwner: .phone))
