@@ -41,7 +41,22 @@ public final class HandoffStateMachine {
         // after init. (No double-write at construction; cleaner.)
         let effectiveInitial: HandoffState
         if let restored = HandoffStatePersistence.load(from: appGroupDefaults) {
-            effectiveInitial = restored
+            // B.8.1 Issue #3: a restored .handoffPending state whose
+            // deadline is past must be converted to a safe recovery state.
+            // Otherwise the machine wakes up still mid-handoff after the
+            // 30s window has long closed, leaving ownership unresolved
+            // and command suppression stuck.
+            if case .handoffPending(direction: let dir, _, deadline: let deadline) = restored,
+               deadline < Date() {
+                let recoveredOwner: HandoffOwner = (dir == .phoneToWatch) ? .phone : .watch
+                effectiveInitial = .recovering(reason: .restoredExpiredPending,
+                                                lastKnownOwner: recoveredOwner)
+                // Clear stale persisted state so the next save (on first
+                // transition) writes the recovery state cleanly.
+                HandoffStatePersistence.clear(from: appGroupDefaults)
+            } else {
+                effectiveInitial = restored
+            }
         } else {
             effectiveInitial = initialState
         }

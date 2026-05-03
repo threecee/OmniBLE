@@ -31,6 +31,7 @@ public enum HandoffRecoveryReason: String, Codable, Equatable {
     case timeoutWaitingForConfirmation
     case rejectedByCounterpart
     case localFailureDuringTransition
+    case restoredExpiredPending
 }
 
 public enum HandoffState: Equatable, Codable {

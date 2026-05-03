@@ -595,4 +595,61 @@ final class HandoffStateMachineTests: XCTestCase {
 
         XCTAssertEqual(machine.state, .phoneDriver)
     }
+
+    // MARK: - B.8.1 Issue #3: init-time deadline check
+
+    // A persisted .handoffPending whose 30-second deadline has already
+    // passed (e.g. crash-restart that took longer than the window) must be
+    // converted to .recovering(.restoredExpiredPending, ...) on init —
+    // otherwise ownership stays unresolved and command suppression sticks.
+    func testInit_withExpiredPending_transitionsToRecovering() {
+        let suiteName = "com.LoopKit.OmniBLE.B8.1_InitExpiredPending.\(UUID().uuidString)"
+        let testDefaults = UserDefaults(suiteName: suiteName)!
+        defer { testDefaults.removePersistentDomain(forName: suiteName) }
+
+        let expiredDeadline = Date().addingTimeInterval(-60)
+        let expiredState: HandoffState = .handoffPending(direction: .phoneToWatch,
+                                                         transitionId: UUID(),
+                                                         deadline: expiredDeadline)
+        HandoffStatePersistence.save(expiredState, to: testDefaults)
+
+        let machine = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
+
+        if case .recovering(let reason, let lastKnownOwner) = machine.state {
+            XCTAssertEqual(reason, .restoredExpiredPending)
+            XCTAssertEqual(lastKnownOwner, .phone, "phoneToWatch direction → phone is last known owner")
+        } else {
+            XCTFail("Expected .recovering(.restoredExpiredPending, .phone), got \(machine.state)")
+        }
+    }
+
+    // Negative case: a .handoffPending with a future deadline must be
+    // restored as-is — the deadline check only fires when the deadline
+    // is already past.
+    func testInit_withNotYetExpiredPending_preservesPendingState() {
+        let suiteName = "com.LoopKit.OmniBLE.B8.1_InitNotYetExpired.\(UUID().uuidString)"
+        let testDefaults = UserDefaults(suiteName: suiteName)!
+        defer { testDefaults.removePersistentDomain(forName: suiteName) }
+
+        let futureDeadline = Date().addingTimeInterval(10)
+        let pendingState: HandoffState = .handoffPending(direction: .phoneToWatch,
+                                                         transitionId: UUID(),
+                                                         deadline: futureDeadline)
+        HandoffStatePersistence.save(pendingState, to: testDefaults)
+
+        let machine = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
+
+        XCTAssertEqual(machine.state, pendingState,
+                       "A pending state with a future deadline should be preserved on init")
+    }
+
+    // Codable round-trip for the new HandoffRecoveryReason case (Codable
+    // is synthesized via String raw-value; this asserts the case's raw
+    // value matches its name and survives encode/decode).
+    func testRestoredExpiredPending_codableRoundTrip() throws {
+        let original: HandoffRecoveryReason = .restoredExpiredPending
+        let encoded = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(HandoffRecoveryReason.self, from: encoded)
+        XCTAssertEqual(decoded, original)
+    }
 }
