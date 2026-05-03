@@ -12,7 +12,11 @@ import Foundation
 
 public enum PhoneWatchProtocol {
     /// Bumped on any incompatible change to message shapes or transport conventions.
-    public static let currentVersion: Int = 5
+    /// B.8.4 (5 → 6): adds `PhoneWatchMessage.algorithmStateSnapshotPointer(sequence:)`
+    /// case used as the file-pointer fallback for oversized snapshot payloads
+    /// (>8 KB applicationContext budget). Old receivers will throw on the new
+    /// `algorithmStateSnapshotPointer` Kind raw value before the payload parses.
+    public static let currentVersion: Int = 6
 
     /// True if an incoming message at `incomingVersion` should be accepted.
     public static func shouldAccept(incomingVersion: Int) -> Bool {

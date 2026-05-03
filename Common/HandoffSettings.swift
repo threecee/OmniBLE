@@ -33,6 +33,16 @@ public struct HandoffSettings: Codable, Equatable {
         UserDefaults(suiteName: appGroupIdentifier) ?? .standard
     }
 
+    /// B.8.4: convenience accessor for the App Group container URL, used for
+    /// shared file storage (e.g., the `<AppGroup>/snapshot.json` fallback when
+    /// the algorithm-state snapshot payload exceeds the applicationContext
+    /// budget). Falls back to the temporary directory if the App Group cannot
+    /// be resolved (test/sim path) so callers don't have to handle nil.
+    public static var appGroupContainerURL: URL {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
+            ?? FileManager.default.temporaryDirectory
+    }
+
     public static func load(from defaults: UserDefaults) -> HandoffSettings {
         guard let data = defaults.data(forKey: userDefaultsKey),
               let decoded = try? JSONDecoder().decode(HandoffSettings.self, from: data)

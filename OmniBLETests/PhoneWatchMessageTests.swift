@@ -21,12 +21,12 @@ final class PhoneWatchMessageTests: XCTestCase {
 
     // MARK: - Protocol version
 
-    func testCurrentVersionIsFive() {
-        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 5,
-                       "B.8.2 bumped the protocol version from 4 to 5 to signal the " +
-                       "heartbeat encoder dateEncodingStrategy switch (.iso8601 → " +
-                       ".secondsSince1970) and applicationContext-delivered " +
-                       "AlgorithmStateSnapshot wire format.")
+    func testCurrentVersionIsSix() {
+        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 6,
+                       "B.8.4 bumped the protocol version from 5 to 6 to signal " +
+                       "the addition of the algorithmStateSnapshotPointer(sequence:) " +
+                       "wire-format case used for the file-pointer fallback when " +
+                       "the snapshot payload exceeds the applicationContext budget.")
     }
 
     // MARK: - Heartbeat
@@ -126,12 +126,13 @@ final class PhoneWatchMessageTests: XCTestCase {
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 2))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 3))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 4))
-        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 5),
-                      "Current version (5) must accept itself.")
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 5))
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 6),
+                      "Current version (6) must accept itself.")
     }
 
     func testRejectsHigherProtocolVersion() {
-        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 6))
+        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 7))
         XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 99))
     }
 
@@ -195,5 +196,17 @@ extension PhoneWatchMessageTests {
             return
         }
         XCTAssertEqual(decodedPayload.snapshotID, payload.snapshotID)
+    }
+
+    /// B.8.4: round-trip the new file-pointer fallback case.
+    func testAlgorithmStateSnapshotPointerCodableRoundTrip() throws {
+        let original = PhoneWatchMessage.algorithmStateSnapshotPointer(sequence: UInt64(42))
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(PhoneWatchMessage.self, from: data)
+        if case .algorithmStateSnapshotPointer(let seq) = decoded {
+            XCTAssertEqual(seq, 42)
+        } else {
+            XCTFail("Expected algorithmStateSnapshotPointer case, got \(decoded)")
+        }
     }
 }

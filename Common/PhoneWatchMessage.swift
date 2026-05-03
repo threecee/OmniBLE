@@ -17,6 +17,13 @@ public enum PhoneWatchMessage: Codable, Equatable {
     case settingsSync(PhoneWatchSettingsSync)
     /// B.8: phone → watch algorithm-state snapshot (every iteration).
     case algorithmStateSnapshot(AlgorithmStateSnapshot)
+    /// B.8.4: tiny pointer message used when the actual snapshot payload
+    /// exceeds the applicationContext size budget. The watch reads the
+    /// payload from <AppGroup>/snapshot.json on receipt of this message.
+    /// The sequence number monotonically increases per emission; older
+    /// sequences are ignored on receipt (the receiver compares against
+    /// the highest-seen sequence).
+    case algorithmStateSnapshotPointer(sequence: UInt64)
 
     // MARK: Codable (manual implementation — Swift's automatic enum Codable
     // uses a structure we want to pin explicitly for transport stability).
@@ -32,6 +39,7 @@ public enum PhoneWatchMessage: Codable, Equatable {
         case pairingHandoff
         case settingsSync
         case algorithmStateSnapshot
+        case algorithmStateSnapshotPointer
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -52,6 +60,9 @@ public enum PhoneWatchMessage: Codable, Equatable {
         case .algorithmStateSnapshot(let s):
             try container.encode(Kind.algorithmStateSnapshot, forKey: .kind)
             try container.encode(s, forKey: .payload)
+        case .algorithmStateSnapshotPointer(let sequence):
+            try container.encode(Kind.algorithmStateSnapshotPointer, forKey: .kind)
+            try container.encode(sequence, forKey: .payload)
         }
     }
 
@@ -69,6 +80,8 @@ public enum PhoneWatchMessage: Codable, Equatable {
             self = .settingsSync(try container.decode(PhoneWatchSettingsSync.self, forKey: .payload))
         case .algorithmStateSnapshot:
             self = .algorithmStateSnapshot(try container.decode(AlgorithmStateSnapshot.self, forKey: .payload))
+        case .algorithmStateSnapshotPointer:
+            self = .algorithmStateSnapshotPointer(sequence: try container.decode(UInt64.self, forKey: .payload))
         }
     }
 }
