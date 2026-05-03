@@ -53,7 +53,7 @@ public final class OmniBLEOwnership {
     public init(
         role: HandoffRole,
         pumpManager: OmniBLEPodOwner? = nil,
-        appGroupDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? .standard,
+        appGroupDefaults: UserDefaults = HandoffSettings.appGroupDefaults,
         initialState: HandoffState = .phoneDriver
     ) {
         self.role = role
@@ -172,13 +172,10 @@ public final class OmniBLEOwnership {
     // MARK: - Cached payload persistence
 
     private static func loadCachedPayload(from defaults: UserDefaults) -> OmniBLEHandoffPayload? {
-        guard let data = defaults.data(forKey: payloadKey) else { return nil }
-        return try? JSONDecoder().decode(OmniBLEHandoffPayload.self, from: data)
+        return defaults.codableValue(forKey: payloadKey, as: OmniBLEHandoffPayload.self)
     }
 
     private static func savePayload(_ payload: OmniBLEHandoffPayload, to defaults: UserDefaults) {
-        if let data = try? JSONEncoder().encode(payload) {
-            defaults.set(data, forKey: payloadKey)
-        }
+        defaults.set(codable: payload, forKey: payloadKey)
     }
 }

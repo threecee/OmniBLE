@@ -24,6 +24,15 @@ public struct HandoffSettings: Codable, Equatable {
     public static let userDefaultsKey = "loop-and-learn.handoffSettings"
     public static let appGroupIdentifier = "group.com.threecee.loop.LoopGroup"
 
+    /// Convenience accessor: the App Group UserDefaults instance that all
+    /// handoff state, settings, and snapshot caches share. Falls back to
+    /// `.standard` if the App Group cannot be resolved (test/sim path).
+    /// Replaces inlined `UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? .standard`
+    /// callsites across OmniBLE/Common and Loop's WatchHandoff modules.
+    public static var appGroupDefaults: UserDefaults {
+        UserDefaults(suiteName: appGroupIdentifier) ?? .standard
+    }
+
     public static func load(from defaults: UserDefaults) -> HandoffSettings {
         guard let data = defaults.data(forKey: userDefaultsKey),
               let decoded = try? JSONDecoder().decode(HandoffSettings.self, from: data)

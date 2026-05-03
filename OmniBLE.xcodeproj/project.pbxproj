@@ -141,6 +141,8 @@
 		B8000000000000102 /* AlgorithmStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000002 /* AlgorithmStateSnapshotTests.swift */; };
 		B8000000000000103 /* PumpStatusSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000003 /* PumpStatusSnapshot.swift */; };
 		B8000000000000104 /* AlgorithmStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000004 /* AlgorithmStateSnapshot.swift */; };
+		B81100000000000101 /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81100000000000001 /* UserDefaults+Codable.swift */; };
+		B81100000000000102 /* UserDefaultsCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81100000000000002 /* UserDefaultsCodableTests.swift */; };
 		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
@@ -456,6 +458,8 @@
 		B8000000000000002 /* AlgorithmStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotTests.swift; sourceTree = "<group>"; };
 		B8000000000000003 /* PumpStatusSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpStatusSnapshot.swift; sourceTree = "<group>"; };
 		B8000000000000004 /* AlgorithmStateSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshot.swift; sourceTree = "<group>"; };
+		B81100000000000001 /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
+		B81100000000000002 /* UserDefaultsCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsCodableTests.swift; sourceTree = "<group>"; };
 		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -742,6 +746,7 @@
 				WB2D00000000000000E /* OmniBLEOwnershipTests.swift */,
 				WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */,
 				B8000000000000002 /* AlgorithmStateSnapshotTests.swift */,
+				B81100000000000002 /* UserDefaultsCodableTests.swift */,
 				B3A800000000000010 /* Integration */,
 				B3A800000000000011 /* PodSimulator */,
 				D802CD0427DD98C10072E3A1 /* PodCommsSessionTests.swift */,
@@ -910,6 +915,7 @@
 				WB2D00000000000000C /* OmniBLEOwnership.swift */,
 				B8000000000000003 /* PumpStatusSnapshot.swift */,
 				B8000000000000004 /* AlgorithmStateSnapshot.swift */,
+				B81100000000000001 /* UserDefaults+Codable.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1436,6 +1442,7 @@
 				WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */,
 				B8000000000000103 /* PumpStatusSnapshot.swift in Sources */,
 				B8000000000000104 /* AlgorithmStateSnapshot.swift in Sources */,
+				B81100000000000101 /* UserDefaults+Codable.swift in Sources */,
 				C1F67E9227975B830017487F /* BasalStateView.swift in Sources */,
 				1024E32B27446DB000DE01F2 /* MessagePacket.swift in Sources */,
 				10289E7B2739F886000339E6 /* EapMessage.swift in Sources */,
@@ -1502,6 +1509,7 @@
 				B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */,
 				B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */,
 				B8000000000000102 /* AlgorithmStateSnapshotTests.swift in Sources */,
+				B81100000000000102 /* UserDefaultsCodableTests.swift in Sources */,
 				B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */,
 				A9A5BCF2276C1E6D00B02C86 /* PayloadSplitterTest.swift in Sources */,
 				D802CD0A27DD98C10072E3A1 /* TempBasalTests.swift in Sources */,

@@ -32,7 +32,7 @@ public final class HandoffStateMachine {
 
     public init(initialState: HandoffState = .phoneDriver,
                 role: HandoffRole,
-                appGroupDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? .standard) {
+                appGroupDefaults: UserDefaults = HandoffSettings.appGroupDefaults) {
         self.appGroupDefaults = appGroupDefaults
         self.role = role
         // B.5 Issue #4: restore persisted state if available; otherwise
