@@ -138,6 +138,8 @@
 		B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000001 /* PodHandoffSafetyTests.swift */; };
 		B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */; };
 		B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */; };
+		B8000000000000102 /* AlgorithmStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000002 /* AlgorithmStateSnapshotTests.swift */; };
+		B8000000000000103 /* PumpStatusSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000003 /* PumpStatusSnapshot.swift */; };
 		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
@@ -450,6 +452,8 @@
 		B3A800000000000001 /* PodHandoffSafetyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodHandoffSafetyTests.swift; sourceTree = "<group>"; };
 		B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = B3aRemoteCommandIntegrationTest.swift; sourceTree = "<group>"; };
 		B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmEndToEndTests.swift; sourceTree = "<group>"; };
+		B8000000000000002 /* AlgorithmStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotTests.swift; sourceTree = "<group>"; };
+		B8000000000000003 /* PumpStatusSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpStatusSnapshot.swift; sourceTree = "<group>"; };
 		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -735,6 +739,7 @@
 				WB2D00000000000000D /* MockOmniBLEPumpManager.swift */,
 				WB2D00000000000000E /* OmniBLEOwnershipTests.swift */,
 				WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */,
+				B8000000000000002 /* AlgorithmStateSnapshotTests.swift */,
 				B3A800000000000010 /* Integration */,
 				B3A800000000000011 /* PodSimulator */,
 				D802CD0427DD98C10072E3A1 /* PodCommsSessionTests.swift */,
@@ -901,6 +906,7 @@
 				WB2D000000000000008 /* HandoffStateMachine.swift */,
 				B5C0000000000000001 /* HandoffStatePersistence.swift */,
 				WB2D00000000000000C /* OmniBLEOwnership.swift */,
+				B8000000000000003 /* PumpStatusSnapshot.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1425,6 +1431,7 @@
 				WB2D000000000000018 /* HandoffStateMachine.swift in Sources */,
 				B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */,
 				WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */,
+				B8000000000000103 /* PumpStatusSnapshot.swift in Sources */,
 				C1F67E9227975B830017487F /* BasalStateView.swift in Sources */,
 				1024E32B27446DB000DE01F2 /* MessagePacket.swift in Sources */,
 				10289E7B2739F886000339E6 /* EapMessage.swift in Sources */,
@@ -1490,6 +1497,7 @@
 				B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */,
 				B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */,
 				B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */,
+				B8000000000000102 /* AlgorithmStateSnapshotTests.swift in Sources */,
 				B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */,
 				A9A5BCF2276C1E6D00B02C86 /* PayloadSplitterTest.swift in Sources */,
 				D802CD0A27DD98C10072E3A1 /* TempBasalTests.swift in Sources */,
