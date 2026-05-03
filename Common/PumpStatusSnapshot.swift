@@ -9,7 +9,7 @@
 
 import Foundation
 
-public struct PumpStatusSnapshot: Codable, Equatable {
+public struct PumpStatusSnapshot: Codable, Equatable, Sendable {
     public let reservoirUnitsRemaining: Double
     public let lastBasalRateUnitsPerHour: Double?
     public let isSuspended: Bool

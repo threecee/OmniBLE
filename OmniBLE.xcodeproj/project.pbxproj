@@ -140,6 +140,7 @@
 		B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */; };
 		B8000000000000102 /* AlgorithmStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000002 /* AlgorithmStateSnapshotTests.swift */; };
 		B8000000000000103 /* PumpStatusSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000003 /* PumpStatusSnapshot.swift */; };
+		B8000000000000104 /* AlgorithmStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000004 /* AlgorithmStateSnapshot.swift */; };
 		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
 		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
 		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
@@ -454,6 +455,7 @@
 		B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmEndToEndTests.swift; sourceTree = "<group>"; };
 		B8000000000000002 /* AlgorithmStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotTests.swift; sourceTree = "<group>"; };
 		B8000000000000003 /* PumpStatusSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpStatusSnapshot.swift; sourceTree = "<group>"; };
+		B8000000000000004 /* AlgorithmStateSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshot.swift; sourceTree = "<group>"; };
 		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
 		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -907,6 +909,7 @@
 				B5C0000000000000001 /* HandoffStatePersistence.swift */,
 				WB2D00000000000000C /* OmniBLEOwnership.swift */,
 				B8000000000000003 /* PumpStatusSnapshot.swift */,
+				B8000000000000004 /* AlgorithmStateSnapshot.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1432,6 +1435,7 @@
 				B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */,
 				WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */,
 				B8000000000000103 /* PumpStatusSnapshot.swift in Sources */,
+				B8000000000000104 /* AlgorithmStateSnapshot.swift in Sources */,
 				C1F67E9227975B830017487F /* BasalStateView.swift in Sources */,
 				1024E32B27446DB000DE01F2 /* MessagePacket.swift in Sources */,
 				10289E7B2739F886000339E6 /* EapMessage.swift in Sources */,
