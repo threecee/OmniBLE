@@ -1947,6 +1947,13 @@ extension OmniBLEPumpManager: PumpManager {
     }
 
     public func resumeDelivery(completion: @escaping (Error?) -> Void) {
+        // B.8.1 Issue #1: gate user-driven delivery resume during handoff transitions.
+        // Closes B.5.2 deferred #5 — completes the suspend/resume symmetry pair.
+        if let check = commandsAllowedCheck, !check() {
+            log.default("resumeDelivery suppressed: commandsAllowed=false (handoff in progress)")
+            completion(PumpManagerError.uncertainDelivery)
+            return
+        }
         guard self.hasActivePod else {
             completion(OmniBLEPumpManagerError.noPodPaired)
             return

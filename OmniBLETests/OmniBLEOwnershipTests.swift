@@ -360,6 +360,32 @@ final class OmniBLEOwnershipTests: XCTestCase {
         }
     }
 
+    // MARK: - B.8.1 Issue #1: gate firing in resumeDelivery (closes B.5.2 deferred #5)
+
+    /// When commandsAllowedCheck returns false, resumeDelivery completes synchronously
+    /// with a non-nil error and never reaches the BLE comms. Mirrors the suspend gate.
+    func testResumeDelivery_shortCircuitsWhenCommandsNotAllowed() {
+        let pumpManager = OmniBLEPumpManager(state: .watchSideDefault)
+        pumpManager.commandsAllowedCheck = { false }
+
+        let exp = expectation(description: "resumeDelivery completion")
+        var receivedError: Error?
+        pumpManager.resumeDelivery { error in
+            receivedError = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 0.5)
+
+        XCTAssertNotNil(receivedError, "Expected non-nil error from suppressed resumeDelivery")
+        if let pmError = receivedError as? PumpManagerError {
+            guard case .uncertainDelivery = pmError else {
+                return XCTFail("Expected PumpManagerError.uncertainDelivery; got \(pmError)")
+            }
+        } else {
+            XCTFail("Expected PumpManagerError; got \(String(describing: receivedError))")
+        }
+    }
+
     // MARK: - Helpers
 
     private func makeTestPayload(validUntil: Date = Date(timeIntervalSinceNow: 60)) -> OmniBLEHandoffPayload {
