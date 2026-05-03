@@ -12,6 +12,8 @@
 import Foundation
 import LoopKit
 
+/// Schema version is carried by the wrapping `PhoneWatchMessage` envelope
+/// (see B.8 T3); do NOT add a `schemaVersion` field here.
 public struct AlgorithmStateSnapshot: Codable, Equatable, Sendable {
     public let snapshotID: UUID
     public let createdAt: Date
