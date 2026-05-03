@@ -42,3 +42,20 @@ public struct AlgorithmStateSnapshot: Codable, Equatable, Sendable {
         self.activeOverride = activeOverride
     }
 }
+
+// MARK: - Freshness check (B.8.4)
+
+extension AlgorithmStateSnapshot {
+    /// Maximum age (relative to `phoneIterationDate`) at which a snapshot is
+    /// still trusted to skip warmup on the watch. Beyond this window the
+    /// watch falls back to a full warmup rather than dose against potentially
+    /// stale state. Pediatric T1D safety: prefer warmup over stale data.
+    public static let maxAgeForSkipWarmup: TimeInterval = 7 * 60
+
+    /// Returns `true` when this snapshot's `phoneIterationDate` is within
+    /// `maxAgeForSkipWarmup` seconds of `now`. Used by the watch's
+    /// `WatchAlgorithmDriver` to gate the `.skipWarmup` hydration path.
+    public func isFreshEnoughForSkipWarmup(now: Date = Date()) -> Bool {
+        return now.timeIntervalSince(phoneIterationDate) < Self.maxAgeForSkipWarmup
+    }
+}
