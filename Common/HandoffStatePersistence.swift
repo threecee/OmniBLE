@@ -2,7 +2,7 @@
 //  HandoffStatePersistence.swift
 //  OmniBLE (Common)
 //
-//  B.5 Issue #4: persists HandoffState to App Group UserDefaults so the
+// persists HandoffState to App Group UserDefaults so the
 //  state machine can recover from app crashes mid-handoff.
 //
 //  Uses a versioned wrapper (formatVersion: Int) so future state-machine

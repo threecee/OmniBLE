@@ -16,7 +16,7 @@ import Foundation
 public struct OmniBLEHandoffPayload: Codable, Equatable {
     public let formatVersion: Int
     public let createdAt: Date
-    public let validUntil: Date           // B.2.e: payload expiration
+    public let validUntil: Date           // payload expiration
     public let podSerial: String
     public let serializedPodState: Data
     public let lastBolusSequence: UInt32?

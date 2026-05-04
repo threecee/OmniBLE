@@ -2,7 +2,7 @@
 //  OmniBLEOwnership.swift
 //  OmniBLE (Common)
 //
-//  B.2.e: Listens for HandoffOrchestrator state changes (pushed via update(state:))
+// Listens for HandoffOrchestrator state changes (pushed via update(state:))
 //  and triggers OmniBLEPumpManager BLE acquire/release on transitions that change
 //  which side owns the pod.
 //
@@ -61,7 +61,7 @@ public final class OmniBLEOwnership {
         self.appGroupDefaults = appGroupDefaults
         self.lastSeenState = initialState
         self.cachedPayload = OmniBLEOwnership.loadCachedPayload(from: appGroupDefaults)
-        // B.5 Issue #1: wire callback if pumpManager supplied at init (iOS path).
+        // wire callback if pumpManager supplied at init (iOS path).
         if let pumpManager = pumpManager {
             wireCommandsCallback(into: pumpManager)
         }

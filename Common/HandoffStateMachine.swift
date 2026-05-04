@@ -35,7 +35,7 @@ public final class HandoffStateMachine {
                 appGroupDefaults: UserDefaults = HandoffSettings.appGroupDefaults) {
         self.appGroupDefaults = appGroupDefaults
         self.role = role
-        // B.5 Issue #4: restore persisted state if available; otherwise
+        // restore persisted state if available; otherwise
         // use supplied initialState. Note: didSet on `state` doesn't fire
         // during init — first persistence happens on the first transition
         // after init. (No double-write at construction; cleaner.)
@@ -154,7 +154,7 @@ public final class HandoffStateMachine {
         // MARK: From Recovering
         case (.recovering(_, lastKnownOwner: let owner), .manualRecoveryDismiss):
             state = (owner == .phone) ? .phoneDriver : .watchDriver
-            // B.8.1 Issue #2: re-emit .resumeIssuingPodCommands for the
+            // re-emit .resumeIssuingPodCommands for the
             // local side when it's the surviving owner, mirroring
             // completeHandoff's resumeIfMine pattern. Without this, the
             // surviving owner stays with commandsAllowed == false
