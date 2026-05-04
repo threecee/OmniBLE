@@ -97,6 +97,7 @@
 		8475315B26EDA193009FD801 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314E26EDA193009FD801 /* NibLoadable.swift */; };
 		8475315C26EDA193009FD801 /* TimeZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314F26EDA193009FD801 /* TimeZone.swift */; };
 		8475315D26EDA193009FD801 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475315026EDA193009FD801 /* Data.swift */; };
+		8E72769ADDA010104B906827 /* RemoteCareDedupE2ETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD5EFBF6FCCE04028791FC71 /* RemoteCareDedupE2ETests.swift */; };
 		A91B2DEC276E1E5E001B0E95 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A91B2DEB276E1E5E001B0E95 /* README.md */; };
 		A9A5BCEF276C1E2D00B02C86 /* TestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054D427651D2400FAFEFB /* TestUtilities.swift */; };
 		A9A5BCF0276C1E2D00B02C86 /* HexConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054CA2764FC8200FAFEFB /* HexConversionTests.swift */; };
@@ -552,6 +553,7 @@
 		D897B06C29347EE500FDB009 /* InsulinTableEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsulinTableEntry.swift; sourceTree = "<group>"; };
 		D8C72BD92A50D7D700268D82 /* OmniBLEParser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OmniBLEParser; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8C72BDB2A50D7D700268D82 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		FD5EFBF6FCCE04028791FC71 /* RemoteCareDedupE2ETests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteCareDedupE2ETests.swift; sourceTree = "<group>"; };
 		T1P4000000000000002 /* CBMSpikeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CBMSpikeTests.swift; sourceTree = "<group>"; };
 		T1P4000000000000004 /* DashServiceUUIDs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashServiceUUIDs.swift; sourceTree = "<group>"; };
 		T1P4000000000000006 /* MockOmnipodPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockOmnipodPeripheral.swift; sourceTree = "<group>"; };
@@ -787,6 +789,7 @@
 				T1P400000000000000B /* Integration */,
 				D800CF1827E682E90090EADB /* ZeroBasalScheduleTest.swift */,
 				434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */,
+				FD5EFBF6FCCE04028791FC71 /* RemoteCareDedupE2ETests.swift */,
 			);
 			path = OmniBLETests;
 			sourceTree = "<group>";
@@ -1595,6 +1598,7 @@
 				T1P800000000000001 /* PodHandoffEncryptedTests.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 				680069920390DF95DBF204F3 /* HandoffOrchestratorTests.swift in Sources */,
+				8E72769ADDA010104B906827 /* RemoteCareDedupE2ETests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
