@@ -71,6 +71,7 @@
 		1D3026DCF195BEF8CAAC7C29 /* RemoteCareUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */; };
 		2742C7052AD875B100E67833 /* SlideButton in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2742C7042AD875B100E67833 /* SlideButton */; };
 		680069920390DF95DBF204F3 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */; };
+		7C4054F06EF34A7E9DAB9A92 /* DriverTokenRendezvousTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5210B58A1BCB0991C866D485 /* DriverTokenRendezvousTests.swift */; };
 		84752E9326ED0FFE009FD801 /* OmniBLE.h in Headers */ = {isa = PBXBuildFile; fileRef = 84752E8526ED0FFE009FD801 /* OmniBLE.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		84752ED626ED13F5009FD801 /* Id.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752EBF26ED13F5009FD801 /* Id.swift */; };
 		84752ED726ED13F5009FD801 /* X25519KeyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752EC126ED13F5009FD801 /* X25519KeyGenerator.swift */; };
@@ -260,6 +261,7 @@
 		D8C72C042A50D95200268D82 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10389A1D26FF7841002115E9 /* Message.swift */; };
 		D8C72C052A50D96800268D82 /* Pod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325327185EE4007A3BC2 /* Pod.swift */; };
 		D8C72C062A50D97500268D82 /* PodProgressStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325627185EE4007A3BC2 /* PodProgressStatus.swift */; };
+		E4EE2DA19B79832B7616873A /* DriverTokenRendezvous.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475ADE55661D31F8F307EF2E /* DriverTokenRendezvous.swift */; };
 		T1CBM0000000000001 /* CoreBluetoothMock in Frameworks */ = {isa = PBXBuildFile; productRef = T1CBM0000000000003 /* CoreBluetoothMock */; };
 		T1P4000000000000001 /* CBMSpikeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000002 /* CBMSpikeTests.swift */; };
 		T1P4000000000000003 /* DashServiceUUIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000004 /* DashServiceUUIDs.swift */; };
@@ -399,6 +401,8 @@
 		10389A2226FF7841002115E9 /* MessageTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTransport.swift; sourceTree = "<group>"; };
 		196A6F222AFFFD1200E3C089 /* SilencePodPreference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SilencePodPreference.swift; sourceTree = "<group>"; };
 		434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HandoffOrchestratorTests.swift; sourceTree = "<group>"; };
+		475ADE55661D31F8F307EF2E /* DriverTokenRendezvous.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DriverTokenRendezvous.swift; sourceTree = "<group>"; };
+		5210B58A1BCB0991C866D485 /* DriverTokenRendezvousTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DriverTokenRendezvousTests.swift; sourceTree = "<group>"; };
 		7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteCareUploader.swift; sourceTree = "<group>"; };
 		84752E8226ED0FFE009FD801 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		84752E8526ED0FFE009FD801 /* OmniBLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OmniBLE.h; sourceTree = "<group>"; };
@@ -790,6 +794,7 @@
 				D800CF1827E682E90090EADB /* ZeroBasalScheduleTest.swift */,
 				434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */,
 				FD5EFBF6FCCE04028791FC71 /* RemoteCareDedupE2ETests.swift */,
+				5210B58A1BCB0991C866D485 /* DriverTokenRendezvousTests.swift */,
 			);
 			path = OmniBLETests;
 			sourceTree = "<group>";
@@ -922,6 +927,7 @@
 				B8000000000000004 /* AlgorithmStateSnapshot.swift */,
 				B81100000000000001 /* UserDefaults+Codable.swift */,
 				7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */,
+				475ADE55661D31F8F307EF2E /* DriverTokenRendezvous.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1534,6 +1540,7 @@
 				C1F67EE227985F580017487F /* ReservoirLevel.swift in Sources */,
 				D845A1372AF89F5500EA0853 /* ActivityView.swift in Sources */,
 				1D3026DCF195BEF8CAAC7C29 /* RemoteCareUploader.swift in Sources */,
+				E4EE2DA19B79832B7616873A /* DriverTokenRendezvous.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1599,6 +1606,7 @@
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
 				680069920390DF95DBF204F3 /* HandoffOrchestratorTests.swift in Sources */,
 				8E72769ADDA010104B906827 /* RemoteCareDedupE2ETests.swift in Sources */,
+				7C4054F06EF34A7E9DAB9A92 /* DriverTokenRendezvousTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
