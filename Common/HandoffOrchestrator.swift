@@ -131,6 +131,34 @@ public final class HandoffOrchestrator: ObservableObject {
     /// type is always `OmniBLEPumpManager` (which conforms to both).
     public var pumpManager: PumpManager? { ownership.pumpManager as? PumpManager }
 
+    /// B.11.1: optional uploader used to forward Nightscout upload triggers,
+    /// gated on `role == handoffState.currentDriver`. Set by call sites
+    /// after orchestrator construction (LoopAppManager on iOS,
+    /// WatchRemoteCommandBootstrap on watchOS). When nil, `proxyUpload(for:)`
+    /// is a no-op — convenient for unit tests and the period before wiring
+    /// is complete. Weak: the uploader is owned by the host (DDM on iOS,
+    /// the bootstrap on watchOS), not by the orchestrator.
+    public weak var remoteCareUploader: RemoteCareUploader?
+
+    /// B.11.1: True iff this orchestrator's role matches the current driver
+    /// in the handoff state. Recovering and handoffPending states have NO
+    /// driver — both devices are passengers in those windows. This is
+    /// load-bearing: it's how driver-only-writes is enforced during the
+    /// transition window. Stricter than `HandoffState.currentOwner`, which
+    /// returns the origin role for handoffPending; here we deliberately
+    /// gate uploads to zero across the transition window.
+    public var isCurrentDriver: Bool {
+        Self.isDriver(role: role, state: handoffState)
+    }
+
+    private static func isDriver(role: HandoffRole, state: HandoffState) -> Bool {
+        switch state {
+        case .phoneDriver: return role == .phone
+        case .watchDriver: return role == .watch
+        case .handoffPending, .recovering: return false
+        }
+    }
+
     /// Forwarded from the state machine. Capped at 10 (state machine
     /// enforces).
     public var transitionLog: [HandoffTransitionRecord] {
@@ -255,6 +283,30 @@ public final class HandoffOrchestrator: ObservableObject {
         policyEngine.markUserInteractedAt(Date())
         let effects = stateMachine.handle(.userRequestedHandoff(target: target))
         execute(effects)
+    }
+
+    /// B.11.1: role-gated proxy for Nightscout upload triggers. Forwards
+    /// to `remoteCareUploader.upload(for:)` only when the local role is
+    /// the current driver. Passenger calls short-circuit and log a
+    /// warning — a passenger SHOULD never reach this in correct code; the
+    /// warning is a debug aid for catching wiring bugs.
+    ///
+    /// This is the only public entry point for upload triggers post-B.11.1.
+    /// Direct callers of `RemoteDataServicesManager.triggerUpload(for:)`
+    /// were migrated in B.11.1 Phase 6/7.
+    public func proxyUpload(for type: RemoteCareUploadType) {
+        guard let uploader = remoteCareUploader else { return }
+
+        // Driver gate: only the current driver uploads.
+        if !isCurrentDriver {
+            log.error(
+                "proxyUpload(for: %{public}@) called by passenger (role=%{public}@, state=%{public}@) — short-circuiting. This indicates a wiring bug; passengers should not reach this code path.",
+                type.rawValue, role.rawValue,
+                String(describing: handoffState))
+            return
+        }
+
+        uploader.upload(for: type)
     }
 
     public func updateSettings(_ new: HandoffSettings) {
@@ -421,6 +473,27 @@ public final class HandoffOrchestrator: ObservableObject {
                 if case .handoffPending(direction: .phoneToWatch, _, _) = state {
                     emitSettingsSync()
                 }
+
+                // B.11.1: quiesce/resume uploader on role flips. Computed
+                // BEFORE we assign handoffState (proxyUpload reads
+                // handoffState; we want the upload state coherent with the
+                // post-transition role). Stricter than currentOwner: during
+                // .handoffPending NO device is driver — closes the
+                // double-write window.
+                let wasCurrentDriver = isCurrentDriver
+                let willBeCurrentDriver = Self.isDriver(role: role, state: state)
+                if wasCurrentDriver && !willBeCurrentDriver {
+                    // Flipping out of driver: quiesce. In-flight requests
+                    // complete naturally; new requests are blocked.
+                    remoteCareUploader?.quiesce()
+                    log.default("remoteCareUploader.quiesce() — flipping out of driver")
+                } else if !wasCurrentDriver && willBeCurrentDriver {
+                    // Flipping into driver: resume. Idempotent if already
+                    // resumed.
+                    remoteCareUploader?.resume()
+                    log.default("remoteCareUploader.resume() — flipping into driver")
+                }
+
                 // Publish handoffState LAST — triggers downstream sinks
                 // that depend on the now-current ownership + policy state.
                 handoffState = state

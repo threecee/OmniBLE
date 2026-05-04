@@ -70,6 +70,7 @@
 		196A6F232AFFFD1700E3C089 /* SilencePodPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196A6F222AFFFD1200E3C089 /* SilencePodPreference.swift */; };
 		1D3026DCF195BEF8CAAC7C29 /* RemoteCareUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */; };
 		2742C7052AD875B100E67833 /* SlideButton in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2742C7042AD875B100E67833 /* SlideButton */; };
+		680069920390DF95DBF204F3 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */; };
 		84752E9326ED0FFE009FD801 /* OmniBLE.h in Headers */ = {isa = PBXBuildFile; fileRef = 84752E8526ED0FFE009FD801 /* OmniBLE.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		84752ED626ED13F5009FD801 /* Id.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752EBF26ED13F5009FD801 /* Id.swift */; };
 		84752ED726ED13F5009FD801 /* X25519KeyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752EC126ED13F5009FD801 /* X25519KeyGenerator.swift */; };
@@ -396,6 +397,7 @@
 		10389A2026FF7841002115E9 /* CRC16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		10389A2226FF7841002115E9 /* MessageTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTransport.swift; sourceTree = "<group>"; };
 		196A6F222AFFFD1200E3C089 /* SilencePodPreference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SilencePodPreference.swift; sourceTree = "<group>"; };
+		434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HandoffOrchestratorTests.swift; sourceTree = "<group>"; };
 		7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteCareUploader.swift; sourceTree = "<group>"; };
 		84752E8226ED0FFE009FD801 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		84752E8526ED0FFE009FD801 /* OmniBLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OmniBLE.h; sourceTree = "<group>"; };
@@ -784,6 +786,7 @@
 				T1PS000000000000007 /* PodSimulator */,
 				T1P400000000000000B /* Integration */,
 				D800CF1827E682E90090EADB /* ZeroBasalScheduleTest.swift */,
+				434E5814AE00A7E834BB556B /* HandoffOrchestratorTests.swift */,
 			);
 			path = OmniBLETests;
 			sourceTree = "<group>";
@@ -1591,6 +1594,7 @@
 				T1P700000000000007 /* PodDeactivationTests.swift in Sources */,
 				T1P800000000000001 /* PodHandoffEncryptedTests.swift in Sources */,
 				D802CCFE27DD98AF0072E3A1 /* BolusTests.swift in Sources */,
+				680069920390DF95DBF204F3 /* HandoffOrchestratorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
