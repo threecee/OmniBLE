@@ -80,7 +80,9 @@ public final class HandoffStack {
         onSettingsSyncReceived: ((PhoneWatchSettingsSync) -> Void)? = nil,
         onSnapshotReceived: ((AlgorithmStateSnapshot) -> Void)? = nil,
         onAPNsTokenPublishReceived: ((APNsTokenPublication) -> Void)? = nil,
-        makeWatchSidePumpManager: (() -> OmniBLEPumpManager)? = nil
+        makeWatchSidePumpManager: (() -> OmniBLEPumpManager)? = nil,
+        nightscoutAPISecretProvider: @escaping () -> String = { "" },
+        clock: @escaping () -> Date = { Date() }
     ) -> HandoffStack {
         // 1. Transport — leaf; depends only on WCSession.
         let transport = WCSessionPhoneWatchTransport(role: role)
@@ -128,7 +130,9 @@ public final class HandoffStack {
             userDefaults: appGroupDefaults,
             pumpManager: pumpManager,
             settingsSyncProvider: settingsSyncProvider,
-            makeWatchSidePumpManager: makeWatchSidePumpManager
+            makeWatchSidePumpManager: makeWatchSidePumpManager,
+            nightscoutAPISecretProvider: nightscoutAPISecretProvider,
+            clock: clock
         )
 
         return HandoffStack(

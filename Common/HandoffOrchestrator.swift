@@ -92,6 +92,24 @@ public final class HandoffOrchestrator: ObservableObject {
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
 
+    /// B.11.2: closure returning the user-configured Nightscout API secret.
+    /// Closure (not stored String) so secret rotations during a session
+    /// are picked up without restarting the orchestrator. Empty string
+    /// degrades the rendezvous to an empty signature (spec Risks #4 — UI
+    /// warning surfaced separately in NightscoutSettingsView). Defaults
+    /// to `{ "" }` so callers that don't yet wire the provider get a
+    /// safe no-op (the rendezvous is published with an empty signature
+    /// rather than not at all).
+    private let nightscoutAPISecretProvider: () -> String
+
+    /// B.11.2: time source for `lastSeen` / rendezvous timestamp. Injected
+    /// for testability; production passes `Date.init`.
+    private let clock: () -> Date
+
+    /// B.11.2: store accessor for App Group APNs token persistence.
+    /// Reads both phone + watch token slots via APNsTokenStore.
+    private let apnsTokenStore: APNsTokenStore
+
     /// BLE ownership coordinator. Exposed (public) so call sites can
     /// read/write the commandsAllowed flag directly (split-brain
     /// demotion + unit tests).
@@ -174,7 +192,9 @@ public final class HandoffOrchestrator: ObservableObject {
                 pumpManager: OmniBLEPodOwner? = nil,
                 settingsSyncProvider: (() -> PhoneWatchSettingsSync?)? = nil,
                 makeWatchSidePumpManager: (() -> OmniBLEPumpManager)? = nil,
-                phoneStableDebounceOverride: TimeInterval? = nil) {
+                phoneStableDebounceOverride: TimeInterval? = nil,
+                nightscoutAPISecretProvider: @escaping () -> String = { "" },
+                clock: @escaping () -> Date = { Date() }) {
         self.role = role
         self.coordinator = coordinator
         self.stateMachine = stateMachine
@@ -193,6 +213,9 @@ public final class HandoffOrchestrator: ObservableObject {
         self.makeWatchSidePumpManager = makeWatchSidePumpManager
         self.phoneStableDebounceSeconds = phoneStableDebounceOverride
             ?? Self.defaultPhoneStableDebounceSeconds
+        self.nightscoutAPISecretProvider = nightscoutAPISecretProvider
+        self.clock = clock
+        self.apnsTokenStore = APNsTokenStore(defaults: userDefaults)
 
         // observe phone-side time-zone changes (iOS posts this when the
         // user crosses a zone boundary, when Settings -> General -> Date &
@@ -307,6 +330,72 @@ public final class HandoffOrchestrator: ObservableObject {
         }
 
         uploader.upload(for: type)
+    }
+
+    // MARK: - B.11.2 Driver-Token Rendezvous
+
+    /// B.11.2: Construct + sign a `DriverTokenRendezvous` from current
+    /// orchestrator state. Returns nil when the local role is not the
+    /// current driver (driver-only-writes invariant), when either token
+    /// is missing from the App Group store, or when the api-secret-empty
+    /// case still produces a valid (unsigned) rendezvous — the empty
+    /// signature is a documented fallback (spec Risks #4), not a "no
+    /// rendezvous" signal.
+    ///
+    /// Production callers wire this into the devicestatus upload path:
+    /// the iOS host's NightscoutService driverTokenProvider closure
+    /// invokes `orchestrator.buildSignedRendezvous()?.dictionaryRepresentation`
+    /// and embeds the result into `LoopStatus.testingDetails["driverToken"]`.
+    /// The watch host does the equivalent on its side when it is the
+    /// driver.
+    ///
+    /// `lastSeen` for own token = `clock()` (refresh on every iteration);
+    /// for peer's token = `APNsTokenPublication.sentAt` (whatever the
+    /// peer's last publish wrote into the App Group). Both timestamps
+    /// drive the caretaker-side 1-hour staleness gate.
+    public func buildSignedRendezvous() -> DriverTokenRendezvous? {
+        guard isCurrentDriver else {
+            log.debug("buildSignedRendezvous: role=%{public}@ is not current driver (state=%{public}@); skipping",
+                      role.rawValue, String(describing: handoffState))
+            return nil
+        }
+
+        let now = clock()
+        guard let phone = readTokenEntry(role: .phone, now: now),
+              let watch = readTokenEntry(role: .watch, now: now) else {
+            log.debug("buildSignedRendezvous: missing token (phone=%{public}@, watch=%{public}@); skipping",
+                      apnsTokenStore.load(role: .phone) == nil ? "nil" : "set",
+                      apnsTokenStore.load(role: .watch) == nil ? "nil" : "set")
+            return nil
+        }
+
+        let secret = nightscoutAPISecretProvider()
+        if secret.isEmpty {
+            log.debug("buildSignedRendezvous: nightscout API secret is empty — publishing rendezvous with empty signature (spec Risks #4)")
+        }
+
+        let unsigned = DriverTokenRendezvous(
+            phone: phone,
+            watch: watch,
+            currentDriver: .init(role: role),
+            timestamp: now,
+            signature: ""
+        )
+        return unsigned.signed(with: secret)
+    }
+
+    /// Read a TokenEntry from the App Group APNsTokenStore. `lastSeen`
+    /// is `now` for the own-role slot (we just observed our own token)
+    /// and `publication.sentAt` for the counterpart slot (whatever the
+    /// peer's most recent `apnsTokenPublish` wrote).
+    private func readTokenEntry(role tokenRole: HandoffRole, now: Date) -> DriverTokenRendezvous.TokenEntry? {
+        guard let publication = apnsTokenStore.load(role: tokenRole) else { return nil }
+        let lastSeen = (tokenRole == role) ? now : publication.sentAt
+        return DriverTokenRendezvous.TokenEntry(
+            token: publication.token.base64EncodedString(),
+            expiresAt: publication.expiresAt,
+            lastSeen: lastSeen
+        )
     }
 
     public func updateSettings(_ new: HandoffSettings) {

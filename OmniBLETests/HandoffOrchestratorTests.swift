@@ -177,4 +177,222 @@ final class HandoffOrchestratorTests: XCTestCase {
         XCTAssertEqual(totalUploads, 2,
             "Each iteration's data was uploaded by exactly one device — no dedup violations")
     }
+
+    // MARK: - B.11.2 Driver-Token Rendezvous
+
+    /// Build an orchestrator wired for rendezvous publication: seeds the
+    /// App Group with both phone + watch APNs tokens (so
+    /// `buildSignedRendezvous()` doesn't short-circuit on missing token),
+    /// passes a fixed `clock` for deterministic timestamps, and supplies
+    /// the API secret via the closure provider.
+    private func makeRendezvousOrchestrator(role: HandoffRole,
+                                            phoneToken: String,
+                                            watchToken: String,
+                                            apiSecret: String,
+                                            now: Date = Date(timeIntervalSince1970: 1_999_999_500),
+                                            peerSentAt: Date = Date(timeIntervalSince1970: 1_999_999_400))
+                                            -> (HandoffOrchestrator, UserDefaults) {
+        let suiteName = "RendezvousOrch-\(role.rawValue)-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+
+        // Seed both APNs token slots in the App Group.
+        let store = APNsTokenStore(defaults: defaults)
+        let phonePub = APNsTokenPublication(
+            protocolVersion: 1,
+            sentAt: role == .phone ? now : peerSentAt,
+            role: .phone,
+            token: Data(base64Encoded: phoneToken)!,
+            expiresAt: now.addingTimeInterval(86_400 * 30)
+        )
+        let watchPub = APNsTokenPublication(
+            protocolVersion: 1,
+            sentAt: role == .watch ? now : peerSentAt,
+            role: .watch,
+            token: Data(base64Encoded: watchToken)!,
+            expiresAt: now.addingTimeInterval(86_400 * 30)
+        )
+        store.save(phonePub)
+        store.save(watchPub)
+
+        let stack = HandoffStack.assemble(
+            role: role,
+            appGroupDefaults: defaults,
+            nightscoutAPISecretProvider: { apiSecret },
+            clock: { now }
+        )
+        return (stack.orchestrator, defaults)
+    }
+
+    func testBuildSignedRendezvous_phoneDriver_currentDriverMatchesRolePhone() {
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cGhvbmUtdG9rZW4=",
+            watchToken: "d2F0Y2gtdG9rZW4=",
+            apiSecret: "test-secret"
+        )
+        // Default state is .phoneDriver; phone is current driver.
+        XCTAssertTrue(orch.isCurrentDriver)
+
+        let rendezvous = orch.buildSignedRendezvous()
+        XCTAssertNotNil(rendezvous)
+        XCTAssertEqual(rendezvous?.currentDriver, .phone)
+        XCTAssertEqual(rendezvous?.phone.token, "cGhvbmUtdG9rZW4=")
+        XCTAssertEqual(rendezvous?.watch.token, "d2F0Y2gtdG9rZW4=")
+        XCTAssertTrue(rendezvous?.verify(with: "test-secret") ?? false)
+    }
+
+    func testBuildSignedRendezvous_watchDriver_currentDriverMatchesRoleWatch() {
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .watch,
+            phoneToken: "cGhvbmUtdG9rZW4=",
+            watchToken: "d2F0Y2gtdG9rZW4=",
+            apiSecret: "test-secret"
+        )
+        // Default state is .phoneDriver; force a transition to .watchDriver.
+        orch.execute([.notifyUI(state: .watchDriver)])
+        XCTAssertTrue(orch.isCurrentDriver)
+
+        let rendezvous = orch.buildSignedRendezvous()
+        XCTAssertNotNil(rendezvous)
+        XCTAssertEqual(rendezvous?.currentDriver, .watch)
+        XCTAssertTrue(rendezvous?.verify(with: "test-secret") ?? false)
+    }
+
+    func testBuildSignedRendezvous_passengerShortCircuits() {
+        // Phone-role orchestrator with state forced to .watchDriver; phone
+        // becomes passenger. Driver-only-writes invariant: must return nil.
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cGhvbmUtdG9rZW4=",
+            watchToken: "d2F0Y2gtdG9rZW4=",
+            apiSecret: "k"
+        )
+        orch.execute([.notifyUI(state: .watchDriver)])
+        XCTAssertFalse(orch.isCurrentDriver,
+                       "Phone in .watchDriver must NOT be current driver")
+
+        XCTAssertNil(orch.buildSignedRendezvous(),
+                     "Passenger MUST NOT publish a rendezvous (driver-only-writes invariant)")
+    }
+
+    func testBuildSignedRendezvous_handoffPendingShortCircuits() {
+        // Phone-role orchestrator transitioning to handoffPending; no
+        // current driver during the transition window — must return nil.
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cGhvbmUtdG9rZW4=",
+            watchToken: "d2F0Y2gtdG9rZW4=",
+            apiSecret: "k"
+        )
+        let pending = HandoffState.handoffPending(
+            direction: .phoneToWatch,
+            transitionId: UUID(),
+            deadline: Date().addingTimeInterval(60)
+        )
+        orch.execute([.notifyUI(state: pending)])
+        XCTAssertFalse(orch.isCurrentDriver)
+
+        XCTAssertNil(orch.buildSignedRendezvous(),
+                     "Both devices are passengers during handoffPending")
+    }
+
+    func testBuildSignedRendezvous_currentDriverTracksRoleAcrossHandoffTransition() {
+        // Phone-role orchestrator across a phone→watch handoff. Phone
+        // publishes when in .phoneDriver; stops publishing in
+        // .handoffPending; remains nil in .watchDriver.
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cA==",
+            watchToken: "dw==",
+            apiSecret: "k"
+        )
+        XCTAssertEqual(orch.buildSignedRendezvous()?.currentDriver, .phone)
+
+        let pending = HandoffState.handoffPending(
+            direction: .phoneToWatch,
+            transitionId: UUID(),
+            deadline: Date().addingTimeInterval(60)
+        )
+        orch.execute([.notifyUI(state: pending)])
+        XCTAssertNil(orch.buildSignedRendezvous(),
+                     "Phone-role orchestrator must NOT publish during pending")
+
+        orch.execute([.notifyUI(state: .watchDriver)])
+        XCTAssertNil(orch.buildSignedRendezvous(),
+                     "Phone-role orchestrator must NOT publish after handoff to watch")
+    }
+
+    func testBuildSignedRendezvous_emptySecretYieldsEmptySignature() {
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cA==",
+            watchToken: "dw==",
+            apiSecret: ""
+        )
+        let rendezvous = orch.buildSignedRendezvous()
+        XCTAssertNotNil(rendezvous,
+                        "Empty secret still publishes — caretaker apps degrade gracefully (spec Risks #4)")
+        XCTAssertEqual(rendezvous?.signature, "")
+        XCTAssertFalse(rendezvous?.verify(with: "") ?? true)
+    }
+
+    func testBuildSignedRendezvous_returnsNilWhenPhoneTokenMissing() {
+        let suiteName = "RendezvousMissing-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+
+        // Save only the watch token; phone slot is empty.
+        let store = APNsTokenStore(defaults: defaults)
+        store.save(APNsTokenPublication(
+            protocolVersion: 1,
+            sentAt: Date(),
+            role: .watch,
+            token: Data([1, 2, 3]),
+            expiresAt: Date().addingTimeInterval(86_400)
+        ))
+
+        let stack = HandoffStack.assemble(
+            role: .phone,
+            appGroupDefaults: defaults,
+            nightscoutAPISecretProvider: { "k" }
+        )
+        XCTAssertNil(stack.orchestrator.buildSignedRendezvous(),
+                     "Missing phone token must short-circuit rendezvous publication")
+    }
+
+    func testBuildSignedRendezvous_lastSeenForOwnRoleIsNow_forPeerIsSentAt() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let peerSent = Date(timeIntervalSince1970: 1_999_999_400)  // 600s earlier
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cA==",
+            watchToken: "dw==",
+            apiSecret: "k",
+            now: now,
+            peerSentAt: peerSent
+        )
+        let rendezvous = orch.buildSignedRendezvous()!
+        XCTAssertEqual(rendezvous.phone.lastSeen.timeIntervalSinceReferenceDate,
+                       now.timeIntervalSinceReferenceDate,
+                       accuracy: 0.001,
+                       "Own (phone) lastSeen must be `clock()` (now)")
+        XCTAssertEqual(rendezvous.watch.lastSeen.timeIntervalSinceReferenceDate,
+                       peerSent.timeIntervalSinceReferenceDate,
+                       accuracy: 0.001,
+                       "Peer (watch) lastSeen must be peer's sentAt")
+    }
+
+    func testBuildSignedRendezvous_isDeterministicAcrossCalls() {
+        // Same orchestrator state + fixed clock => identical signatures.
+        let (orch, _) = makeRendezvousOrchestrator(
+            role: .phone,
+            phoneToken: "cGhvbmUtdG9rZW4=",
+            watchToken: "d2F0Y2gtdG9rZW4=",
+            apiSecret: "secret"
+        )
+        let a = orch.buildSignedRendezvous()
+        let b = orch.buildSignedRendezvous()
+        XCTAssertEqual(a, b, "Two calls under identical state must yield identical rendezvous")
+    }
 }
