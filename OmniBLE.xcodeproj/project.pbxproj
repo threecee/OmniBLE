@@ -126,6 +126,7 @@
 		WB2D000000000000016 /* HandoffEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000006 /* HandoffEvent.swift */; };
 		WB2D000000000000017 /* HandoffSideEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000007 /* HandoffSideEffect.swift */; };
 		WB2D000000000000018 /* HandoffStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000008 /* HandoffStateMachine.swift */; };
+		B10A00000000000101 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10A00000000000001 /* ShadowStateScheduler.swift */; };
 		B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000001 /* HandoffStatePersistence.swift */; };
 		B5C0000000000000102 /* HandoffStatePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000002 /* HandoffStatePersistenceTests.swift */; };
 		WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000009 /* HandoffSettingsTests.swift */; };
@@ -443,6 +444,7 @@
 		WB2D000000000000006 /* HandoffEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffEvent.swift; sourceTree = "<group>"; };
 		WB2D000000000000007 /* HandoffSideEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSideEffect.swift; sourceTree = "<group>"; };
 		WB2D000000000000008 /* HandoffStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachine.swift; sourceTree = "<group>"; };
+		B10A00000000000001 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateScheduler.swift; sourceTree = "<group>"; };
 		B5C0000000000000001 /* HandoffStatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistence.swift; sourceTree = "<group>"; };
 		B5C0000000000000002 /* HandoffStatePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistenceTests.swift; sourceTree = "<group>"; };
 		WB2D000000000000009 /* HandoffSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettingsTests.swift; sourceTree = "<group>"; };
@@ -911,6 +913,7 @@
 				WB2D000000000000006 /* HandoffEvent.swift */,
 				WB2D000000000000007 /* HandoffSideEffect.swift */,
 				WB2D000000000000008 /* HandoffStateMachine.swift */,
+				B10A00000000000001 /* ShadowStateScheduler.swift */,
 				B5C0000000000000001 /* HandoffStatePersistence.swift */,
 				WB2D00000000000000C /* OmniBLEOwnership.swift */,
 				B8000000000000003 /* PumpStatusSnapshot.swift */,
@@ -1438,6 +1441,7 @@
 				WB2D000000000000016 /* HandoffEvent.swift in Sources */,
 				WB2D000000000000017 /* HandoffSideEffect.swift in Sources */,
 				WB2D000000000000018 /* HandoffStateMachine.swift in Sources */,
+				B10A00000000000101 /* ShadowStateScheduler.swift in Sources */,
 				B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */,
 				WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */,
 				B8000000000000103 /* PumpStatusSnapshot.swift in Sources */,
