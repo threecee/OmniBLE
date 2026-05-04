@@ -38,17 +38,17 @@ public struct PhoneWatchSettingsSync: Codable, Equatable {
     /// receiving side MUST NOT start Nightscout polling when nil.
     public let nightscoutConfig: NightscoutConfig?
 
-    /// B.4 Issue #3: Whether the phone has automatic dosing enabled.
+    /// Whether the phone has automatic dosing enabled.
     /// Optional + nil-default for backward compatibility with v1 senders;
     /// receivers should treat nil as `false` (fail-closed).
     public let automaticDosingEnabled: Bool?
 
-    /// B.4 Issue #3: Whether automatic dosing is currently allowed
+    /// Whether automatic dosing is currently allowed
     /// (not blocked by, e.g., a pump comms failure). Optional for
     /// backward compatibility; receivers should treat nil as `false`.
     public let isAutomaticDosingAllowed: Bool?
 
-    /// B.5.2 Issue #3: Phone-side TimeZone identifier (e.g. "Europe/Copenhagen").
+    /// Phone-side TimeZone identifier (e.g. "Europe/Copenhagen").
     /// The watch uses this to align its schedule lookups to the phone's local
     /// time when the two devices are in different time zones (or when iOS
     /// has not yet propagated a TZ change to the watch). Optional + nil-default

@@ -15,9 +15,9 @@ public enum PhoneWatchMessage: Codable, Equatable {
     case pairingHandoff(PhoneWatchPairingHandoff)
     /// B.3.a Phase 6: phone → watch settings synchronization.
     case settingsSync(PhoneWatchSettingsSync)
-    /// B.8: phone → watch algorithm-state snapshot (every iteration).
+    /// phone → watch algorithm-state snapshot (every iteration).
     case algorithmStateSnapshot(AlgorithmStateSnapshot)
-    /// B.8.4: tiny pointer message used when the actual snapshot payload
+    /// tiny pointer message used when the actual snapshot payload
     /// exceeds the applicationContext size budget. The watch reads the
     /// payload from <AppGroup>/snapshot.json on receipt of this message.
     /// The sequence number monotonically increases per emission; older

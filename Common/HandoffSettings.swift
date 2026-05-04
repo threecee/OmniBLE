@@ -33,7 +33,7 @@ public struct HandoffSettings: Codable, Equatable {
         UserDefaults(suiteName: appGroupIdentifier) ?? .standard
     }
 
-    /// B.8.4: convenience accessor for the App Group container URL, used for
+    /// convenience accessor for the App Group container URL, used for
     /// shared file storage (e.g., the `<AppGroup>/snapshot.json` fallback when
     /// the algorithm-state snapshot payload exceeds the applicationContext
     /// budget). Falls back to the temporary directory if the App Group cannot

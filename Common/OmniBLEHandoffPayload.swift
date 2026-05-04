@@ -82,7 +82,7 @@ public enum OmniBLEHandoffPayloadError: Error {
 }
 
 extension OmniBLEHandoffPayload {
-    /// B.2.e: Constructs a payload from a current PodState by serializing its
+    /// Constructs a payload from a current PodState by serializing its
     /// rawValue via PropertyListSerialization. Used by HandoffOrchestrator's
     /// fillPayload helper to populate outgoing pairing-handoff messages.
     ///

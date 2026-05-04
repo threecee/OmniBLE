@@ -75,7 +75,7 @@ public extension HandoffState {
         }
     }
 
-    /// B.4 Issue #2: derive the current owner from a HandoffState for use by
+    /// derive the current owner from a HandoffState for use by
     /// the policy engine's `markCurrentOwner` hook. Pending transitions are
     /// still owned by the origin until commit; ambiguous states return nil.
     var currentOwner: HandoffOwner? {

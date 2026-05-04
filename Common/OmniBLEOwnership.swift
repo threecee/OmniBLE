@@ -38,7 +38,7 @@ public final class OmniBLEOwnership {
     public private(set) var pumpManager: OmniBLEPodOwner?
     public private(set) var cachedPayload: OmniBLEHandoffPayload?
 
-    /// B.5 Issue #1: Gate flag for pod commands during handoff transitions.
+    /// Gate flag for pod commands during handoff transitions.
     /// Set to false on `.stopIssuingPodCommands` effect; true on
     /// `.resumeIssuingPodCommands`. Wired into `OmniBLEPumpManager` via
     /// `commandsAllowedCheck` callback (see `wireCommandsCallback`).
@@ -97,7 +97,7 @@ public final class OmniBLEOwnership {
         wireCommandsCallback(into: pumpManager)
     }
 
-    /// B.5 Issue #1: install the commandsAllowed callback into the pump manager.
+    /// install the commandsAllowed callback into the pump manager.
     /// Called from setPumpManager (watch path) and init (iOS path). Cast
     /// through to OmniBLEPumpManager since the gate lives on the concrete
     /// class — OmniBLEPodOwner only has BLE-control methods.

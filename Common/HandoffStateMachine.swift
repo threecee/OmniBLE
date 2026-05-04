@@ -13,7 +13,7 @@ import Foundation
 
 public final class HandoffStateMachine {
 
-    /// B.5 Issue #4: didSet persists every state transition (including
+    /// didSet persists every state transition (including
     /// transient .handoffPending states) to App Group UserDefaults so the
     /// state machine can recover from crash mid-handoff.
     public private(set) var state: HandoffState {
