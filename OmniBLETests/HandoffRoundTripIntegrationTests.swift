@@ -148,7 +148,7 @@ final class HandoffRoundTripIntegrationTests: XCTestCase {
         driveOwnership(phoneOwnership, effects: phoneEffectsA)
 
         // Phone is now in handoffPending — hasn't released BLE yet.
-        guard case .handoffPending(direction: .phoneToWatch, _, _) = phoneStateMachine.state else {
+        guard case .handoffPending(direction: .phoneToWatch, _, _, _) = phoneStateMachine.state else {
             return XCTFail("Phone should be handoffPending(phoneToWatch); got \(phoneStateMachine.state)")
         }
         XCTAssertTrue(phoneMockPump.callLog.isEmpty,
@@ -211,7 +211,7 @@ final class HandoffRoundTripIntegrationTests: XCTestCase {
         let watchEffectsB = watchStateMachine.handle(.userRequestedHandoff(target: .phone))
         driveOwnership(watchOwnership, effects: watchEffectsB)
 
-        guard case .handoffPending(direction: .watchToPhone, _, _) = watchStateMachine.state else {
+        guard case .handoffPending(direction: .watchToPhone, _, _, _) = watchStateMachine.state else {
             return XCTFail("Watch should be handoffPending(watchToPhone); got \(watchStateMachine.state)")
         }
         // Watch hasn't released BLE yet (still owner during pending).

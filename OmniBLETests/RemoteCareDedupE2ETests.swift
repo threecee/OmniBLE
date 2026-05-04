@@ -53,7 +53,8 @@ final class RemoteCareDedupE2ETests: XCTestCase {
     private func handoffPendingPhoneToWatch() -> HandoffState {
         .handoffPending(direction: .phoneToWatch,
                         transitionId: UUID(),
-                        deadline: Date().addingTimeInterval(60))
+                        deadline: Date().addingTimeInterval(60),
+                        tokenRendezvousPublished: false)
     }
 
     func testNoDoubleWriteAcrossPhoneToWatchHandoffWindow() {

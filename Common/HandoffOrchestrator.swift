@@ -138,6 +138,15 @@ public final class HandoffOrchestrator: ObservableObject {
     /// `emitSettingsSync()` exits early).
     private var lastEmittedSync: PhoneWatchSettingsSync?
 
+    /// B.11.3: incoming-driver override consulted by
+    /// `buildSignedRendezvous()` when the no-arg form is called (e.g.
+    /// from the host's `NightscoutService.driverTokenProvider` closure).
+    /// Set non-nil for the duration of `.publishRendezvous` execution so
+    /// the in-flight pre-flip upload's devicestatus stamps
+    /// `currentDriver: incomingDriver` rather than `currentDriver: self`.
+    /// Cleared immediately after the upload trigger fires.
+    private var pendingRendezvousIncomingDriver: HandoffOwner?
+
     /// replaces the previous `lastReceivedPayload` field — accessor
     /// forwards to ownership's cache (single source of truth).
     public var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
@@ -353,7 +362,23 @@ public final class HandoffOrchestrator: ObservableObject {
     /// for peer's token = `APNsTokenPublication.sentAt` (whatever the
     /// peer's last publish wrote into the App Group). Both timestamps
     /// drive the caretaker-side 1-hour staleness gate.
-    public func buildSignedRendezvous() -> DriverTokenRendezvous? {
+    ///
+    /// B.11.3: `incomingDriverOverride`, when non-nil, stamps the
+    /// rendezvous's `currentDriver` to the *incoming* (post-flip) driver
+    /// instead of the local role. Used by the pre-flip rendezvous publish
+    /// to advertise the new driver BEFORE the BLE role transitions, so
+    /// caretaker apps polling Nightscout learn the new driver's APNs
+    /// token target on their next poll. Defaults to nil (per-iteration
+    /// uploads stamp `currentDriver = self`).
+    public func buildSignedRendezvous(incomingDriverOverride: HandoffOwner? = nil) -> DriverTokenRendezvous? {
+        // B.11.3: if no explicit override is supplied (e.g. the host's
+        // driverTokenProvider closure calling the no-arg form), consult
+        // the in-flight pre-flip override stored on the orchestrator. This
+        // lets the existing per-iteration upload path stamp the rendezvous
+        // with the incoming driver during the pre-flip publish window
+        // without changing call sites.
+        let effectiveOverride = incomingDriverOverride ?? pendingRendezvousIncomingDriver
+
         guard isCurrentDriver else {
             log.debug("buildSignedRendezvous: role=%{public}@ is not current driver (state=%{public}@); skipping",
                       role.rawValue, String(describing: handoffState))
@@ -374,10 +399,24 @@ public final class HandoffOrchestrator: ObservableObject {
             log.debug("buildSignedRendezvous: nightscout API secret is empty — publishing rendezvous with empty signature (spec Risks #4)")
         }
 
+        // B.11.3: select indicator from the override (explicit-arg or
+        // in-flight pre-flip stash) if supplied; otherwise from the local
+        // role. The override is the rendezvous guarantee — the outgoing
+        // driver's last upload advertises the new (incoming) driver.
+        let driverIndicator: DriverTokenRendezvous.DriverIndicator
+        if let incoming = effectiveOverride {
+            switch incoming {
+            case .phone: driverIndicator = .phone
+            case .watch: driverIndicator = .watch
+            }
+        } else {
+            driverIndicator = .init(role: role)
+        }
+
         let unsigned = DriverTokenRendezvous(
             phone: phone,
             watch: watch,
-            currentDriver: .init(role: role),
+            currentDriver: driverIndicator,
             timestamp: now,
             signature: ""
         )
@@ -501,6 +540,60 @@ public final class HandoffOrchestrator: ObservableObject {
     public func execute(_ effects: [HandoffSideEffect]) {
         for effect in effects {
             switch effect {
+            case .publishRendezvous(let transitionId, let incomingDriver):
+                // B.11.3: pre-flip rendezvous publication.
+                //
+                // Ordering invariant: this case runs BEFORE the
+                // `.notifyUI(.handoffPending)` effect in the same effects
+                // array (see `HandoffStateMachine.beginHandoff`). As a
+                // result, `handoffState` is still the prior driver state
+                // here and `isCurrentDriver` is still true — the provider
+                // closure (NightscoutService.driverTokenProvider) and
+                // proxyUpload pass through.
+                //
+                // Mechanism (Option D — fire-and-forget):
+                // 1. Stash the incoming-driver override so the closure
+                //    `nightscoutDriverTokenOverride` (read by the host's
+                //    driverTokenProvider closure) returns the rendezvous
+                //    with currentDriver: incomingDriver.
+                // 2. Trigger an upload via `proxyUpload(for: .dose)` —
+                //    `.dose` is the lightest RemoteCareUploadType that
+                //    fans out a devicestatus document.
+                // 3. Immediately feed `.rendezvousPublishCompleted` back
+                //    into the state machine to flip the substate flag.
+                //
+                // The pre-flip rendezvous upload is fire-and-forget by
+                // design. If it fails, the watch's first upload after
+                // role transition re-stamps currentDriver correctly
+                // within ~5 minutes. Aborting the role flip on a
+                // transient network failure would block legitimate
+                // handoff when the user walks out of BLE range — worse
+                // than the brief caretaker-visibility gap. Idempotency
+                // on first-iteration is the load-bearing safety
+                // property; this pre-flip step is advisory.
+                pendingRendezvousIncomingDriver = incomingDriver
+                log.default("publishRendezvous (advisory): transitionId=%{public}@ incomingDriver=%{public}@",
+                            transitionId.uuidString, incomingDriver.rawValue)
+                if remoteCareUploader != nil {
+                    proxyUpload(for: .dose)
+                } else {
+                    log.default("publishRendezvous: no remoteCareUploader wired — skipping upload trigger (still flipping substate flag)")
+                }
+                // Clear the override; subsequent per-iteration uploads
+                // (if any during the same effects loop) stamp
+                // currentDriver=self per the default code path.
+                pendingRendezvousIncomingDriver = nil
+                // Feed completion back into the state machine to flip
+                // the substate flag. Synchronous — Option D: we don't
+                // wait on the upload's Result. The handler returns []
+                // (no notifyUI emission — substate flag lives on
+                // stateMachine.state; @Published handoffState mirror
+                // remains consistent with the trailing notifyUI emitted
+                // by beginHandoff).
+                _ = stateMachine.handle(
+                    .rendezvousPublishCompleted(transitionId: transitionId)
+                )
+
             case .sendModeSwitch(let ms):
                 coordinator.sendModeSwitch(ms)
             case .sendPairingHandoff(let ph):
@@ -559,7 +652,7 @@ public final class HandoffOrchestrator: ObservableObject {
                 // transition entering .handoffPending(.phoneToWatch). No-op
                 // on watch since `emitSettingsSync()` early-exits when the
                 // settings-sync provider is nil.
-                if case .handoffPending(direction: .phoneToWatch, _, _) = state {
+                if case .handoffPending(direction: .phoneToWatch, _, _, _) = state {
                     emitSettingsSync()
                 }
 

@@ -17,4 +17,12 @@ public enum HandoffSideEffect: Equatable {
     case resumeIssuingPodCommands
     case recordTransitionInLog(HandoffTransitionRecord)
     case notifyUI(state: HandoffState)
+
+    /// B.11.3: orchestrator must publish a devicestatus document with
+    /// `currentDriver: incomingDriver`. Under Option D the orchestrator
+    /// fires `RemoteCareUploader.upload(for: .dose)` (fire-and-forget)
+    /// and immediately feeds `.rendezvousPublishCompleted` back into the
+    /// state machine — the upload is advisory; idempotency on the new
+    /// driver's first iteration is the load-bearing safety property.
+    case publishRendezvous(transitionId: UUID, incomingDriver: HandoffOwner)
 }

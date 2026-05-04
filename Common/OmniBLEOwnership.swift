@@ -164,8 +164,8 @@ public final class OmniBLEOwnership {
         case .phoneDriver: return .phone
         case .watchDriver: return .watch
         case .recovering(_, let last): return last
-        case .handoffPending(.phoneToWatch, _, _): return .phone
-        case .handoffPending(.watchToPhone, _, _): return .watch
+        case .handoffPending(.phoneToWatch, _, _, _): return .phone
+        case .handoffPending(.watchToPhone, _, _, _): return .watch
         }
     }
 

@@ -32,11 +32,27 @@ public enum HandoffRecoveryReason: String, Codable, Equatable {
     case rejectedByCounterpart
     case localFailureDuringTransition
     case restoredExpiredPending
+    /// B.11.3: pre-flip rendezvous upload failed. NOTE: under Option D
+    /// (Carl-decided), this recovery reason is NOT currently emitted —
+    /// the pre-flip rendezvous publish is fire-and-forget and never
+    /// surfaces a failure. The case is retained additively for future
+    /// surface area (and to keep the structural mechanical landing per
+    /// plan); see `HandoffOrchestrator` for the rationale.
+    case rendezvousPublishFailed
 }
 
 public enum HandoffState: Equatable, Codable {
     case phoneDriver
-    case handoffPending(direction: HandoffDirection, transitionId: UUID, deadline: Date)
+    /// B.11.3: 4th tuple element `tokenRendezvousPublished` tracks whether
+    /// the outgoing-driver pre-flip rendezvous publication has fired for
+    /// this transition. Set true by `.rendezvousPublishCompleted`. The
+    /// flag is advisory — pre-flip publish is fire-and-forget; idempotency
+    /// on the new driver's first post-flip upload is the load-bearing
+    /// safety property.
+    case handoffPending(direction: HandoffDirection,
+                        transitionId: UUID,
+                        deadline: Date,
+                        tokenRendezvousPublished: Bool)
     case watchDriver
     case recovering(reason: HandoffRecoveryReason, lastKnownOwner: HandoffOwner)
 
@@ -68,8 +84,8 @@ public extension HandoffState {
     var snapshot: HandoffStateSnapshot {
         switch self {
         case .phoneDriver: return .phoneDriver
-        case .handoffPending(direction: .phoneToWatch, _, _): return .handoffPendingPhoneToWatch
-        case .handoffPending(direction: .watchToPhone, _, _): return .handoffPendingWatchToPhone
+        case .handoffPending(direction: .phoneToWatch, _, _, _): return .handoffPendingPhoneToWatch
+        case .handoffPending(direction: .watchToPhone, _, _, _): return .handoffPendingWatchToPhone
         case .watchDriver: return .watchDriver
         case .recovering: return .recovering
         }
@@ -82,7 +98,7 @@ public extension HandoffState {
         switch self {
         case .phoneDriver: return .phone
         case .watchDriver: return .watch
-        case .handoffPending(direction: let dir, _, _):
+        case .handoffPending(direction: let dir, _, _, _):
             // Pending TO watch means phone is still owner until commit;
             // pending TO phone means watch is still owner until commit.
             return dir.origin
@@ -97,6 +113,9 @@ public enum HandoffTransitionTrigger: String, Codable, Equatable {
     case messageFromCounterpart
     case timeout
     case shadowRefresh
+    /// B.11.3: trigger for `.rendezvousPublishCompleted` /
+    /// `.rendezvousPublishFailed` events.
+    case rendezvousOutcome
 }
 
 public struct HandoffTransitionRecord: Equatable, Codable {

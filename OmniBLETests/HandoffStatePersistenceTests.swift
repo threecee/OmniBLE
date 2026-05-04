@@ -42,7 +42,8 @@ final class HandoffStatePersistenceTests: XCTestCase {
         let deadline = Date(timeIntervalSince1970: 1_700_000_000)
         let pending = HandoffState.handoffPending(direction: .phoneToWatch,
                                                    transitionId: id,
-                                                   deadline: deadline)
+                                                   deadline: deadline,
+                                                   tokenRendezvousPublished: false)
         HandoffStatePersistence.save(pending, to: defaults)
         let restored = HandoffStatePersistence.load(from: defaults)
         XCTAssertEqual(restored, pending)

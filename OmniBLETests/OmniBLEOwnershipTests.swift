@@ -87,7 +87,8 @@ final class OmniBLEOwnershipTests: XCTestCase {
         let ownership = OmniBLEOwnership(role: .phone, pumpManager: mock, appGroupDefaults: defaults)
         ownership.update(state: .handoffPending(direction: .phoneToWatch,
                                                   transitionId: UUID(),
-                                                  deadline: Date().addingTimeInterval(30)))
+                                                  deadline: Date().addingTimeInterval(30),
+                                                  tokenRendezvousPublished: false))
         XCTAssertEqual(mock.connectCallCount, 0)
         XCTAssertEqual(mock.disconnectCallCount, 0)
     }

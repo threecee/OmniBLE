@@ -10,6 +10,7 @@
 //
 
 import Foundation
+import os.log
 
 public final class HandoffStateMachine {
 
@@ -29,6 +30,10 @@ public final class HandoffStateMachine {
 
     private let role: HandoffRole
     private let appGroupDefaults: UserDefaults
+
+    /// B.11.3: log channel for HandoffPending entry/exit timeline so HV-1
+    /// can correlate state transitions with rendezvous-publish timing.
+    private let log = OSLog(category: "HandoffStateMachine")
 
     public init(initialState: HandoffState = .phoneDriver,
                 role: HandoffRole,
@@ -52,7 +57,7 @@ public final class HandoffStateMachine {
             // failure mode impossible. (Vacuously closes M2: no path leaves
             // init in .handoffPending, so no .scheduleTimeout re-emission
             // is needed.)
-            if case .handoffPending(direction: let dir, _, _) = restored {
+            if case .handoffPending(direction: let dir, _, _, _) = restored {
                 let recoveredOwner: HandoffOwner = dir.origin
                 effectiveInitial = .recovering(reason: .restoredExpiredPending,
                                                 lastKnownOwner: recoveredOwner)
@@ -70,8 +75,8 @@ public final class HandoffStateMachine {
         case .phoneDriver: self.lastKnownOwner = .phone
         case .watchDriver: self.lastKnownOwner = .watch
         case .recovering(_, let last): self.lastKnownOwner = last
-        case .handoffPending(.phoneToWatch, _, _): self.lastKnownOwner = .phone
-        case .handoffPending(.watchToPhone, _, _): self.lastKnownOwner = .watch
+        case .handoffPending(.phoneToWatch, _, _, _): self.lastKnownOwner = .phone
+        case .handoffPending(.watchToPhone, _, _, _): self.lastKnownOwner = .watch
         }
     }
 
@@ -106,12 +111,12 @@ public final class HandoffStateMachine {
                                                                 transitionId: UUID()))]
 
         // MARK: From HandoffPending(phoneToWatch)
-        case (.handoffPending(direction: .phoneToWatch, transitionId: let id, _),
+        case (.handoffPending(direction: .phoneToWatch, transitionId: let id, _, _),
               .incomingModeSwitch(let ms))
             where ms.transitionId == id && ms.targetMode == .watchDriver:
             effects = completeHandoff(to: .watch, now: now)
 
-        case (.handoffPending(direction: .phoneToWatch, transitionId: let id, _),
+        case (.handoffPending(direction: .phoneToWatch, transitionId: let id, _, _),
               .incomingModeSwitch(let ms))
             where ms.transitionId == id && ms.targetMode != .watchDriver:
             effects = enterRecovering(reason: .rejectedByCounterpart, now: now)
@@ -135,21 +140,67 @@ public final class HandoffStateMachine {
                                                                 transitionId: UUID()))]
 
         // MARK: From HandoffPending(watchToPhone)
-        case (.handoffPending(direction: .watchToPhone, transitionId: let id, _),
+        case (.handoffPending(direction: .watchToPhone, transitionId: let id, _, _),
               .incomingModeSwitch(let ms))
             where ms.transitionId == id && ms.targetMode == .phoneDriver:
             effects = completeHandoff(to: .phone, now: now)
 
-        case (.handoffPending(direction: .watchToPhone, transitionId: let id, _),
+        case (.handoffPending(direction: .watchToPhone, transitionId: let id, _, _),
               .incomingModeSwitch(let ms))
             where ms.transitionId == id && ms.targetMode != .phoneDriver:
             effects = enterRecovering(reason: .rejectedByCounterpart, now: now)
 
         // MARK: HandoffPending — common: timeout matching the active transition id
-        case (.handoffPending(_, transitionId: let id, _),
+        case (.handoffPending(_, transitionId: let id, _, _),
               .transitionDeadlineReached(let timeoutId))
             where id == timeoutId:
             effects = enterRecovering(reason: .timeoutWaitingForConfirmation, now: now)
+
+        // MARK: B.11.3 — Pre-flip rendezvous publication outcomes
+        // .rendezvousPublishCompleted: orchestrator just fired the
+        // pre-flip devicestatus upload (fire-and-forget under Option D).
+        // We flip the substate flag to true so HV-1 + UI can observe the
+        // completed rendezvous step. transitionId guard defends against
+        // late callbacks from a prior, aborted handoff.
+        case (.handoffPending(direction: let dir,
+                              transitionId: let id,
+                              deadline: let deadline,
+                              tokenRendezvousPublished: false),
+              .rendezvousPublishCompleted(transitionId: let cid))
+            where id == cid:
+            state = .handoffPending(direction: dir,
+                                    transitionId: id,
+                                    deadline: deadline,
+                                    tokenRendezvousPublished: true)
+            log.default("rendezvousPublishCompleted: transitionId=%{public}@",
+                        id.uuidString)
+            // No notifyUI emission. The originating .userRequestedHandoff
+            // already emitted notifyUI(.handoffPending(..., published:
+            // false)) which the orchestrator processes AFTER
+            // .publishRendezvous (the orchestrator's .publishRendezvous
+            // handler runs first, fires the upload while still driver,
+            // then feeds this event). The substate flag is consumed
+            // primarily for HV-1 timeline + tests reading
+            // `stateMachine.state` directly; the @Published handoffState
+            // mirror need not flip a second time within the same effects
+            // loop. If a future UI surface needs to react to the substate
+            // flag flipping, expose a dedicated published property
+            // (tokenRendezvousPublished: Bool) rather than re-emitting
+            // notifyUI here.
+            effects = []
+
+        // .rendezvousPublishFailed: NOT emitted under current Option D
+        // wiring (pre-flip publish is fire-and-forget, no failure
+        // surfacing). The handler is retained for the additive structural
+        // landing per plan + future surface area. If invoked it transitions
+        // to .recovering(.rendezvousPublishFailed, ...) and re-emits
+        // .resumeIssuingPodCommands so the surviving outgoing driver can
+        // continue delivering.
+        case (.handoffPending(_, transitionId: let id, _, _),
+              .rendezvousPublishFailed(transitionId: let fid))
+            where id == fid:
+            effects = enterRecovering(reason: .rendezvousPublishFailed, now: now)
+                    + [.resumeIssuingPodCommands]
 
         // MARK: From Recovering
         case (.recovering(_, lastKnownOwner: let owner), .manualRecoveryDismiss):
@@ -193,6 +244,7 @@ public final class HandoffStateMachine {
         case .transitionDeadlineReached: return .timeout
         case .shadowStateRefreshDue: return .shadowRefresh
         case .manualRecoveryDismiss: return .userManual
+        case .rendezvousPublishCompleted, .rendezvousPublishFailed: return .rendezvousOutcome
         }
     }
 
@@ -200,7 +252,12 @@ public final class HandoffStateMachine {
                               now: Date) -> [HandoffSideEffect] {
         let id = UUID()
         let deadline = now.addingTimeInterval(Self.transitionTimeout)
-        state = .handoffPending(direction: direction, transitionId: id, deadline: deadline)
+        state = .handoffPending(direction: direction,
+                                transitionId: id,
+                                deadline: deadline,
+                                tokenRendezvousPublished: false)
+        log.default("HandoffPending ENTRY (initiator): direction=%{public}@ transitionId=%{public}@ tokenRendezvousPublished=false",
+                    direction.rawValue, id.uuidString)
 
         let modeSwitch = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
@@ -211,11 +268,17 @@ public final class HandoffStateMachine {
         )
         let pairingHandoff = buildPairingHandoff(now: now, transitionId: id)
 
+        // B.11.3: emit .publishRendezvous so the orchestrator fires the
+        // pre-flip devicestatus upload with `currentDriver: incomingDriver`
+        // BEFORE the BLE role flip. Receiver-side enterPending does NOT
+        // emit this — only the initiating outgoing driver writes the
+        // rendezvous (driver-only-writes invariant).
         return [
             .stopIssuingPodCommands,
             .sendPairingHandoff(pairingHandoff),
             .sendModeSwitch(modeSwitch),
             .scheduleTimeout(transitionId: id, after: Self.transitionTimeout),
+            .publishRendezvous(transitionId: id, incomingDriver: direction.destination),
             .notifyUI(state: state)
         ]
     }
@@ -224,7 +287,12 @@ public final class HandoffStateMachine {
                               transitionId: UUID,
                               now: Date) -> [HandoffSideEffect] {
         let deadline = now.addingTimeInterval(Self.transitionTimeout)
-        state = .handoffPending(direction: direction, transitionId: transitionId, deadline: deadline)
+        state = .handoffPending(direction: direction,
+                                transitionId: transitionId,
+                                deadline: deadline,
+                                tokenRendezvousPublished: false)
+        log.default("HandoffPending ENTRY (receiver): direction=%{public}@ transitionId=%{public}@",
+                    direction.rawValue, transitionId.uuidString)
         let confirm = PhoneWatchModeSwitch(
             protocolVersion: PhoneWatchProtocol.currentVersion,
             sentAt: now,
@@ -232,6 +300,8 @@ public final class HandoffStateMachine {
             targetMode: direction.destination == .watch ? .watchDriver : .phoneDriver,
             transitionId: transitionId
         )
+        // Receiver-side does NOT emit .publishRendezvous — the initiating
+        // outgoing driver owns the rendezvous publish (driver-only-writes).
         return [
             .stopIssuingPodCommands,
             .sendModeSwitch(confirm),
@@ -242,6 +312,7 @@ public final class HandoffStateMachine {
 
     private func completeHandoff(to owner: HandoffOwner,
                                  now: Date) -> [HandoffSideEffect] {
+        log.default("HandoffPending EXIT (success): newOwner=%{public}@", owner.rawValue)
         state = (owner == .phone) ? .phoneDriver : .watchDriver
         lastKnownOwner = owner
         let resumeIfMine: [HandoffSideEffect] = (owner == role.asOwner)
@@ -251,6 +322,7 @@ public final class HandoffStateMachine {
 
     private func enterRecovering(reason: HandoffRecoveryReason,
                                  now: Date) -> [HandoffSideEffect] {
+        log.default("HandoffPending EXIT (recovering): reason=%{public}@", reason.rawValue)
         state = .recovering(reason: reason, lastKnownOwner: lastKnownOwner)
         return [.notifyUI(state: state)]
     }

@@ -32,7 +32,7 @@ final class HandoffStateMachineTests: XCTestCase {
         let m = machine(role: .phone)
         let effects = m.handle(.userRequestedHandoff(target: .watch), now: now)
 
-        if case .handoffPending(direction: .phoneToWatch, _, let deadline) = m.state {
+        if case .handoffPending(direction: .phoneToWatch, _, let deadline, _) = m.state {
             XCTAssertEqual(deadline, now.addingTimeInterval(30))
         } else {
             XCTFail("expected handoffPending(phoneToWatch), got \(m.state)")
@@ -46,7 +46,7 @@ final class HandoffStateMachineTests: XCTestCase {
     func testPhoneDriver_policyRequestsHandoffToWatch_transitionsToHandoffPendingPhoneToWatch() {
         let m = machine(role: .phone)
         _ = m.handle(.policyRequestedHandoff(target: .watch), now: now)
-        if case .handoffPending(direction: .phoneToWatch, _, _) = m.state {
+        if case .handoffPending(direction: .phoneToWatch, _, _, _) = m.state {
             // OK
         } else {
             XCTFail("expected handoffPending")
@@ -101,7 +101,8 @@ final class HandoffStateMachineTests: XCTestCase {
         machine(role: .phone, initial: .handoffPending(
             direction: .phoneToWatch,
             transitionId: id,
-            deadline: now.addingTimeInterval(30)))
+            deadline: now.addingTimeInterval(30),
+            tokenRendezvousPublished: false))
     }
 
     func testHandoffPendingPhoneToWatch_modeSwitchConfirmation_transitionsToWatchDriver() {
@@ -166,7 +167,7 @@ final class HandoffStateMachineTests: XCTestCase {
     func testWatchDriver_userRequestsHandoffToPhone_transitionsToHandoffPendingWatchToPhone() {
         let m = machine(role: .phone, initial: .watchDriver)
         let effects = m.handle(.userRequestedHandoff(target: .phone), now: now)
-        if case .handoffPending(direction: .watchToPhone, _, _) = m.state {
+        if case .handoffPending(direction: .watchToPhone, _, _, _) = m.state {
             // OK
         } else {
             XCTFail("expected handoffPending(watchToPhone)")
@@ -177,7 +178,7 @@ final class HandoffStateMachineTests: XCTestCase {
     func testWatchDriver_policyRequestsRevertToPhone_transitionsToHandoffPendingWatchToPhone() {
         let m = machine(role: .phone, initial: .watchDriver)
         _ = m.handle(.policyRequestedHandoff(target: .phone), now: now)
-        if case .handoffPending(direction: .watchToPhone, _, _) = m.state {
+        if case .handoffPending(direction: .watchToPhone, _, _, _) = m.state {
             // OK
         } else {
             XCTFail("expected handoffPending(watchToPhone)")
@@ -226,7 +227,8 @@ final class HandoffStateMachineTests: XCTestCase {
         machine(role: .watch, initial: .handoffPending(
             direction: .watchToPhone,
             transitionId: id,
-            deadline: now.addingTimeInterval(30)))
+            deadline: now.addingTimeInterval(30),
+            tokenRendezvousPublished: false))
     }
 
     func testHandoffPendingWatchToPhone_confirmation_transitionsToPhoneDriver() {
@@ -366,14 +368,14 @@ final class HandoffStateMachineTests: XCTestCase {
         for _ in 0..<8 {
             _ = m.handle(.userRequestedHandoff(target: .watch), now: now)
             // Confirm
-            if case .handoffPending(_, let id, _) = m.state {
+            if case .handoffPending(_, let id, _, _) = m.state {
                 let confirm = PhoneWatchModeSwitch(
                     protocolVersion: 1, sentAt: now,
                     requestedBy: .watch, targetMode: .watchDriver, transitionId: id)
                 _ = m.handle(.incomingModeSwitch(confirm), now: now)
             }
             _ = m.handle(.userRequestedHandoff(target: .phone), now: now)
-            if case .handoffPending(_, let id, _) = m.state {
+            if case .handoffPending(_, let id, _, _) = m.state {
                 let confirm = PhoneWatchModeSwitch(
                     protocolVersion: 1, sentAt: now,
                     requestedBy: .phone, targetMode: .phoneDriver, transitionId: id)
@@ -435,7 +437,8 @@ final class HandoffStateMachineTests: XCTestCase {
         let sm = HandoffStateMachine(
             initialState: .handoffPending(direction: .phoneToWatch,
                                            transitionId: initialId,
-                                           deadline: Date().addingTimeInterval(30)),
+                                           deadline: Date().addingTimeInterval(30),
+                                           tokenRendezvousPublished: false),
             role: .phone,
             appGroupDefaults: isolatedDefaults()
         )
@@ -530,7 +533,7 @@ final class HandoffStateMachineTests: XCTestCase {
         XCTAssertFalse(notifyUIEffects.isEmpty, "Expected at least one notifyUI effect")
 
         let hasPendingPhoneToWatch = notifyUIEffects.contains {
-            if case .handoffPending(direction: .phoneToWatch, _, _) = $0 { return true }
+            if case .handoffPending(direction: .phoneToWatch, _, _, _) = $0 { return true }
             return false
         }
         XCTAssertTrue(hasPendingPhoneToWatch,
@@ -610,7 +613,8 @@ final class HandoffStateMachineTests: XCTestCase {
         let expiredDeadline = Date().addingTimeInterval(-60)
         let expiredState: HandoffState = .handoffPending(direction: .phoneToWatch,
                                                          transitionId: UUID(),
-                                                         deadline: expiredDeadline)
+                                                         deadline: expiredDeadline,
+                                                         tokenRendezvousPublished: false)
         HandoffStatePersistence.save(expiredState, to: testDefaults)
 
         let machine = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
@@ -641,7 +645,8 @@ final class HandoffStateMachineTests: XCTestCase {
         let pendingState: HandoffState = .handoffPending(
             direction: .phoneToWatch,
             transitionId: UUID(),
-            deadline: futureDeadline)
+            deadline: futureDeadline,
+            tokenRendezvousPublished: false)
         HandoffStatePersistence.save(pendingState, to: testDefaults)
 
         let m = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
@@ -667,7 +672,8 @@ final class HandoffStateMachineTests: XCTestCase {
             let pendingState: HandoffState = .handoffPending(
                 direction: .phoneToWatch,
                 transitionId: UUID(),
-                deadline: deadline)
+                deadline: deadline,
+                tokenRendezvousPublished: false)
             HandoffStatePersistence.save(pendingState, to: testDefaults)
 
             let m = HandoffStateMachine(role: .phone, appGroupDefaults: testDefaults)
@@ -689,5 +695,123 @@ final class HandoffStateMachineTests: XCTestCase {
         let encoded = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(HandoffRecoveryReason.self, from: encoded)
         XCTAssertEqual(decoded, original)
+    }
+
+    // MARK: - B.11.3: HandoffPending substate (tokenRendezvousPublished)
+
+    func testPhoneDriver_userRequestsHandoff_initialRendezvousPublishedIsFalse() {
+        let m = machine(role: .phone)
+        _ = m.handle(.userRequestedHandoff(target: .watch), now: now)
+        if case .handoffPending(direction: .phoneToWatch,
+                                transitionId: _,
+                                deadline: _,
+                                tokenRendezvousPublished: let pub) = m.state {
+            XCTAssertFalse(pub, "tokenRendezvousPublished MUST start false on entry to handoffPending")
+        } else {
+            XCTFail("expected handoffPending(phoneToWatch), got \(m.state)")
+        }
+    }
+
+    func testHandoffPending_rendezvousPublishCompleted_setsFlagTrue() {
+        let m = machine(role: .phone)
+        _ = m.handle(.userRequestedHandoff(target: .watch), now: now)
+        guard case .handoffPending(_, transitionId: let tid, _, _) = m.state else {
+            XCTFail("setup failed"); return
+        }
+        _ = m.handle(.rendezvousPublishCompleted(transitionId: tid), now: now)
+        if case .handoffPending(_, _, _, tokenRendezvousPublished: let pub) = m.state {
+            XCTAssertTrue(pub, "rendezvousPublishCompleted MUST set tokenRendezvousPublished=true")
+        } else {
+            XCTFail("expected still in handoffPending after rendezvousPublishCompleted")
+        }
+    }
+
+    func testHandoffPending_rendezvousPublishCompleted_wrongTransitionId_isIgnored() {
+        let m = machine(role: .phone)
+        _ = m.handle(.userRequestedHandoff(target: .watch), now: now)
+        let staleTid = UUID()  // not the active transition id
+        _ = m.handle(.rendezvousPublishCompleted(transitionId: staleTid), now: now)
+        if case .handoffPending(_, _, _, tokenRendezvousPublished: let pub) = m.state {
+            XCTAssertFalse(pub, "stale transitionId MUST NOT flip the flag")
+        } else {
+            XCTFail("expected still in handoffPending")
+        }
+    }
+
+    func testCompleteHandoff_clearsSubstate() {
+        let m = machine(role: .phone)
+        _ = m.handle(.userRequestedHandoff(target: .watch), now: now)
+        guard case .handoffPending(_, transitionId: let tid, _, _) = m.state else {
+            XCTFail("setup failed"); return
+        }
+        _ = m.handle(.rendezvousPublishCompleted(transitionId: tid), now: now)
+        let confirm = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: now,
+            requestedBy: .watch,
+            targetMode: .watchDriver,
+            transitionId: tid
+        )
+        _ = m.handle(.incomingModeSwitch(confirm), now: now)
+        XCTAssertEqual(m.state, .watchDriver,
+                       "after completion the substate is gone (no .handoffPending wrapping it)")
+    }
+
+    func testBeginHandoff_emitsPublishRendezvousSideEffect() {
+        let m = machine(role: .phone)
+        let effects = m.handle(.userRequestedHandoff(target: .watch), now: now)
+        let hasPublishRendezvous = effects.contains {
+            if case .publishRendezvous(_, incomingDriver: .watch) = $0 { return true }
+            return false
+        }
+        XCTAssertTrue(hasPublishRendezvous,
+                      "beginHandoff (initiator-side) MUST emit .publishRendezvous with incomingDriver=watch")
+    }
+
+    func testEnterPending_doesNotEmitPublishRendezvous() {
+        // Receiver-side: only the initiating outgoing driver writes the
+        // rendezvous (driver-only-writes invariant). The receiver's
+        // enterPending must NOT emit .publishRendezvous.
+        let sm = HandoffStateMachine(initialState: .phoneDriver, role: .watch,
+                                     appGroupDefaults: isolatedDefaults())
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: now,
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: UUID()
+        )
+        let effects = sm.handle(.incomingModeSwitch(ms))
+        let hasPublishRendezvous = effects.contains {
+            if case .publishRendezvous = $0 { return true }
+            return false
+        }
+        XCTAssertFalse(hasPublishRendezvous,
+                       "Receiver-side enterPending MUST NOT emit .publishRendezvous (driver-only-writes)")
+    }
+
+    func testRendezvousPublishFailedHandler_transitionsToRecovering() {
+        // Defensive: under Option D the .rendezvousPublishFailed event is
+        // not emitted by the orchestrator (pre-flip publish is fire-and-
+        // forget), but the structural handler is retained for additive
+        // landing per plan + future surface area. This test asserts the
+        // handler still works if invoked manually.
+        let m = machine(role: .phone)
+        _ = m.handle(.userRequestedHandoff(target: .watch), now: now)
+        guard case .handoffPending(_, transitionId: let tid, _, _) = m.state else {
+            XCTFail("setup failed"); return
+        }
+        let effects = m.handle(.rendezvousPublishFailed(transitionId: tid), now: now)
+        if case .recovering(let reason, let owner) = m.state {
+            XCTAssertEqual(reason, .rendezvousPublishFailed)
+            XCTAssertEqual(owner, .phone, "lastKnownOwner remains phone — role flip aborted")
+        } else {
+            XCTFail("expected .recovering, got \(m.state)")
+        }
+        // Also verify the surviving driver gets resumeIssuingPodCommands
+        // re-emitted so it can keep delivering after the abort.
+        XCTAssertTrue(effects.contains {
+            if case .resumeIssuingPodCommands = $0 { return true }; return false
+        }, "abort path MUST re-emit .resumeIssuingPodCommands so surviving driver resumes")
     }
 }
