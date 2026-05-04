@@ -2,7 +2,7 @@
 //  PhoneWatchMessage.swift
 //  OmniBLE
 //
-//  Top-level discriminating enum that wraps the three phone↔watch message types.
+//  Top-level discriminating enum that wraps the phone↔watch message types.
 //  WCSession-level transport encodes/decodes this enum; receivers pattern-match
 //  to dispatch to their type-specific handlers.
 //
@@ -24,6 +24,14 @@ public enum PhoneWatchMessage: Codable, Equatable {
     /// sequences are ignored on receipt (the receiver compares against
     /// the highest-seen sequence).
     case algorithmStateSnapshotPointer(sequence: UInt64)
+    /// B.11.0: each device publishes its own APNs device token to the
+    /// counterpart on `didRegisterForRemoteNotifications`. Receiver
+    /// persists the counterpart's token to App Group (see
+    /// `APNsTokenStore` for the storage layer). Symmetric: phone sends
+    /// `role: .phone`, watch sends `role: .watch`. Required by B.11.0
+    /// for the driver-owns-network path; B.11.0 itself does NOT
+    /// integrate Nightscout — that is B.11.1/B.11.2.
+    case apnsTokenPublish(APNsTokenPublication)
 
     // MARK: Codable (manual implementation — Swift's automatic enum Codable
     // uses a structure we want to pin explicitly for transport stability).
@@ -40,6 +48,7 @@ public enum PhoneWatchMessage: Codable, Equatable {
         case settingsSync
         case algorithmStateSnapshot
         case algorithmStateSnapshotPointer
+        case apnsTokenPublish
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -63,6 +72,9 @@ public enum PhoneWatchMessage: Codable, Equatable {
         case .algorithmStateSnapshotPointer(let sequence):
             try container.encode(Kind.algorithmStateSnapshotPointer, forKey: .kind)
             try container.encode(sequence, forKey: .payload)
+        case .apnsTokenPublish(let pub):
+            try container.encode(Kind.apnsTokenPublish, forKey: .kind)
+            try container.encode(pub, forKey: .payload)
         }
     }
 
@@ -82,6 +94,8 @@ public enum PhoneWatchMessage: Codable, Equatable {
             self = .algorithmStateSnapshot(try container.decode(AlgorithmStateSnapshot.self, forKey: .payload))
         case .algorithmStateSnapshotPointer:
             self = .algorithmStateSnapshotPointer(sequence: try container.decode(UInt64.self, forKey: .payload))
+        case .apnsTokenPublish:
+            self = .apnsTokenPublish(try container.decode(APNsTokenPublication.self, forKey: .payload))
         }
     }
 }

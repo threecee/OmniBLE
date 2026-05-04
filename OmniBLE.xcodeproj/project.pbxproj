@@ -111,6 +111,10 @@
 		A9A5BCF7276C1E7000B02C86 /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054DB27655F9C00FAFEFB /* KeyExchangeTests.swift */; };
 		B60BB2E62BC6E74100D2BB39 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60BB2E52BC6E74000D2BB39 /* Bundle.swift */; };
 		B2C0E00000000000020 /* PhoneWatchProtocolVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */; };
+		B11A00000000000101 /* APNsTokenPublication.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000001 /* APNsTokenPublication.swift */; };
+		B11A00000000000202 /* APNsTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000002 /* APNsTokenStore.swift */; };
+		B11A00000000000303 /* APNsTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000003 /* APNsTokenStoreTests.swift */; };
+		B11A00000000000404 /* PhoneWatchTransportQueueing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000004 /* PhoneWatchTransportQueueing.swift */; };
 		B2C0E00000000000021 /* PhoneWatchHeartbeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */; };
 		B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */; };
 		B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */; };
@@ -436,6 +440,10 @@
 		A9D349312764F5D30037F77C /* PayloadJoinerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadJoinerTest.swift; sourceTree = "<group>"; };
 		B60BB2E52BC6E74000D2BB39 /* Bundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
 		B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchProtocolVersion.swift; sourceTree = "<group>"; };
+		B11A00000000000001 /* APNsTokenPublication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenPublication.swift; sourceTree = "<group>"; };
+		B11A00000000000002 /* APNsTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenStore.swift; sourceTree = "<group>"; };
+		B11A00000000000003 /* APNsTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenStoreTests.swift; sourceTree = "<group>"; };
+		B11A00000000000004 /* PhoneWatchTransportQueueing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransportQueueing.swift; sourceTree = "<group>"; };
 		B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchHeartbeat.swift; sourceTree = "<group>"; };
 		B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchModeSwitch.swift; sourceTree = "<group>"; };
 		B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchPairingHandoff.swift; sourceTree = "<group>"; };
@@ -754,6 +762,7 @@
 				C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */,
 				B2C0E00000000000010 /* PhoneWatchMessageTests.swift */,
 				B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */,
+				B11A00000000000003 /* APNsTokenStoreTests.swift */,
 				WB2D000000000000009 /* HandoffSettingsTests.swift */,
 				WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */,
 				WB2D00000000000000B /* HandoffStateMachineTests.swift */,
@@ -915,6 +924,9 @@
 				B60BB2E52BC6E74000D2BB39 /* Bundle.swift */,
 				C1F67EDD2797AFF10017487F /* Image.swift */,
 				B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */,
+				B11A00000000000001 /* APNsTokenPublication.swift */,
+				B11A00000000000002 /* APNsTokenStore.swift */,
+				B11A00000000000004 /* PhoneWatchTransportQueueing.swift */,
 				B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */,
 				B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */,
 				B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */,
@@ -1449,6 +1461,9 @@
 				C1F67EBA27975EB70017487F /* FrameworkLocalText.swift in Sources */,
 				B60BB2E62BC6E74100D2BB39 /* Bundle.swift in Sources */,
 				B2C0E00000000000020 /* PhoneWatchProtocolVersion.swift in Sources */,
+				B11A00000000000101 /* APNsTokenPublication.swift in Sources */,
+				B11A00000000000202 /* APNsTokenStore.swift in Sources */,
+				B11A00000000000404 /* PhoneWatchTransportQueueing.swift in Sources */,
 				B2C0E00000000000021 /* PhoneWatchHeartbeat.swift in Sources */,
 				B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */,
 				B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */,
@@ -1529,6 +1544,7 @@
 				C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */,
 				B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */,
 				B2C0E00000000000031 /* PhoneWatchSettingsSyncTests.swift in Sources */,
+				B11A00000000000303 /* APNsTokenStoreTests.swift in Sources */,
 				WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */,
 				WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */,
 				WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */,

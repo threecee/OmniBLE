@@ -114,7 +114,7 @@ public struct HandoffTransitionRecord: Equatable, Codable {
     }
 }
 
-public enum HandoffRole: String, Equatable {
+public enum HandoffRole: String, Codable, Equatable {
     case phone
     case watch
 

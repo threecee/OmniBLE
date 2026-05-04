@@ -301,6 +301,12 @@ public final class HandoffOrchestrator: ObservableObject {
             // edge before the transport decodes; the orchestrator never
             // sees pointers. No-op to keep the switch exhaustive.
             break
+        case .apnsTokenPublish:
+            // B.11.0: APNs token routing is owned by PhoneWatchSessionCoordinator
+            // (cache update via closure injection into APNsTokenStore). The
+            // orchestrator has nothing to do here on either side. No-op to keep
+            // the switch exhaustive.
+            break
         }
     }
 

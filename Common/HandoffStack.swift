@@ -79,6 +79,7 @@ public final class HandoffStack {
         settingsSyncProvider: (() -> PhoneWatchSettingsSync?)? = nil,
         onSettingsSyncReceived: ((PhoneWatchSettingsSync) -> Void)? = nil,
         onSnapshotReceived: ((AlgorithmStateSnapshot) -> Void)? = nil,
+        onAPNsTokenPublishReceived: ((APNsTokenPublication) -> Void)? = nil,
         makeWatchSidePumpManager: (() -> OmniBLEPumpManager)? = nil
     ) -> HandoffStack {
         // 1. Transport — leaf; depends only on WCSession.
@@ -89,7 +90,8 @@ public final class HandoffStack {
             role: role,
             transport: transport,
             onSettingsSyncReceived: onSettingsSyncReceived,
-            onSnapshotReceived: onSnapshotReceived
+            onSnapshotReceived: onSnapshotReceived,
+            onAPNsTokenPublishReceived: onAPNsTokenPublishReceived
         )
 
         // 3. State machine — depends only on UserDefaults for persistence.

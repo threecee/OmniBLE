@@ -30,7 +30,7 @@ public protocol PhoneWatchTransport: AnyObject {
     var onIncomingMessage: ((PhoneWatchMessage) -> Void)? { get set }
 }
 
-public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
+public final class WCSessionPhoneWatchTransport: PhoneWatchTransport, PhoneWatchTransportQueueing {
     public var onIncomingMessage: ((PhoneWatchMessage) -> Void)?
 
     private let role: HandoffRole

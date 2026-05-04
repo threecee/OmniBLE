@@ -21,12 +21,12 @@ final class PhoneWatchMessageTests: XCTestCase {
 
     // MARK: - Protocol version
 
-    func testCurrentVersionIsSix() {
-        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 6,
-                       "B.8.4 bumped the protocol version from 5 to 6 to signal " +
-                       "the addition of the algorithmStateSnapshotPointer(sequence:) " +
-                       "wire-format case used for the file-pointer fallback when " +
-                       "the snapshot payload exceeds the applicationContext budget.")
+    func testCurrentVersionIsSeven() {
+        XCTAssertEqual(PhoneWatchProtocol.currentVersion, 7,
+                       "B.11.0 bumped the protocol version from 6 to 7 to signal " +
+                       "the addition of the apnsTokenPublish(APNsTokenPublication) " +
+                       "wire-format case used for the symmetric APNs-token rendezvous. " +
+                       "Old receivers throw on the new apnsTokenPublish Kind raw value.")
     }
 
     // MARK: - Heartbeat
@@ -127,12 +127,13 @@ final class PhoneWatchMessageTests: XCTestCase {
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 3))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 4))
         XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 5))
-        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 6),
-                      "Current version (6) must accept itself.")
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 6))
+        XCTAssertTrue(PhoneWatchProtocol.shouldAccept(incomingVersion: 7),
+                      "Current version (7) must accept itself.")
     }
 
     func testRejectsHigherProtocolVersion() {
-        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 7))
+        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 8))
         XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 99))
     }
 
@@ -208,5 +209,44 @@ extension PhoneWatchMessageTests {
         } else {
             XCTFail("Expected algorithmStateSnapshotPointer case, got \(decoded)")
         }
+    }
+
+    // MARK: - B.11.0 apnsTokenPublish
+
+    /// Encoding and decoding an APNsTokenPublication preserves all fields.
+    func testAPNsTokenPublication_codable_roundTrip() throws {
+        let original = APNsTokenPublication(
+            protocolVersion: 7,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            role: .watch,
+            token: Data([0x0a, 0x0b, 0x0c, 0xde, 0xad, 0xbe, 0xef]),
+            expiresAt: Date(timeIntervalSince1970: 1_700_000_000 + 60 * 60 * 24 * 30)
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(APNsTokenPublication.self, from: data)
+        XCTAssertEqual(decoded, original)
+    }
+
+    /// Wrapping an APNsTokenPublication in PhoneWatchMessage round-trips.
+    func testWrappedAPNsTokenPublishRoundTrip() throws {
+        let pub = APNsTokenPublication(
+            protocolVersion: 7,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_100),
+            role: .phone,
+            token: Data([0x01, 0x02, 0x03, 0x04]),
+            expiresAt: Date(timeIntervalSince1970: 1_700_000_100 + 60 * 60 * 24 * 30)
+        )
+        let original = PhoneWatchMessage.apnsTokenPublish(pub)
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(PhoneWatchMessage.self, from: data)
+        XCTAssertEqual(decoded, original)
+    }
+
+    /// A receiver at protocol version 7 rejects an apnsTokenPublish at v8.
+    /// (Wire-level version-mismatch sanity test using the published struct
+    /// shape; the inbound coordinator branch in B.11.0 Phase 5 will perform
+    /// the equivalent runtime check.)
+    func testAPNsTokenPublication_versionMismatch_isRejected() {
+        XCTAssertFalse(PhoneWatchProtocol.shouldAccept(incomingVersion: 8))
     }
 }

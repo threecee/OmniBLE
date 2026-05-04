@@ -79,6 +79,12 @@ public final class PhoneWatchSessionCoordinator: ObservableObject {
     /// In production wired to `WatchAlgorithmSnapshotCache.shared.update(_:)`.
     private let onSnapshotReceived: ((AlgorithmStateSnapshot) -> Void)?
 
+    /// B.11.0: inbound APNs-token publication. Both sides install this
+    /// to write the counterpart's token slot to APNsTokenStore. Wired
+    /// in HandoffStack.assemble. Optional only because tests can
+    /// short-circuit observation; production always installs it.
+    private let onAPNsTokenPublishReceived: ((APNsTokenPublication) -> Void)?
+
     /// log channel for split-brain detection.
     private let log = OSLog(category: "PhoneWatchSessionCoordinator")
 
@@ -106,13 +112,15 @@ public final class PhoneWatchSessionCoordinator: ObservableObject {
                 appBuildNumber: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?",
                 clock: @escaping () -> Date = Date.init,
                 onSettingsSyncReceived: ((PhoneWatchSettingsSync) -> Void)? = nil,
-                onSnapshotReceived: ((AlgorithmStateSnapshot) -> Void)? = nil) {
+                onSnapshotReceived: ((AlgorithmStateSnapshot) -> Void)? = nil,
+                onAPNsTokenPublishReceived: ((APNsTokenPublication) -> Void)? = nil) {
         self.role = role
         self.transport = transport
         self.appBuildNumber = appBuildNumber
         self.clock = clock
         self.onSettingsSyncReceived = onSettingsSyncReceived
         self.onSnapshotReceived = onSnapshotReceived
+        self.onAPNsTokenPublishReceived = onAPNsTokenPublishReceived
     }
 
     public func start() {
@@ -259,6 +267,21 @@ public final class PhoneWatchSessionCoordinator: ObservableObject {
             if role == .watch {
                 log.error("unexpected algorithmStateSnapshotPointer at coordinator — pointer should have been re-wrapped at ExtensionDelegate")
             }
+        case .apnsTokenPublish(let pub):
+            // B.11.0: each side persists the counterpart's token under its
+            // role-keyed slot in APNsTokenStore. Self-published tokens are
+            // already persisted at the registration callsite (Phase 4); the
+            // inbound branch only writes when the publication's role differs
+            // from the local role.
+            guard PhoneWatchProtocol.shouldAccept(incomingVersion: pub.protocolVersion) else { return }
+            guard pub.role != role else {
+                log.error("ignoring apnsTokenPublish from counterpart that claims our own role (%{public}@) — wire-format violation",
+                          pub.role.rawValue)
+                return
+            }
+            log.default("received apnsTokenPublish role=%{public}@ token=%d bytes expiresAt=%{public}@",
+                        pub.role.rawValue, pub.token.count, String(describing: pub.expiresAt))
+            onAPNsTokenPublishReceived?(pub)
         }
     }
 }
