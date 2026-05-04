@@ -68,6 +68,7 @@
 		10389A3F26FF7841002115E9 /* CRC16.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10389A2026FF7841002115E9 /* CRC16.swift */; };
 		10389A4126FF7841002115E9 /* MessageTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10389A2226FF7841002115E9 /* MessageTransport.swift */; };
 		196A6F232AFFFD1700E3C089 /* SilencePodPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196A6F222AFFFD1200E3C089 /* SilencePodPreference.swift */; };
+		1D3026DCF195BEF8CAAC7C29 /* RemoteCareUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */; };
 		2742C7052AD875B100E67833 /* SlideButton in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2742C7042AD875B100E67833 /* SlideButton */; };
 		84752E9326ED0FFE009FD801 /* OmniBLE.h in Headers */ = {isa = PBXBuildFile; fileRef = 84752E8526ED0FFE009FD801 /* OmniBLE.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		84752ED626ED13F5009FD801 /* Id.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752EBF26ED13F5009FD801 /* Id.swift */; };
@@ -85,12 +86,8 @@
 		84752EE726ED13F5009FD801 /* PairResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752ED426ED13F5009FD801 /* PairResult.swift */; };
 		84752EE826ED13F5009FD801 /* PairMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84752ED526ED13F5009FD801 /* PairMessage.swift */; };
 		8475306E26ED15DE009FD801 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8475306D26ED15DE009FD801 /* CryptoSwift */; };
-		T1CBM0000000000001 /* CoreBluetoothMock in Frameworks (OmniBLE) */ = {isa = PBXBuildFile; productRef = T1CBM0000000000003 /* CoreBluetoothMock */; };
 		847530F626ED65DD009FD801 /* LoopKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F426ED65DD009FD801 /* LoopKit.framework */; };
 		847530F826ED65DD009FD801 /* LoopKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847530F526ED65DD009FD801 /* LoopKitUI.framework */; platformFilter = ios; };
-		B6F2000000000001 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000004 /* WatchAlgorithmKit.framework */; };
-		B6F2000000000002 /* LoopAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000005 /* LoopAlgorithmCore.framework */; };
-		B6F2000000000003 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000006 /* LoopCore.framework */; };
 		8475315326EDA193009FD801 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314626EDA193009FD801 /* TimeInterval.swift */; };
 		8475315726EDA193009FD801 /* LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314A26EDA193009FD801 /* LocalizedString.swift */; };
 		8475315826EDA193009FD801 /* OSLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8475314B26EDA193009FD801 /* OSLog.swift */; };
@@ -109,27 +106,6 @@
 		A9A5BCF5276C1E6D00B02C86 /* PayloadSplitJoinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054D627651D4F00FAFEFB /* PayloadSplitJoinTests.swift */; };
 		A9A5BCF6276C1E6D00B02C86 /* MessagePacketTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054CC2764FDB700FAFEFB /* MessagePacketTests.swift */; };
 		A9A5BCF7276C1E7000B02C86 /* KeyExchangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D054DB27655F9C00FAFEFB /* KeyExchangeTests.swift */; };
-		B60BB2E62BC6E74100D2BB39 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60BB2E52BC6E74000D2BB39 /* Bundle.swift */; };
-		B2C0E00000000000020 /* PhoneWatchProtocolVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */; };
-		B11A00000000000101 /* APNsTokenPublication.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000001 /* APNsTokenPublication.swift */; };
-		B11A00000000000202 /* APNsTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000002 /* APNsTokenStore.swift */; };
-		B11A00000000000303 /* APNsTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000003 /* APNsTokenStoreTests.swift */; };
-		B11A00000000000404 /* PhoneWatchTransportQueueing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000004 /* PhoneWatchTransportQueueing.swift */; };
-		B2C0E00000000000021 /* PhoneWatchHeartbeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */; };
-		B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */; };
-		B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */; };
-		B2C0E00000000000024 /* PhoneWatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000005 /* PhoneWatchMessage.swift */; };
-		B2C0E00000000000025 /* PhoneWatchSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */; };
-		B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000010 /* PhoneWatchMessageTests.swift */; };
-		B2C0E00000000000031 /* PhoneWatchSettingsSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */; };
-		WB2D000000000000011 /* HandoffOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000001 /* HandoffOwner.swift */; };
-		WB2D000000000000012 /* HandoffMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000002 /* HandoffMode.swift */; };
-		WB2D000000000000013 /* HandoffSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000003 /* HandoffSettings.swift */; };
-		WB2D000000000000014 /* OmniBLEHandoffPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000004 /* OmniBLEHandoffPayload.swift */; };
-		WB2D000000000000015 /* HandoffState.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000005 /* HandoffState.swift */; };
-		WB2D000000000000016 /* HandoffEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000006 /* HandoffEvent.swift */; };
-		WB2D000000000000017 /* HandoffSideEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000007 /* HandoffSideEffect.swift */; };
-		WB2D000000000000018 /* HandoffStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000008 /* HandoffStateMachine.swift */; };
 		B10A00000000000101 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10A00000000000001 /* ShadowStateScheduler.swift */; };
 		B10B00000000000101 /* PhoneWatchTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10B00000000000001 /* PhoneWatchTransport.swift */; };
 		B10C00000000000101 /* PhoneWatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10C00000000000001 /* PhoneWatchSessionCoordinator.swift */; };
@@ -138,26 +114,35 @@
 		B10E00000000000101 /* HandoffOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10E00000000000001 /* HandoffOrchestrator.swift */; };
 		B10F00000000000101 /* HandoffStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10F00000000000001 /* HandoffStack.swift */; };
 		B10G00000000000101 /* HandoffStackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10G00000000000001 /* HandoffStackTests.swift */; };
-		B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000001 /* HandoffStatePersistence.swift */; };
-		B5C0000000000000102 /* HandoffStatePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000002 /* HandoffStatePersistenceTests.swift */; };
-		WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000009 /* HandoffSettingsTests.swift */; };
-		WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */; };
-		WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000B /* HandoffStateMachineTests.swift */; };
-		WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000C /* OmniBLEOwnership.swift */; };
-		WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000D /* MockOmniBLEPumpManager.swift */; };
-		WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000E /* OmniBLEOwnershipTests.swift */; };
-		WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */; };
+		B11A00000000000101 /* APNsTokenPublication.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000001 /* APNsTokenPublication.swift */; };
+		B11A00000000000202 /* APNsTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000002 /* APNsTokenStore.swift */; };
+		B11A00000000000303 /* APNsTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000003 /* APNsTokenStoreTests.swift */; };
+		B11A00000000000404 /* PhoneWatchTransportQueueing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000004 /* PhoneWatchTransportQueueing.swift */; };
+		B2C0E00000000000020 /* PhoneWatchProtocolVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */; };
+		B2C0E00000000000021 /* PhoneWatchHeartbeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */; };
+		B2C0E00000000000022 /* PhoneWatchModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */; };
+		B2C0E00000000000023 /* PhoneWatchPairingHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */; };
+		B2C0E00000000000024 /* PhoneWatchMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000005 /* PhoneWatchMessage.swift */; };
+		B2C0E00000000000025 /* PhoneWatchSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */; };
+		B2C0E00000000000030 /* PhoneWatchMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000010 /* PhoneWatchMessageTests.swift */; };
+		B2C0E00000000000031 /* PhoneWatchSettingsSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */; };
 		B3A800000000000101 /* PodHandoffSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000001 /* PodHandoffSafetyTests.swift */; };
 		B3A800000000000102 /* B3aRemoteCommandIntegrationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */; };
+		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
+		B5C0000000000000101 /* HandoffStatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000001 /* HandoffStatePersistence.swift */; };
+		B5C0000000000000102 /* HandoffStatePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0000000000000002 /* HandoffStatePersistenceTests.swift */; };
+		B60BB2E62BC6E74100D2BB39 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60BB2E52BC6E74000D2BB39 /* Bundle.swift */; };
+		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
+		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
+		B6F2000000000001 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000004 /* WatchAlgorithmKit.framework */; };
+		B6F2000000000002 /* LoopAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000005 /* LoopAlgorithmCore.framework */; };
+		B6F2000000000003 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F2000000000006 /* LoopCore.framework */; };
 		B6F2000000000010 /* WatchAlgorithmEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */; };
 		B8000000000000102 /* AlgorithmStateSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000002 /* AlgorithmStateSnapshotTests.swift */; };
 		B8000000000000103 /* PumpStatusSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000003 /* PumpStatusSnapshot.swift */; };
 		B8000000000000104 /* AlgorithmStateSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8000000000000004 /* AlgorithmStateSnapshot.swift */; };
 		B81100000000000101 /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81100000000000001 /* UserDefaults+Codable.swift */; };
 		B81100000000000102 /* UserDefaultsCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81100000000000002 /* UserDefaultsCodableTests.swift */; };
-		B3A800000000000103 /* MockNightscoutHTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A800000000000003 /* MockNightscoutHTTPServer.swift */; };
-		B66D1F912E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F902E6A89E400471149 /* Localizable.xcstrings */; };
-		B66D1F932E6A89E400471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F922E6A89E400471149 /* Localizable.xcstrings */; };
 		C10D6D6C27A2393800F53D58 /* OmniBLETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */; };
 		C10D6D6E27A2395700F53D58 /* OmniBLEPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10D6D6D27A2395700F53D58 /* OmniBLEPlugin.swift */; };
 		C187C191278FCEC9006E3557 /* InsulinTypeConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187C190278FCEC9006E3557 /* InsulinTypeConfirmation.swift */; };
@@ -273,10 +258,7 @@
 		D8C72C042A50D95200268D82 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10389A1D26FF7841002115E9 /* Message.swift */; };
 		D8C72C052A50D96800268D82 /* Pod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325327185EE4007A3BC2 /* Pod.swift */; };
 		D8C72C062A50D97500268D82 /* PodProgressStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1016325627185EE4007A3BC2 /* PodProgressStatus.swift */; };
-		WA7C4006000000000000001 /* ReservoirLevelHighlightState.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */; };
-		T1PS000000000000002 /* MessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000001 /* MessageType.swift */; };
-		T1PS000000000000004 /* PodSimulatorBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000003 /* PodSimulatorBridgeTests.swift */; };
-		T1PS000000000000006 /* PodSimulatorBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000005 /* PodSimulatorBridge.swift */; };
+		T1CBM0000000000001 /* CoreBluetoothMock in Frameworks */ = {isa = PBXBuildFile; productRef = T1CBM0000000000003 /* CoreBluetoothMock */; };
 		T1P4000000000000001 /* CBMSpikeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000002 /* CBMSpikeTests.swift */; };
 		T1P4000000000000003 /* DashServiceUUIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000004 /* DashServiceUUIDs.swift */; };
 		T1P4000000000000005 /* MockOmnipodPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P4000000000000006 /* MockOmnipodPeripheral.swift */; };
@@ -292,6 +274,25 @@
 		T1P700000000000005 /* PodAlertsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000006 /* PodAlertsTests.swift */; };
 		T1P700000000000007 /* PodDeactivationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P700000000000008 /* PodDeactivationTests.swift */; };
 		T1P800000000000001 /* PodHandoffEncryptedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1P800000000000002 /* PodHandoffEncryptedTests.swift */; };
+		T1PS000000000000002 /* MessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000001 /* MessageType.swift */; };
+		T1PS000000000000004 /* PodSimulatorBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000003 /* PodSimulatorBridgeTests.swift */; };
+		T1PS000000000000006 /* PodSimulatorBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1PS000000000000005 /* PodSimulatorBridge.swift */; };
+		WA7C4006000000000000001 /* ReservoirLevelHighlightState.swift in Sources */ = {isa = PBXBuildFile; fileRef = WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */; };
+		WB2D000000000000011 /* HandoffOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000001 /* HandoffOwner.swift */; };
+		WB2D000000000000012 /* HandoffMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000002 /* HandoffMode.swift */; };
+		WB2D000000000000013 /* HandoffSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000003 /* HandoffSettings.swift */; };
+		WB2D000000000000014 /* OmniBLEHandoffPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000004 /* OmniBLEHandoffPayload.swift */; };
+		WB2D000000000000015 /* HandoffState.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000005 /* HandoffState.swift */; };
+		WB2D000000000000016 /* HandoffEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000006 /* HandoffEvent.swift */; };
+		WB2D000000000000017 /* HandoffSideEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000007 /* HandoffSideEffect.swift */; };
+		WB2D000000000000018 /* HandoffStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000008 /* HandoffStateMachine.swift */; };
+		WB2D000000000000019 /* HandoffSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000000009 /* HandoffSettingsTests.swift */; };
+		WB2D00000000000001A /* OmniBLEHandoffPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */; };
+		WB2D00000000000001B /* HandoffStateMachineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000B /* HandoffStateMachineTests.swift */; };
+		WB2D00000000000001C /* OmniBLEOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000C /* OmniBLEOwnership.swift */; };
+		WB2D00000000000001D /* MockOmniBLEPumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000D /* MockOmniBLEPumpManager.swift */; };
+		WB2D00000000000001E /* OmniBLEOwnershipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000E /* OmniBLEOwnershipTests.swift */; };
+		WB2D00000000000001F /* HandoffRoundTripIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -363,7 +364,6 @@
 		10289E802739F8E4000339E6 /* SessionKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionKeys.swift; sourceTree = "<group>"; };
 		10289E822739F917000339E6 /* SessionEstablisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionEstablisher.swift; sourceTree = "<group>"; };
 		1029AE4627094D0E00B7F5B6 /* OmniBLEPumpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLEPumpManager.swift; sourceTree = "<group>"; };
-		WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservoirLevelHighlightState.swift; sourceTree = "<group>"; };
 		1029AE4727094D0E00B7F5B6 /* OmniBLEPumpManagerState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLEPumpManagerState.swift; sourceTree = "<group>"; };
 		1029AE4A27094DDC00B7F5B6 /* OmniBLEPumpManager+UI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "OmniBLEPumpManager+UI.swift"; sourceTree = "<group>"; };
 		1029AE4E27094E1900B7F5B6 /* OmniBLEUI.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = OmniBLEUI.xcassets; sourceTree = "<group>"; };
@@ -396,6 +396,7 @@
 		10389A2026FF7841002115E9 /* CRC16.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		10389A2226FF7841002115E9 /* MessageTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTransport.swift; sourceTree = "<group>"; };
 		196A6F222AFFFD1200E3C089 /* SilencePodPreference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SilencePodPreference.swift; sourceTree = "<group>"; };
+		7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteCareUploader.swift; sourceTree = "<group>"; };
 		84752E8226ED0FFE009FD801 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		84752E8526ED0FFE009FD801 /* OmniBLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OmniBLE.h; sourceTree = "<group>"; };
 		84752E8626ED0FFE009FD801 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -417,9 +418,6 @@
 		84752ED526ED13F5009FD801 /* PairMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairMessage.swift; sourceTree = "<group>"; };
 		847530F426ED65DD009FD801 /* LoopKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		847530F526ED65DD009FD801 /* LoopKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B6F2000000000004 /* WatchAlgorithmKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = WatchAlgorithmKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B6F2000000000005 /* LoopAlgorithmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopAlgorithmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B6F2000000000006 /* LoopCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8475314626EDA193009FD801 /* TimeInterval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
 		8475314A26EDA193009FD801 /* LocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalizedString.swift; sourceTree = "<group>"; };
 		8475314B26EDA193009FD801 /* OSLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OSLog.swift; sourceTree = "<group>"; };
@@ -438,27 +436,6 @@
 		A9D054DB27655F9C00FAFEFB /* KeyExchangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyExchangeTests.swift; sourceTree = "<group>"; };
 		A9D3492F2764F5780037F77C /* EnDecryptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnDecryptTests.swift; sourceTree = "<group>"; };
 		A9D349312764F5D30037F77C /* PayloadJoinerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadJoinerTest.swift; sourceTree = "<group>"; };
-		B60BB2E52BC6E74000D2BB39 /* Bundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
-		B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchProtocolVersion.swift; sourceTree = "<group>"; };
-		B11A00000000000001 /* APNsTokenPublication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenPublication.swift; sourceTree = "<group>"; };
-		B11A00000000000002 /* APNsTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenStore.swift; sourceTree = "<group>"; };
-		B11A00000000000003 /* APNsTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenStoreTests.swift; sourceTree = "<group>"; };
-		B11A00000000000004 /* PhoneWatchTransportQueueing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransportQueueing.swift; sourceTree = "<group>"; };
-		B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchHeartbeat.swift; sourceTree = "<group>"; };
-		B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchModeSwitch.swift; sourceTree = "<group>"; };
-		B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchPairingHandoff.swift; sourceTree = "<group>"; };
-		B2C0E00000000000005 /* PhoneWatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessage.swift; sourceTree = "<group>"; };
-		B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSettingsSync.swift; sourceTree = "<group>"; };
-		B2C0E00000000000010 /* PhoneWatchMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessageTests.swift; sourceTree = "<group>"; };
-		B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSettingsSyncTests.swift; sourceTree = "<group>"; };
-		WB2D000000000000001 /* HandoffOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOwner.swift; sourceTree = "<group>"; };
-		WB2D000000000000002 /* HandoffMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffMode.swift; sourceTree = "<group>"; };
-		WB2D000000000000003 /* HandoffSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettings.swift; sourceTree = "<group>"; };
-		WB2D000000000000004 /* OmniBLEHandoffPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEHandoffPayload.swift; sourceTree = "<group>"; };
-		WB2D000000000000005 /* HandoffState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffState.swift; sourceTree = "<group>"; };
-		WB2D000000000000006 /* HandoffEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffEvent.swift; sourceTree = "<group>"; };
-		WB2D000000000000007 /* HandoffSideEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSideEffect.swift; sourceTree = "<group>"; };
-		WB2D000000000000008 /* HandoffStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachine.swift; sourceTree = "<group>"; };
 		B10A00000000000001 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateScheduler.swift; sourceTree = "<group>"; };
 		B10B00000000000001 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransport.swift; sourceTree = "<group>"; };
 		B10C00000000000001 /* PhoneWatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSessionCoordinator.swift; sourceTree = "<group>"; };
@@ -467,26 +444,35 @@
 		B10E00000000000001 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOrchestrator.swift; sourceTree = "<group>"; };
 		B10F00000000000001 /* HandoffStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStack.swift; sourceTree = "<group>"; };
 		B10G00000000000001 /* HandoffStackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStackTests.swift; sourceTree = "<group>"; };
-		B5C0000000000000001 /* HandoffStatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistence.swift; sourceTree = "<group>"; };
-		B5C0000000000000002 /* HandoffStatePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistenceTests.swift; sourceTree = "<group>"; };
-		WB2D000000000000009 /* HandoffSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettingsTests.swift; sourceTree = "<group>"; };
-		WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEHandoffPayloadTests.swift; sourceTree = "<group>"; };
-		WB2D00000000000000B /* HandoffStateMachineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachineTests.swift; sourceTree = "<group>"; };
-		WB2D00000000000000C /* OmniBLEOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnership.swift; sourceTree = "<group>"; };
-		WB2D00000000000000D /* MockOmniBLEPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOmniBLEPumpManager.swift; sourceTree = "<group>"; };
-		WB2D00000000000000E /* OmniBLEOwnershipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnershipTests.swift; sourceTree = "<group>"; };
-		WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffRoundTripIntegrationTests.swift; sourceTree = "<group>"; };
+		B11A00000000000001 /* APNsTokenPublication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenPublication.swift; sourceTree = "<group>"; };
+		B11A00000000000002 /* APNsTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenStore.swift; sourceTree = "<group>"; };
+		B11A00000000000003 /* APNsTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsTokenStoreTests.swift; sourceTree = "<group>"; };
+		B11A00000000000004 /* PhoneWatchTransportQueueing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransportQueueing.swift; sourceTree = "<group>"; };
+		B2C0E00000000000001 /* PhoneWatchProtocolVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchProtocolVersion.swift; sourceTree = "<group>"; };
+		B2C0E00000000000002 /* PhoneWatchHeartbeat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchHeartbeat.swift; sourceTree = "<group>"; };
+		B2C0E00000000000003 /* PhoneWatchModeSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchModeSwitch.swift; sourceTree = "<group>"; };
+		B2C0E00000000000004 /* PhoneWatchPairingHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchPairingHandoff.swift; sourceTree = "<group>"; };
+		B2C0E00000000000005 /* PhoneWatchMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessage.swift; sourceTree = "<group>"; };
+		B2C0E00000000000006 /* PhoneWatchSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSettingsSync.swift; sourceTree = "<group>"; };
+		B2C0E00000000000010 /* PhoneWatchMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchMessageTests.swift; sourceTree = "<group>"; };
+		B2C0E00000000000011 /* PhoneWatchSettingsSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSettingsSyncTests.swift; sourceTree = "<group>"; };
 		B3A800000000000001 /* PodHandoffSafetyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodHandoffSafetyTests.swift; sourceTree = "<group>"; };
 		B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = B3aRemoteCommandIntegrationTest.swift; sourceTree = "<group>"; };
+		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
+		B5C0000000000000001 /* HandoffStatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistence.swift; sourceTree = "<group>"; };
+		B5C0000000000000002 /* HandoffStatePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStatePersistenceTests.swift; sourceTree = "<group>"; };
+		B60BB2E52BC6E74000D2BB39 /* Bundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
+		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		B6F2000000000004 /* WatchAlgorithmKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = WatchAlgorithmKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6F2000000000005 /* LoopAlgorithmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopAlgorithmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6F2000000000006 /* LoopCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmEndToEndTests.swift; sourceTree = "<group>"; };
 		B8000000000000002 /* AlgorithmStateSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotTests.swift; sourceTree = "<group>"; };
 		B8000000000000003 /* PumpStatusSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpStatusSnapshot.swift; sourceTree = "<group>"; };
 		B8000000000000004 /* AlgorithmStateSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshot.swift; sourceTree = "<group>"; };
 		B81100000000000001 /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		B81100000000000002 /* UserDefaultsCodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsCodableTests.swift; sourceTree = "<group>"; };
-		B3A800000000000003 /* MockNightscoutHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNightscoutHTTPServer.swift; sourceTree = "<group>"; };
-		B66D1F902E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		B66D1F922E6A89E400471149 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C10D6D6B27A2393800F53D58 /* OmniBLETests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLETests.swift; sourceTree = "<group>"; };
 		C10D6D6D27A2395700F53D58 /* OmniBLEPlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OmniBLEPlugin.swift; sourceTree = "<group>"; };
 		C187C190278FCEC9006E3557 /* InsulinTypeConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinTypeConfirmation.swift; sourceTree = "<group>"; };
@@ -564,9 +550,6 @@
 		D897B06C29347EE500FDB009 /* InsulinTableEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsulinTableEntry.swift; sourceTree = "<group>"; };
 		D8C72BD92A50D7D700268D82 /* OmniBLEParser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OmniBLEParser; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8C72BDB2A50D7D700268D82 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		T1PS000000000000001 /* MessageType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageType.swift; sourceTree = "<group>"; };
-		T1PS000000000000003 /* PodSimulatorBridgeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorBridgeTests.swift; sourceTree = "<group>"; };
-		T1PS000000000000005 /* PodSimulatorBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorBridge.swift; sourceTree = "<group>"; };
 		T1P4000000000000002 /* CBMSpikeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CBMSpikeTests.swift; sourceTree = "<group>"; };
 		T1P4000000000000004 /* DashServiceUUIDs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashServiceUUIDs.swift; sourceTree = "<group>"; };
 		T1P4000000000000006 /* MockOmnipodPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockOmnipodPeripheral.swift; sourceTree = "<group>"; };
@@ -582,6 +565,25 @@
 		T1P700000000000006 /* PodAlertsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodAlertsTests.swift; sourceTree = "<group>"; };
 		T1P700000000000008 /* PodDeactivationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodDeactivationTests.swift; sourceTree = "<group>"; };
 		T1P800000000000002 /* PodHandoffEncryptedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodHandoffEncryptedTests.swift; sourceTree = "<group>"; };
+		T1PS000000000000001 /* MessageType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageType.swift; sourceTree = "<group>"; };
+		T1PS000000000000003 /* PodSimulatorBridgeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorBridgeTests.swift; sourceTree = "<group>"; };
+		T1PS000000000000005 /* PodSimulatorBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodSimulatorBridge.swift; sourceTree = "<group>"; };
+		WA7C4006000000000000003 /* ReservoirLevelHighlightState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservoirLevelHighlightState.swift; sourceTree = "<group>"; };
+		WB2D000000000000001 /* HandoffOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOwner.swift; sourceTree = "<group>"; };
+		WB2D000000000000002 /* HandoffMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffMode.swift; sourceTree = "<group>"; };
+		WB2D000000000000003 /* HandoffSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettings.swift; sourceTree = "<group>"; };
+		WB2D000000000000004 /* OmniBLEHandoffPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEHandoffPayload.swift; sourceTree = "<group>"; };
+		WB2D000000000000005 /* HandoffState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffState.swift; sourceTree = "<group>"; };
+		WB2D000000000000006 /* HandoffEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffEvent.swift; sourceTree = "<group>"; };
+		WB2D000000000000007 /* HandoffSideEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSideEffect.swift; sourceTree = "<group>"; };
+		WB2D000000000000008 /* HandoffStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachine.swift; sourceTree = "<group>"; };
+		WB2D000000000000009 /* HandoffSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffSettingsTests.swift; sourceTree = "<group>"; };
+		WB2D00000000000000A /* OmniBLEHandoffPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEHandoffPayloadTests.swift; sourceTree = "<group>"; };
+		WB2D00000000000000B /* HandoffStateMachineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffStateMachineTests.swift; sourceTree = "<group>"; };
+		WB2D00000000000000C /* OmniBLEOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnership.swift; sourceTree = "<group>"; };
+		WB2D00000000000000D /* MockOmniBLEPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOmniBLEPumpManager.swift; sourceTree = "<group>"; };
+		WB2D00000000000000E /* OmniBLEOwnershipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniBLEOwnershipTests.swift; sourceTree = "<group>"; };
+		WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffRoundTripIntegrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -593,7 +595,7 @@
 				847530F626ED65DD009FD801 /* LoopKit.framework in Frameworks */,
 				8475306E26ED15DE009FD801 /* CryptoSwift in Frameworks */,
 				847530F826ED65DD009FD801 /* LoopKitUI.framework in Frameworks */,
-				T1CBM0000000000001 /* CoreBluetoothMock in Frameworks (OmniBLE) */,
+				T1CBM0000000000001 /* CoreBluetoothMock in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -773,8 +775,6 @@
 				WB2D00000000000000F /* HandoffRoundTripIntegrationTests.swift */,
 				B8000000000000002 /* AlgorithmStateSnapshotTests.swift */,
 				B81100000000000002 /* UserDefaultsCodableTests.swift */,
-				B3A800000000000010 /* Integration */,
-				B3A800000000000011 /* PodSimulator */,
 				D802CD0427DD98C10072E3A1 /* PodCommsSessionTests.swift */,
 				D802CD0127DD98C10072E3A1 /* PodInfoTests.swift */,
 				D802CD0227DD98C10072E3A1 /* PodStateTests.swift */,
@@ -788,43 +788,6 @@
 			path = OmniBLETests;
 			sourceTree = "<group>";
 		};
-		T1PS000000000000007 /* PodSimulator */ = {
-			isa = PBXGroup;
-			children = (
-				T1PS000000000000001 /* MessageType.swift */,
-				T1PS000000000000005 /* PodSimulatorBridge.swift */,
-				T1PS000000000000003 /* PodSimulatorBridgeTests.swift */,
-				T1P4000000000000002 /* CBMSpikeTests.swift */,
-				T1P4000000000000004 /* DashServiceUUIDs.swift */,
-				T1P4000000000000006 /* MockOmnipodPeripheral.swift */,
-				T1P4000000000000008 /* PodSimulatorTestCase.swift */,
-				T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */,
-				T1P600000000000006 /* MockPumpManagerDelegate.swift */,
-				B3A800000000000003 /* MockNightscoutHTTPServer.swift */,
-			);
-			path = PodSimulator;
-			sourceTree = "<group>";
-		};
-		T1P400000000000000B /* Integration */ = {
-			isa = PBXGroup;
-			children = (
-				T1P400000000000000A /* PodConnectionTests.swift */,
-				T1P500000000000000C /* PodActivationTests.swift */,
-				T1P600000000000002 /* PodStatusTests.swift */,
-				T1P600000000000004 /* PodBolusTests.swift */,
-				T1P700000000000002 /* PodBasalTests.swift */,
-				T1P700000000000004 /* PodSuspendResumeTests.swift */,
-				T1P700000000000006 /* PodAlertsTests.swift */,
-				T1P700000000000008 /* PodDeactivationTests.swift */,
-				T1P800000000000002 /* PodHandoffEncryptedTests.swift */,
-				B3A800000000000001 /* PodHandoffSafetyTests.swift */,
-				B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */,
-				B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */,
-			);
-			path = Integration;
-			sourceTree = "<group>";
-		};
-
 		84752E9C26ED10A0009FD801 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -952,6 +915,7 @@
 				B8000000000000003 /* PumpStatusSnapshot.swift */,
 				B8000000000000004 /* AlgorithmStateSnapshot.swift */,
 				B81100000000000001 /* UserDefaults+Codable.swift */,
+				7FFD3B1B78F8BFC354E47291 /* RemoteCareUploader.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1114,6 +1078,42 @@
 			path = OmniBLEParser;
 			sourceTree = "<group>";
 		};
+		T1P400000000000000B /* Integration */ = {
+			isa = PBXGroup;
+			children = (
+				T1P400000000000000A /* PodConnectionTests.swift */,
+				T1P500000000000000C /* PodActivationTests.swift */,
+				T1P600000000000002 /* PodStatusTests.swift */,
+				T1P600000000000004 /* PodBolusTests.swift */,
+				T1P700000000000002 /* PodBasalTests.swift */,
+				T1P700000000000004 /* PodSuspendResumeTests.swift */,
+				T1P700000000000006 /* PodAlertsTests.swift */,
+				T1P700000000000008 /* PodDeactivationTests.swift */,
+				T1P800000000000002 /* PodHandoffEncryptedTests.swift */,
+				B3A800000000000001 /* PodHandoffSafetyTests.swift */,
+				B3A800000000000002 /* B3aRemoteCommandIntegrationTest.swift */,
+				B6F2000000000011 /* WatchAlgorithmEndToEndTests.swift */,
+			);
+			path = Integration;
+			sourceTree = "<group>";
+		};
+		T1PS000000000000007 /* PodSimulator */ = {
+			isa = PBXGroup;
+			children = (
+				T1PS000000000000001 /* MessageType.swift */,
+				T1PS000000000000005 /* PodSimulatorBridge.swift */,
+				T1PS000000000000003 /* PodSimulatorBridgeTests.swift */,
+				T1P4000000000000002 /* CBMSpikeTests.swift */,
+				T1P4000000000000004 /* DashServiceUUIDs.swift */,
+				T1P4000000000000006 /* MockOmnipodPeripheral.swift */,
+				T1P4000000000000008 /* PodSimulatorTestCase.swift */,
+				T1P5B0000000000002 /* QueueBouncingCentralDelegate.swift */,
+				T1P600000000000006 /* MockPumpManagerDelegate.swift */,
+				B3A800000000000003 /* MockNightscoutHTTPServer.swift */,
+			);
+			path = PodSimulator;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1174,8 +1174,6 @@
 				84752E8E26ED0FFE009FD801 /* PBXTargetDependency */,
 			);
 			name = OmniBLETests;
-			packageProductDependencies = (
-			);
 			productName = OmniBLETests;
 			productReference = 84752E8B26ED0FFE009FD801 /* OmniBLETests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1529,6 +1527,7 @@
 				C1F67E9F27975B830017487F /* SetupCompleteView.swift in Sources */,
 				C1F67EE227985F580017487F /* ReservoirLevel.swift in Sources */,
 				D845A1372AF89F5500EA0853 /* ActivityView.swift in Sources */,
+				1D3026DCF195BEF8CAAC7C29 /* RemoteCareUploader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2133,13 +2132,13 @@
 			};
 		};
 		T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */ = {
-				isa = XCRemoteSwiftPackageReference;
-				repositoryURL = "https://github.com/NordicSemiconductor/IOS-CoreBluetooth-Mock.git";
-				requirement = {
-					kind = upToNextMajorVersion;
-					minimumVersion = 0.18.0;
-				};
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/NordicSemiconductor/IOS-CoreBluetooth-Mock.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.18.0;
 			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2153,11 +2152,11 @@
 			package = 8475306C26ED15DE009FD801 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
-		T1CBM0000000000003 /* CoreBluetoothMock (OmniBLE) */ = {
-				isa = XCSwiftPackageProductDependency;
-				package = T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */;
-				productName = CoreBluetoothMock;
-			};
+		T1CBM0000000000003 /* CoreBluetoothMock */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = T1CBM0000000000005 /* XCRemoteSwiftPackageReference "IOS-CoreBluetooth-Mock" */;
+			productName = CoreBluetoothMock;
+		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 84752E7926ED0FFE009FD801 /* Project object */;
